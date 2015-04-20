@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:c="http://www.springframework.org/schema/c" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
+     default-lazy-init="true">
+
+	<context:property-placeholder location="classpath*:redis.properties" ignore-unresolvable="true" />
+			
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxActive" value="${redis.maxActive:50}" />
+		<property name="maxIdle" value="${redis.maxIdle:10}" />
+		<property name="maxWait" value="${redis.maxWait:1000}" />
+		<property name="testOnBorrow" value="${redis.testOnBorrow:true}" />
+	</bean>
+	
+	<bean id="jedisPool" class="redis.clients.jedis.JedisPool" >
+		<constructor-arg ref="jedisPoolConfig" />
+		<constructor-arg value="${redis.host}" />
+		<constructor-arg value="${redis.port}" />
+		<constructor-arg value="5000" />
+		<constructor-arg ><null/></constructor-arg>
+		<constructor-arg value="13" />
+	</bean>
+
+	<!-- declare Redis Cache Manager -->
+	<bean id="cacheManager2" class="com.appleframework.cache.redis.RedisCacheManager">
+		<property name="jedisPool" ref="jedisPool" />
+	</bean>
+
+</beans>
