@@ -37,7 +37,7 @@ public class RedisCacheManager implements CacheManager {
 		Jedis jedis = jedisPool.getResource();
 		try {
 			 byte[] value = jedis.get(key.getBytes());
-	         return SerializeUtility. unserialize(value);
+	         return SerializeUtility.unserialize(value);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
