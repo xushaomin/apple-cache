@@ -4,14 +4,14 @@
 
 	<groupId>com.appleframework.cache</groupId>
 	<artifactId>apple-cache</artifactId>
-	<version>0.0.1.RELEASE</version>
+	<version>0.0.2.RELEASE</version>
 	<packaging>pom</packaging>
 
 	<name>apple-cache</name>
 	<url>http://mvnrepo.appleframework.com</url>
 
 	<properties>
-		<project.version>0.0.1.RELEASE</project.version>
+		<project.version>0.0.2.RELEASE</project.version>
 		<java.version>1.6</java.version>
 		<log4j.version>1.2.16</log4j.version>
 		<spring.version>4.0.5.RELEASE</spring.version>
@@ -72,6 +72,12 @@
 				<scope>test</scope>
 			</dependency>
 			
+			<dependency>
+				<groupId>com.hazelcast</groupId>
+				<artifactId>hazelcast</artifactId>
+				<version>3.4.2</version>
+			</dependency>
+			
 		</dependencies>
 	</dependencyManagement>
 	
@@ -79,7 +85,8 @@
 		<module>apple-cache-core</module>
 		<module>apple-cache-redis</module>
 		<module>apple-cache-memcache</module>
-  	</modules>
+    	<module>apple-cache-hazelcast</module>
+	</modules>
 	
 	<build>
 		<plugins>
