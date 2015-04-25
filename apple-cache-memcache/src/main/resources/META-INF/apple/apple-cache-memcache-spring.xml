@@ -9,8 +9,6 @@
         http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
 	default-lazy-init="true">
 
-	<context:property-placeholder location="classpath*:memcache.properties" ignore-unresolvable="true" />
-
 	<!-- 开启缓存 -->
 	<cache:annotation-driven cache-manager="cacheManager" proxy-target-class="true" />
 	
