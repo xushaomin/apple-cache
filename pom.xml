@@ -15,6 +15,7 @@
 		<java.version>1.6</java.version>
 		<log4j.version>1.2.16</log4j.version>
 		<spring.version>4.0.5.RELEASE</spring.version>
+		<hazelcast.version>3.4.2</hazelcast.version>
 	</properties>
 
 
@@ -75,7 +76,13 @@
 			<dependency>
 				<groupId>com.hazelcast</groupId>
 				<artifactId>hazelcast</artifactId>
-				<version>3.4.2</version>
+				<version>${hazelcast.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.hazelcast</groupId>
+				<artifactId>hazelcast-spring</artifactId>
+				<version>${hazelcast.version}</version>
 			</dependency>
 			
 		</dependencies>
