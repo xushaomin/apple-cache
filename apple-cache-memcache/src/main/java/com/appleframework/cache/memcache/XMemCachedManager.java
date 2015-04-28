@@ -58,6 +58,22 @@ public class XMemCachedManager implements CacheManager {
 			throw new CacheException(e.getMessage());
 		}
 	}
+	
+	@Override
+	public <T> T get(String key, Class<T> clazz) throws CacheException {
+		try {
+			return memcachedClient.get(key);
+		} catch (TimeoutException e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
+		} catch (InterruptedException e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
+		} catch (MemcachedException e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
+		}
+	}
 
 	public boolean remove(String key) throws CacheException {
 		try {
