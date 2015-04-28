@@ -7,6 +7,9 @@ public interface CacheManager {
 
 	// 获取缓存
 	public Object get(String key) throws CacheException;
+	
+	// 获取缓存
+	public <T> T get(String key, Class<T> clazz) throws CacheException;
 
 	// 清除指定的缓存
 	public boolean remove(String key) throws CacheException;
