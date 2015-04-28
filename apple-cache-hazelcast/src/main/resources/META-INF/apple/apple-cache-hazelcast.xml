@@ -14,7 +14,7 @@
 
 	<hz:hazelcast id="hazelcastInstance">
 		<hz:config>
-			<hz:group name="dev" password="password" />
+			<hz:group name="${hazelcast.config.group.name:dev}" password="hazelcast.config.group.password:password" />
 			<hz:properties>
 				<hz:property name="hazelcast.logging.type">log4j</hz:property>
 			</hz:properties>
@@ -28,5 +28,9 @@
 			</hz:network>
 		</hz:config>
 	</hz:hazelcast>
+	
+	<bean id="cacheManager2" class="com.appleframework.cache.hazelcast.HazelcastCacheManager">
+        <property name="hazelcastInstance" ref="hazelcastInstance"/>
+    </bean>
 
 </beans>
