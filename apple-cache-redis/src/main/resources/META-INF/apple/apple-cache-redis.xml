@@ -11,21 +11,19 @@
         http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
      default-lazy-init="true">
 
-	<context:property-placeholder location="classpath*:redis.properties" ignore-unresolvable="true" />
-			
+	<context:property-placeholder location="classpath*:redis.properties" ignore-unresolvable="true" />	
+	
 	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
-		<!-- 
-		<property name="maxActive" value="${redis.maxActive:50}" />
-		<property name="maxIdle" value="${redis.maxIdle:10}" />
-		<property name="maxWait" value="${redis.maxWait:1000}" />
-		<property name="testOnBorrow" value="${redis.testOnBorrow:true}" /> -->
+		<property name="maxTotal" value="${redis.maxTotal:24}" />
+		<property name="maxIdle" value="${redis.maxIdle:24}" />
+		<property name="minIdle" value="${redis.minIdle:0}" />
 	</bean>
 	
 	<bean id="jedisPool" class="redis.clients.jedis.JedisPool" >
 		<constructor-arg ref="jedisPoolConfig" />
-		<constructor-arg value="${redis.host}" />
-		<constructor-arg value="${redis.port}" />
-		<constructor-arg value="5000" />
+		<constructor-arg value="${redis.host:127.0.0.1}" />
+		<constructor-arg value="${redis.port:6379}" />
+		<constructor-arg value="${redis.timeout:5000}" />
 		<constructor-arg ><null/></constructor-arg>
 		<constructor-arg value="${redis.database:0}" />
 	</bean>
