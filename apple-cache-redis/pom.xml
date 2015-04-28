@@ -6,13 +6,25 @@
 	<parent>
 		<artifactId>apple-cache</artifactId>
 		<groupId>com.appleframework.cache</groupId>
-		<version>0.0.2.RELEASE</version>
+		<version>0.0.3.RELEASE</version>
 	</parent>
 	<artifactId>apple-cache-redis</artifactId>
 	<name>apple-cache-redis</name>
 	<url>http://mvnrepo.appleframework.com</url>
 		
 	<dependencies>
+	
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>com.appleframework.cache</groupId>
@@ -42,6 +54,12 @@
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.1.42</version>
 		</dependency>
 
 	</dependencies>
