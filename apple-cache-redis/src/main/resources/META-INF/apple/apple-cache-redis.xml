@@ -14,10 +14,11 @@
 	<context:property-placeholder location="classpath*:redis.properties" ignore-unresolvable="true" />
 			
 	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<!-- 
 		<property name="maxActive" value="${redis.maxActive:50}" />
 		<property name="maxIdle" value="${redis.maxIdle:10}" />
 		<property name="maxWait" value="${redis.maxWait:1000}" />
-		<property name="testOnBorrow" value="${redis.testOnBorrow:true}" />
+		<property name="testOnBorrow" value="${redis.testOnBorrow:true}" /> -->
 	</bean>
 	
 	<bean id="jedisPool" class="redis.clients.jedis.JedisPool" >
@@ -26,12 +27,13 @@
 		<constructor-arg value="${redis.port}" />
 		<constructor-arg value="5000" />
 		<constructor-arg ><null/></constructor-arg>
-		<constructor-arg value="13" />
+		<constructor-arg value="${redis.database:0}" />
 	</bean>
 
 	<!-- declare Redis Cache Manager -->
 	<bean id="cacheManager2" class="com.appleframework.cache.redis.RedisCacheManager">
 		<property name="jedisPool" ref="jedisPool" />
+		<property name="serializeType" value="${redis.serializeType:1}" />
 	</bean>
 
 </beans>
