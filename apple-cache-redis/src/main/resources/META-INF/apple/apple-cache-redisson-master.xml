@@ -18,8 +18,11 @@
 		<property name="slaveAddressUris" value="${redis.slaveAddresses:127.0.0.1:6379}" />
 	</bean>
 	
+	<bean id="redissonCodec" class="org.redisson.codec.SerializationCodec" />
+	
 	<bean id="config" class="org.redisson.Config">
 		<property name="masterSlaveServersConfig" ref="masterSlaveServersConfig" />
+		<property name="codec" ref="redissonCodec" />
 	</bean>
 	
 	<bean id="redisson" class="org.redisson.Redisson" >
