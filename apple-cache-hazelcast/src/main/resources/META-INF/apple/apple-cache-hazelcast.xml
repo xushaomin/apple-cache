@@ -10,8 +10,6 @@
         	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
             http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd">
 
-	<context:property-placeholder location="classpath*:hazelcast.properties" ignore-unresolvable="true" />
-
 	<hz:hazelcast id="hazelcastInstance">
 		<hz:config>
 			<hz:group name="${hazelcast.config.group.name:dev}" password="hazelcast.config.group.password:password" />
@@ -29,7 +27,7 @@
 		</hz:config>
 	</hz:hazelcast>
 	
-	<bean id="cacheManager2" class="com.appleframework.cache.hazelcast.HazelcastCacheManager">
+	<bean id="cacheManager" class="com.appleframework.cache.hazelcast.HazelcastCacheManager">
         <property name="hazelcastInstance" ref="hazelcastInstance"/>
     </bean>
 
