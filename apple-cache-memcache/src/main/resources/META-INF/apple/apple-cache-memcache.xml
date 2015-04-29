@@ -12,8 +12,6 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<context:property-placeholder location="classpath*:memcache.properties" ignore-unresolvable="true" />
-
 	<bean name="memcachedClient"
 		class="com.appleframework.cache.memcache.MemcachedClientFactoryBean"
 		destroy-method="shutdown">
@@ -43,7 +41,7 @@
 		<property name="failureMode" value="false" />
 	</bean>
 	
-	<bean id="cacheManager2" class="com.appleframework.cache.memcache.XMemCachedManager" >
+	<bean id="cacheManager" class="com.appleframework.cache.memcache.XMemCachedManager" >
 		<property name="memcachedClient" ref="memcachedClient" />
 	</bean>
 
