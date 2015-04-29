@@ -11,10 +11,8 @@
         http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
      default-lazy-init="true">
 
-	<context:property-placeholder location="classpath*:redis.properties" ignore-unresolvable="true" />
-
 	<!-- turn on declarative caching -->
-	<cache:annotation-driven />
+	<cache:annotation-driven cache-manager="cacheManager2" />  
 
 	<!-- Jedis ConnectionFactory -->
 	<bean id="jedisConnectionFactory"
@@ -26,7 +24,7 @@
 		p:connection-factory-ref="jedisConnectionFactory" />
 
 	<!-- declare Redis Cache Manager -->
-	<bean id="cacheManager" class="org.springframework.data.redis.cache.RedisCacheManager"
+	<bean id="cacheManager2" class="org.springframework.data.redis.cache.RedisCacheManager"
 		c:template-ref="redisTemplate" />
 
 </beans>

@@ -10,8 +10,6 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
      default-lazy-init="true">
-
-	<context:property-placeholder location="classpath*:redisso.properties" ignore-unresolvable="true" />	
 		
 	<bean id="singleServerConfig" class="org.redisson.SingleServerConfig">
 		<property name="addressUri" value="${redis.addressUri:127.0.0.1:6379}" />

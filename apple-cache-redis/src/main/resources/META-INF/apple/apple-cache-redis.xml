@@ -10,8 +10,6 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
      default-lazy-init="true">
-
-	<context:property-placeholder location="classpath*:redis.properties" ignore-unresolvable="true" />	
 	
 	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
 		<property name="maxTotal" value="${redis.maxTotal:24}" />
@@ -29,7 +27,7 @@
 	</bean>
 
 	<!-- declare Redis Cache Manager -->
-	<bean id="cacheManager2" class="com.appleframework.cache.redis.RedisCacheManager">
+	<bean id="cacheManager" class="com.appleframework.cache.redis.RedisCacheManager">
 		<property name="jedisPool" ref="jedisPool" />
 		<property name="serializeType" value="${redis.serializeType:1}" />
 	</bean>
