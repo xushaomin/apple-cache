@@ -16,6 +16,7 @@ public class RedissonTest {
     public void testRedisson() {
         Config config = new Config();
         config.useSingleServer().setAddress("192.168.1.38:6379");
+        
 
         Redisson redisson = Redisson.create(config);
 
