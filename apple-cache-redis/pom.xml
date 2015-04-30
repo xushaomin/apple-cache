@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>apple-cache</artifactId>
 		<groupId>com.appleframework.cache</groupId>
-		<version>0.0.3.RELEASE</version>
+		<version>0.0.4.RELEASE</version>
 	</parent>
 	<artifactId>apple-cache-redis</artifactId>
 	<name>apple-cache-redis</name>
@@ -25,6 +25,11 @@
 			<artifactId>spring-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>com.appleframework.cache</groupId>
@@ -32,11 +37,13 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- 
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-redis</artifactId>
 			<version>1.5.0.RELEASE</version>
 		</dependency>
+		 -->
 		
 		<!-- required for @Configuration annotation -->
 		<dependency>
@@ -48,7 +55,7 @@
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
-			<version>2.7.0</version>
+			<version>2.7.2</version>
 		</dependency>
 		
 		<dependency>
