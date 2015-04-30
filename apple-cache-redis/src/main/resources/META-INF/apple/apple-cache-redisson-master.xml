@@ -23,7 +23,7 @@
 		<property name="codec" ref="redissonCodec" />
 	</bean>
 	
-	<bean id="redisson" class="org.redisson.Redisson" >
+	<bean id="redisson" class="org.redisson.Redisson" destroy-method="shutdown">
 		<constructor-arg ref="config" />
 	</bean>
 	
