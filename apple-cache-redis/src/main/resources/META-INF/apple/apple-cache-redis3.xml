@@ -10,21 +10,12 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
      default-lazy-init="true">
-
-	<!-- turn on declarative caching -->
-	<cache:annotation-driven cache-manager="cacheManager2" />  
-
-	<import resource="apple-cache-redisson-master.xml"/>
 	
-	<bean id="cacheManager2"
-		class="com.appleframework.cache.redis.spring.RedisCacheManager">
+	<import resource="apple-cache-redisson-master.xml"/>
+
+	<!-- declare Redis Cache Manager -->
+	<bean id="cacheManager3" class="com.appleframework.cache.redis.RedisCacheManager3">
 		<property name="redisson" ref="redisson" />
-		<!-- 配置缓存时间 -->
-		<property name="configMap">
-			<map>
-				<entry key="typeList" value="3600" />   <!-- key缓存对象名称 value缓存过期时间 -->
-			</map>
-		</property>
 	</bean>
 
 </beans>
