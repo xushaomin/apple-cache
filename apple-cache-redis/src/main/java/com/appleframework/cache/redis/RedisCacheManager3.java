@@ -79,5 +79,6 @@ public class RedisCacheManager3 implements CacheManager {
 	public void set(String key, Object obj, int expireTime) throws CacheException {
 		this.set(key, obj);
 	}
+	
 
 }

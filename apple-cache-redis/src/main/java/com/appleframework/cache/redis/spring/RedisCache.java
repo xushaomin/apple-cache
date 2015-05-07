@@ -35,7 +35,6 @@ public class RedisCache {
 	public Object get(String key) {
 		Object value = null;
 		try {
-			key = this.getKey(key);
 			value = getCacheMap().get(key);
 		} catch (Exception e) {
 			log.warn("»ñÈ¡ Cache »º´æ´íÎó", e);
@@ -47,7 +46,6 @@ public class RedisCache {
 		if (value == null)
 			return;
 		try {
-			key = this.getKey(key);
 			getCacheMap().put(key, value);
 			keySet.add(key);
 		} catch (Exception e) {
@@ -58,7 +56,7 @@ public class RedisCache {
 	public void clear() {
 		for (String key : keySet) {
 			try {
-				getCacheMap().remove(this.getKey(key));
+				getCacheMap().remove(key);
 			} catch (Exception e) {
 				log.warn("É¾³ý Cache »º´æ´íÎó", e);
 			}
@@ -67,15 +65,10 @@ public class RedisCache {
 
 	public void delete(String key) {
 		try {
-			key = this.getKey(key);
 			getCacheMap().remove(key);
 		} catch (Exception e) {
 			log.warn("É¾³ý Cache »º´æ´íÎó", e);
 		}
-	}
-
-	private String getKey(String key) {
-		return name + "_" + key;
 	}
 
 	public int getExpire() {
