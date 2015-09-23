@@ -67,4 +67,18 @@ public class MemcachedCache implements Cache {
 		return (T) value;
 	}
 
+	@Override
+	public ValueWrapper putIfAbsent(Object key, Object value) {
+		ValueWrapper wrapper = null;
+		Object objValue = this.memCache.get(key.toString());
+		if (objValue != null) {
+			wrapper = new SimpleValueWrapper(objValue);
+		}
+		else {
+			wrapper = new SimpleValueWrapper(value);
+			this.memCache.put(key.toString(), value);
+		}
+		return wrapper;
+	}
+	
 }

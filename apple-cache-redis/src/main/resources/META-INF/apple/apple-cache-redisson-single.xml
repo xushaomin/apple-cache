@@ -13,6 +13,7 @@
 		
 	<bean id="singleServerConfig" class="org.redisson.SingleServerConfig">
 		<property name="addressUri" value="${redis.addressUri:127.0.0.1:6379}" />
+		<property name="database" value="${redis.database:1}" />
 	</bean>
 	
 	<bean id="redissonCodec" class="org.redisson.codec.SerializationCodec" />

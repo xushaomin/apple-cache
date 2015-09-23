@@ -66,4 +66,20 @@ public class RedissonCache implements Cache {
 		return (T) value;
 	}
 
+	@Override
+	public ValueWrapper putIfAbsent(Object key, Object value) {
+		ValueWrapper wrapper = null;
+		Object objValue = this.redisCache.get(key.toString());
+		if (objValue != null) {
+			wrapper = new SimpleValueWrapper(objValue);
+		}
+		else {
+			wrapper = new SimpleValueWrapper(value);
+			this.redisCache.put(key.toString(), value);
+		}
+		return wrapper;
+	}
+	
+	
+
 }

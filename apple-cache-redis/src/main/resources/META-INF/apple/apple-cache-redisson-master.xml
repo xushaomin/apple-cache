@@ -14,6 +14,7 @@
 	<bean id="masterSlaveServersConfig" class="org.redisson.MasterSlaveServersConfig">
 		<property name="masterAddressUri" value="${redis.masterAddress:127.0.0.1:6379}" />
 		<property name="slaveAddressUris" value="${redis.slaveAddresses:127.0.0.1:6379}" />
+		<property name="database" value="${redis.database:1}" />
 	</bean>
 	
 	<bean id="redissonCodec" class="org.redisson.codec.SerializationCodec" />

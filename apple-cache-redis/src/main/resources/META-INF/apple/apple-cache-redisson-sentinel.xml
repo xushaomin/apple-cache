@@ -13,6 +13,7 @@
 		
 	<bean id="sentinelServersConfig" class="org.redisson.SentinelServersConfig">
 		<property name="sentinelAddressUris" value="${redis.sentinelAddressUris:127.0.0.1:6379}" />
+		<property name="database" value="${redis.database:1}" />
 	</bean>
 	
 	<bean id="redissonCodec" class="org.redisson.codec.SerializationCodec" />
