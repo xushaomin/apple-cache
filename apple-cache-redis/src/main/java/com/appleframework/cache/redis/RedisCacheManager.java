@@ -15,7 +15,7 @@ public class RedisCacheManager implements CacheManager {
 
 	private static Logger logger = Logger.getLogger(RedisCacheManager.class);
 	
-	private int serializeType = 1; //ĞòÁĞ»¯·½Ê½ 1=byte[] =2json
+	private int serializeType = 1; //åºåˆ—åŒ–æ–¹å¼ 1=byte[] =2json
 
 	private JedisPool jedisPool;
 
