@@ -11,7 +11,7 @@ import java.io.ObjectOutputStream;
  */
 public class SerializeUtility {
 	
-	// ĞòÁĞ»¯
+	// åºåˆ—åŒ–
 	public static byte[] serialize(Object object) {
 		ObjectOutputStream oos = null;
 		ByteArrayOutputStream baos = null;
@@ -26,7 +26,7 @@ public class SerializeUtility {
 		}
 	}
 
-	// ·´ĞòÁĞ»¯
+	// ååºåˆ—åŒ–
 	public static Object unserialize(byte[] bytes) {
 		ByteArrayInputStream bais = null;
 		try {
