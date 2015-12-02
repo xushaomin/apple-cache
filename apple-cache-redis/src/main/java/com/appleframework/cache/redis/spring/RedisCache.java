@@ -37,7 +37,7 @@ public class RedisCache {
 		try {
 			value = getCacheMap().get(key);
 		} catch (Exception e) {
-			log.warn("»ñÈ¡ Cache »º´æ´íÎó", e);
+			log.warn("è·å– Cache ç¼“å­˜é”™è¯¯", e);
 		}
 		return value;
 	}
@@ -49,7 +49,7 @@ public class RedisCache {
 			getCacheMap().put(key, value);
 			keySet.add(key);
 		} catch (Exception e) {
-			log.warn("¸üĞÂ Cache »º´æ´íÎó", e);
+			log.warn("æ›´æ–° Cache ç¼“å­˜é”™è¯¯", e);
 		}
 	}
 
@@ -58,7 +58,7 @@ public class RedisCache {
 			try {
 				getCacheMap().remove(key);
 			} catch (Exception e) {
-				log.warn("É¾³ı Cache »º´æ´íÎó", e);
+				log.warn("åˆ é™¤ Cache ç¼“å­˜é”™è¯¯", e);
 			}
 		}
 	}
@@ -67,7 +67,7 @@ public class RedisCache {
 		try {
 			getCacheMap().remove(key);
 		} catch (Exception e) {
-			log.warn("É¾³ı Cache »º´æ´íÎó", e);
+			log.warn("åˆ é™¤ Cache ç¼“å­˜é”™è¯¯", e);
 		}
 	}
 

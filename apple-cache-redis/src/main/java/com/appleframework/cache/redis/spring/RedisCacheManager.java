@@ -13,8 +13,8 @@ import org.springframework.cache.support.AbstractCacheManager;
 public class RedisCacheManager extends AbstractCacheManager {
 
 	private ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>();
-	private Map<String, Integer> expireMap = new HashMap<String, Integer>(); // »º´æµÄÊ±¼ä
-	private Redisson redisson; // redisµÄ¿Í»§¶Ë
+	private Map<String, Integer> expireMap = new HashMap<String, Integer>(); // ç¼“å­˜çš„æ—¶é—´
+	private Redisson redisson; // redisçš„å®¢æˆ·ç«¯
 
 	public RedisCacheManager() {
 	}
