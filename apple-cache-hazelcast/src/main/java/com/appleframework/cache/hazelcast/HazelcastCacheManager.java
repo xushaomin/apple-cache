@@ -11,7 +11,7 @@ import com.appleframework.cache.core.CacheManager;
 import com.hazelcast.core.HazelcastInstance;
 
 /**
- * @author xusm
+ * @author cruise.xu
  * 
  */
 public class HazelcastCacheManager implements CacheManager {
