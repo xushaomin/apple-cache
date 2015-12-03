@@ -12,7 +12,7 @@ import net.rubyeye.xmemcached.exception.MemcachedException;
 
 
 /**
- * @author xusm
+ * @author cruise.xu
  * 
  */
 public class XMemCachedManager implements CacheManager {
