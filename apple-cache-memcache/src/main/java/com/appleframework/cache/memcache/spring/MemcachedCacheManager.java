@@ -14,8 +14,8 @@ import org.springframework.cache.support.AbstractCacheManager;
 public class MemcachedCacheManager extends AbstractCacheManager {
 
 	private ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>();
-	private Map<String, Integer> expireMap = new HashMap<String, Integer>(); // »º´æµÄÊ±¼ä
-	private MemcachedClient memcachedClient; // xmemcachedµÄ¿Í»§¶Ë
+	private Map<String, Integer> expireMap = new HashMap<String, Integer>(); // ç¼“å­˜çš„æ—¶é—´
+	private MemcachedClient memcachedClient; // xmemcachedçš„å®¢æˆ·ç«¯
 
 	public MemcachedCacheManager() {
 	}

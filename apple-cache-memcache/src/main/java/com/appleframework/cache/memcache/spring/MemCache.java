@@ -36,11 +36,11 @@ public class MemCache {
 			key = this.getKey(key);
 			value = memcachedClient.get(key);
 		} catch (TimeoutException e) {
-			log.warn("»ñÈ¡ Memcached »º´æ³¬Ê±", e);
+			log.warn("è·å– Memcached ç¼“å­˜è¶…æ—¶", e);
 		} catch (InterruptedException e) {
-			log.warn("»ñÈ¡ Memcached »º´æ±»ÖĞ¶Ï", e);
+			log.warn("è·å– Memcached ç¼“å­˜è¢«ä¸­æ–­", e);
 		} catch (MemcachedException e) {
-			log.warn("»ñÈ¡ Memcached »º´æ´íÎó", e);
+			log.warn("è·å– Memcached ç¼“å­˜é”™è¯¯", e);
 		}
 		return value;
 	}
@@ -53,9 +53,9 @@ public class MemCache {
 			memcachedClient.setWithNoReply(key, expire, value);
 			keySet.add(key);
 		} catch (InterruptedException e) {
-			log.warn("¸üĞÂ Memcached »º´æ±»ÖĞ¶Ï", e);
+			log.warn("æ›´æ–° Memcached ç¼“å­˜è¢«ä¸­æ–­", e);
 		} catch (MemcachedException e) {
-			log.warn("¸üĞÂ Memcached »º´æ´íÎó", e);
+			log.warn("æ›´æ–° Memcached ç¼“å­˜é”™è¯¯", e);
 		}
 	}
 
@@ -64,9 +64,9 @@ public class MemCache {
 			try {
 				memcachedClient.deleteWithNoReply(this.getKey(key));
 			} catch (InterruptedException e) {
-				log.warn("É¾³ı Memcached »º´æ±»ÖĞ¶Ï", e);
+				log.warn("åˆ é™¤ Memcached ç¼“å­˜è¢«ä¸­æ–­", e);
 			} catch (MemcachedException e) {
-				log.warn("É¾³ı Memcached »º´æ´íÎó", e);
+				log.warn("åˆ é™¤ Memcached ç¼“å­˜é”™è¯¯", e);
 			}
 		}
 	}
@@ -76,9 +76,9 @@ public class MemCache {
 			key = this.getKey(key);
 			memcachedClient.deleteWithNoReply(key);
 		} catch (InterruptedException e) {
-			log.warn("É¾³ı Memcached »º´æ±»ÖĞ¶Ï", e);
+			log.warn("åˆ é™¤ Memcached ç¼“å­˜è¢«ä¸­æ–­", e);
 		} catch (MemcachedException e) {
-			log.warn("É¾³ı Memcached »º´æ´íÎó", e);
+			log.warn("åˆ é™¤ Memcached ç¼“å­˜é”™è¯¯", e);
 		}
 	}
 
