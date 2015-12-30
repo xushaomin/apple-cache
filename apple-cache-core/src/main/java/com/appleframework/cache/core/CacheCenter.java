@@ -1,14 +1,10 @@
 package com.appleframework.cache.core;
 
-import java.util.Map;
-
 /**
  * @author xusm
  */
 public interface CacheCenter {
 	
-	public Map<String, Object> getCacheMap(String name);
-
 	// 获取缓存
 	public Object get(String name, String key) throws CacheException;
 	
