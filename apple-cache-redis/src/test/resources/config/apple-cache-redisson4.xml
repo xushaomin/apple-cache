@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:c="http://www.springframework.org/schema/c" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
+     default-lazy-init="true">
+     
+	<bean id="redissonCodec" class="org.redisson.codec.SerializationCodec" />
+		
+	<!-- serversConfig -->
+	<bean id="readMasterSlaveServersConfig" class="org.redisson.MasterSlaveServersConfig">
+		<property name="masterAddressUri" value="192.168.1.214:6379" />
+		<property name="slaveAddressUris" value="192.168.1.214:6379" />
+		<property name="database" value="1" />
+	</bean>
+	
+	<bean id="writeMasterSlaveServersConfig1" class="org.redisson.MasterSlaveServersConfig">
+		<property name="masterAddressUri" value="192.168.1.230:6379" />
+		<property name="slaveAddressUris" value="192.168.1.230:6379" />
+		<property name="database" value="1" />
+	</bean>
+	
+	<bean id="writeMasterSlaveServersConfig2" class="org.redisson.MasterSlaveServersConfig">
+		<property name="masterAddressUri" value="192.168.1.214:6379" />
+		<property name="slaveAddressUris" value="192.168.1.214:6379" />
+		<property name="database" value="1" />
+	</bean>
+	
+	<!-- config -->
+	<bean id="readConfig" class="org.redisson.Config">
+		<property name="masterSlaveServersConfig" ref="readMasterSlaveServersConfig" />
+		<property name="codec" ref="redissonCodec" />
+	</bean>
+	
+	<bean id="writeConfig1" class="org.redisson.Config">
+		<property name="masterSlaveServersConfig" ref="writeMasterSlaveServersConfig1" />
+		<property name="codec" ref="redissonCodec" />
+	</bean>
+	
+	<bean id="writeConfig2" class="org.redisson.Config">
+		<property name="masterSlaveServersConfig" ref="writeMasterSlaveServersConfig2" />
+		<property name="codec" ref="redissonCodec" />
+	</bean>
+	
+	<!-- redisson -->
+	<bean id="readRedisson" class="org.redisson.Redisson" destroy-method="shutdown">
+		<constructor-arg ref="readConfig" />
+	</bean>
+	
+	<bean id="writeRedisson1" class="org.redisson.Redisson" destroy-method="shutdown">
+		<constructor-arg ref="writeConfig1" />
+	</bean>
+	
+	<bean id="writeRedisson2" class="org.redisson.Redisson" destroy-method="shutdown">
+		<constructor-arg ref="writeConfig2" />
+	</bean>
+	
+	<!-- manager -->
+	<bean id="cacheManager4" class="com.appleframework.cache.redis.RedisCacheManager4">
+		<property name="name" value="test" />
+        <property name="redRedissonList">
+            <list>
+                <ref bean="readRedisson" />
+            </list>
+        </property>
+        <property name="writeRedissonList">
+            <list>
+                <ref bean="writeRedisson1" />
+                <ref bean="writeRedisson2" />
+            </list>
+        </property>	
+	</bean>
+	
+</beans>
