@@ -1,6 +1,7 @@
 package com.appleframework.cache.redis.spring;
 
 import org.redisson.Redisson;
+import org.redisson.RedissonClient;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
 
@@ -9,7 +10,7 @@ public class RedissonCache implements Cache {
 	private final String name;
 	private final RedisCache redisCache;
 
-	public RedissonCache(String name, int expire, Redisson redisson) {
+	public RedissonCache(String name, int expire, RedissonClient redisson) {
 		this.name = name;
 		this.redisCache = new RedisCache(name, expire, redisson);
 	}

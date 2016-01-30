@@ -1,15 +1,15 @@
 package com.appleframework.cache.redis.id;
 
-import org.redisson.Redisson;
+import org.redisson.RedissonClient;
 import org.redisson.core.RAtomicLong;
 
 public class RedissonIdGenerator implements IdGenerator {
 
-	private Redisson redisson;
+	private RedissonClient redisson;
 
 	private int retryTimes = 3;
 
-	public long next(String tab) {
+	public synchronized long next(String tab) {
 		return next(tab, 0);
 	}
 
@@ -35,7 +35,7 @@ public class RedissonIdGenerator implements IdGenerator {
 		}
 	}
 
-	public void setRedisson(Redisson redisson) {
+	public void setRedisson(RedissonClient redisson) {
 		this.redisson = redisson;
 	}
 

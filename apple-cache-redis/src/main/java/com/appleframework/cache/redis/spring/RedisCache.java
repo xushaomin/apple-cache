@@ -1,32 +1,30 @@
 package com.appleframework.cache.redis.spring;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.redisson.Redisson;
+import org.redisson.RedissonClient;
+import org.redisson.core.RMapCache;
 
 public class RedisCache {
 
-	private static Logger log = Logger.getLogger(RedisCache.class);
+	private static Logger logger = Logger.getLogger(RedisCache.class);
 
-	private Set<String> keySet = new HashSet<String>();
 	private final String name;
 	private final int expire;
-	private final Redisson redisson;
+	private final RedissonClient redisson;
 	
-	public Map<String, Object> getCacheMap() {
-		return redisson.getMap(name);
+	public RMapCache<String, Object> getCacheMap() {
+		return redisson.getMapCache(name);
 	}
 
-	public RedisCache(String name, int expire, Redisson redisson) {
+	public RedisCache(String name, int expire, RedissonClient redisson) {
 		this.name = name;
 		this.expire = expire;
 		this.redisson = redisson;
 	}
 	
-	public RedisCache(String name, Redisson redisson) {
+	public RedisCache(String name, RedissonClient redisson) {
 		this.name = name;
 		this.expire = 0;
 		this.redisson = redisson;
@@ -37,7 +35,7 @@ public class RedisCache {
 		try {
 			value = getCacheMap().get(key);
 		} catch (Exception e) {
-			log.warn("获取 Cache 缓存错误", e);
+			logger.warn("获取 Cache 缓存错误", e);
 		}
 		return value;
 	}
@@ -46,20 +44,20 @@ public class RedisCache {
 		if (value == null)
 			return;
 		try {
-			getCacheMap().put(key, value);
-			keySet.add(key);
+			if(expire == 0)
+				getCacheMap().put(key, value);
+			else
+				getCacheMap().put(key, value, expire, TimeUnit.SECONDS);
 		} catch (Exception e) {
-			log.warn("更新 Cache 缓存错误", e);
+			logger.warn("更新 Cache 缓存错误", e);
 		}
 	}
 
 	public void clear() {
-		for (String key : keySet) {
-			try {
-				getCacheMap().remove(key);
-			} catch (Exception e) {
-				log.warn("删除 Cache 缓存错误", e);
-			}
+		try {
+			getCacheMap().clear();
+		} catch (Exception e) {
+			logger.warn("删除 Cache 缓存错误", e);
 		}
 	}
 
@@ -67,7 +65,7 @@ public class RedisCache {
 		try {
 			getCacheMap().remove(key);
 		} catch (Exception e) {
-			log.warn("删除 Cache 缓存错误", e);
+			logger.warn("删除 Cache 缓存错误", e);
 		}
 	}
 
