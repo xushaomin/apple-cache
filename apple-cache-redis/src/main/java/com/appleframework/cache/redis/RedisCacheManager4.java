@@ -39,31 +39,35 @@ public class RedisCacheManager4 implements CacheManager {
 			}
 		}
 	}
+	
+	private Redisson getRandomReadRedisson() {
+		if(redRedissonList.size() > 1) {
+			int i = (int) Math.round(Math.random() * 1000.0D) % this.redRedissonList.size();
+			return this.redRedissonList.get(i);
+		}
+		else {
+			return redRedissonList.get(0);
+		}
+	}
 
 	public Object get(String key) throws CacheException {
-		for (Redisson redisson : redRedissonList) {
-			try {
-				return redisson.getMap(name).get(key);
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-				continue;
-			}
+		try {
+			return this.getRandomReadRedisson().getMap(name).get(key);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
 		}
-		return null;
 	}
 
 	@SuppressWarnings({ "unchecked" })
 	@Override
 	public <T> T get(String key, Class<T> clazz) throws CacheException {
-		for (Redisson redisson : redRedissonList) {
-			try {
-				return (T)redisson.getMap(name).get(key);
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-				continue;
-			}
+		try {
+			return (T)this.getRandomReadRedisson().getMap(name).get(key);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
 		}
-		return null;
 	}
 
 	public boolean remove(String key) throws CacheException {
