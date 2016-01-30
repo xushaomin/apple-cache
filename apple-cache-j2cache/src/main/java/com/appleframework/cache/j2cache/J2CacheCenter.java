@@ -1,9 +1,10 @@
 package com.appleframework.cache.j2cache;
 
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.redisson.Redisson;
+import org.redisson.RedissonClient;
+import org.redisson.core.RMapCache;
 
 import com.appleframework.cache.core.CacheCenter;
 import com.appleframework.cache.core.CacheException;
@@ -12,14 +13,14 @@ public class J2CacheCenter implements CacheCenter {
 
 	private static Logger logger = Logger.getLogger(J2CacheCenter.class);
 		
-	private Redisson redisson;
+	private RedissonClient redisson;
 
-	public void setRedisson(Redisson redisson) {
+	public void setRedisson(RedissonClient redisson) {
 		this.redisson = redisson;
 	}
 
-	public Map<String, Object> getRedisCache(String name) {
-		return redisson.getMap(name);
+	public RMapCache<String, Object> getRedisCache(String name) {
+		return redisson.getMapCache(name);
 	}
 	
 
@@ -70,8 +71,14 @@ public class J2CacheCenter implements CacheCenter {
 		}
 	}
 
-	public void set(String name, String key, Object obj, int expireTime) throws CacheException {
-		this.set(name, key, obj);
+	public void set(String name, String key, Object value, int expireTime) throws CacheException {
+		if (null != value) {
+			try {
+				getRedisCache(name).put(key, value, expireTime, TimeUnit.SECONDS);
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+			}
+		}
 	}
 	
 }
