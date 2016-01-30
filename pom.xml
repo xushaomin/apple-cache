@@ -118,6 +118,7 @@
 		<module>apple-cache-redis</module>
 		<module>apple-cache-memcache</module>
     	<module>apple-cache-hazelcast</module>
+    	<module>apple-cache-j2cache</module>
 	</modules>
 	
 	<build>
