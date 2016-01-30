@@ -37,13 +37,10 @@ public class J2CacheManager implements com.appleframework.cache.core.CacheManage
 		topic = redisson.getTopic(Contants.TOPIC_PREFIX_KEY + name);
 		topic.addListener(new MessageListener<OperateObject>() {
 			
-		    public void onMessage(String channel, OperateObject message) {
-		    	
+		    public void onMessage(String channel, OperateObject message) {		    	
 		    	Object key = message.getKey();
 		    	Cache cache = getEhCache();
-		    	
 		    	if(null != cache) {
-			    	
 			    	if(message.getOperateType().equals(OperateType.PUT)) {
 			    		cache.remove(key);
 			    	}
