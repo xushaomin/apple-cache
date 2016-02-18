@@ -119,7 +119,7 @@ public class J2CacheManager implements com.appleframework.cache.core.CacheManage
 			if(null == element) {
 				value = (T)getRedisCache().get(key);
 				if(null != value)
-					getEhCache().putIfAbsent(new Element(key, value));
+					getEhCache().put(new Element(key, value));
 			}
 			else {
 				value = (T)element.getObjectValue();
