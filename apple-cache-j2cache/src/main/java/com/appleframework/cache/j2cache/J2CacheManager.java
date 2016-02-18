@@ -104,7 +104,6 @@ public class J2CacheManager implements com.appleframework.cache.core.CacheManage
 			}			
 			return value;
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
 		}
