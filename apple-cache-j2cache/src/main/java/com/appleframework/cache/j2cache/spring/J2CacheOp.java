@@ -26,7 +26,7 @@ public class J2CacheOp {
 	private RTopic<OperateObject> topic;
 	
 	public Map<String, Object> getRedisCache() {
-		return redisson.getMapCache(name);
+		return redisson.getMap(name);
 	}
 	
 	public Cache getEhCache() {
