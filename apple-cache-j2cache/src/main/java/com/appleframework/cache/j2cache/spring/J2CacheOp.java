@@ -33,7 +33,14 @@ public class J2CacheOp {
 	}
 	
 	public Cache getEhCache() {
-		return ehcacheManager.getCache(name);
+		Cache cache = ehcacheManager.getCache(name);
+		if(null == cache) {
+			ehcacheManager.addCache(name);
+			return ehcacheManager.getCache(name);
+		}
+		else {
+			return cache;
+		}
 	}
 
 	public J2CacheOp(String name, int expire, CacheManager ehcacheManager, RedissonClient redisson) {
