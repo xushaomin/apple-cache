@@ -1,8 +1,6 @@
 package com.appleframework.cache.j2cache.spring;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.redisson.RedissonClient;
@@ -21,7 +19,6 @@ public class J2CacheOp {
 
 	private static Logger logger = Logger.getLogger(J2CacheOp.class);
 
-	private Set<String> keySet = new HashSet<String>();
 	private String name;
 	private int expire;
 	private RedissonClient redisson;
@@ -29,7 +26,7 @@ public class J2CacheOp {
 	private RTopic<OperateObject> topic;
 	
 	public Map<String, Object> getRedisCache() {
-		return redisson.getMap(name);
+		return redisson.getMapCache(name);
 	}
 	
 	public Cache getEhCache() {
@@ -111,7 +108,6 @@ public class J2CacheOp {
 			return;
 		try {
 			getRedisCache().put(key, value);
-			keySet.add(key);
 			publish(key, OperateType.PUT);
 		} catch (Exception e) {
 			logger.warn("更新 Cache 缓存错误", e);
@@ -119,12 +115,10 @@ public class J2CacheOp {
 	}
 
 	public void clear() {
-		for (String key : keySet) {
-			try {
-				getRedisCache().remove(key);
-			} catch (Exception e) {
-				logger.warn("删除 Cache 缓存错误", e);
-			}
+		try {
+			getRedisCache().clear();
+		} catch (Exception e) {
+			logger.warn("删除 Cache 缓存错误", e);
 		}
 		publish(null, OperateType.CLEAR);
 	}
@@ -146,15 +140,10 @@ public class J2CacheOp {
 		OperateObject object = new OperateObject();
 		object.setKey(key);
 		object.setOperateType(operateType);
-		this.sendWithResson(object);
-	}
-	
-	private void sendWithResson(OperateObject object) {
 		try {
 			topic.publish(object);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
-	}
-	
+	}	
 }
