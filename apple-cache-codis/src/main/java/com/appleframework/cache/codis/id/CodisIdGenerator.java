@@ -25,7 +25,7 @@ public class CodisIdGenerator implements IdGenerator {
 	}
 
 	private Long innerNext(String tab, long shardId) {
-		Jedis jedis = getCodisResourcePool().getJedisResourcePool().getResource();
+		Jedis jedis = getCodisResourcePool().getResource();
 		long id = jedis.incr(tab);
 		if (id >= shardId) {
 			return id;

@@ -23,7 +23,7 @@ public class CodisCacheManager implements CacheManager {
 	}
 
 	public void clear() throws CacheException {
-		Jedis jedis = codisResourcePool.getJedisResourcePool().getResource();
+		Jedis jedis = codisResourcePool.getResource();
 		try {
 			jedis.flushDB();
 		} catch (Exception e) {
@@ -32,7 +32,7 @@ public class CodisCacheManager implements CacheManager {
 	}
 
 	public Object get(String key) throws CacheException {
-		Jedis jedis = codisResourcePool.getJedisResourcePool().getResource();
+		Jedis jedis = codisResourcePool.getResource();
 		try {
 			byte[] value = jedis.get(key.getBytes());
 	     	return SerializeUtility.unserialize(value);
@@ -45,7 +45,7 @@ public class CodisCacheManager implements CacheManager {
 	@SuppressWarnings({ "unchecked" })
 	@Override
 	public <T> T get(String key, Class<T> clazz) throws CacheException {
-		Jedis jedis = codisResourcePool.getJedisResourcePool().getResource();
+		Jedis jedis = codisResourcePool.getResource();
 		try {
 			byte[] value = jedis.get(key.getBytes());
 	     	return (T)SerializeUtility.unserialize(value);
@@ -56,7 +56,7 @@ public class CodisCacheManager implements CacheManager {
 	}
 
 	public boolean remove(String key) throws CacheException {
-		Jedis jedis = codisResourcePool.getJedisResourcePool().getResource();
+		Jedis jedis = codisResourcePool.getResource();
 		try {
 			return jedis.del(key.getBytes())>0;
 		} catch (Exception e) {
@@ -66,7 +66,7 @@ public class CodisCacheManager implements CacheManager {
 	}
 
 	public void set(String key, Object obj) throws CacheException {
-		Jedis jedis = codisResourcePool.getJedisResourcePool().getResource();
+		Jedis jedis = codisResourcePool.getResource();
 		if (null != obj) {
 			try {
 				String o = jedis.set(key.getBytes(), SerializeUtility.serialize(obj));
