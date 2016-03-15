@@ -19,7 +19,7 @@ public class RedisSpringTest4 {
 	@Test
 	public void testAddOpinion1() {
 		try {
-			for (int i = 0; i < 100; i++) {
+			for (int i = 1000; i < 2000; i++) {
 				cacheManager4.set("" + i, User.create("" + i, i));
 			}
 		} catch (Exception e) {
