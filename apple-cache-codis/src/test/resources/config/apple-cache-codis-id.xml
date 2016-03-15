@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:c="http://www.springframework.org/schema/c" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
+     default-lazy-init="true">
+
+	<bean id="codisResourcePool" class="com.appleframework.cache.codis.CodisResourcePool" init-method="init">
+		<property name="zkAddr" value="192.168.1.182:2181,192.168.1.183:2181,192.168.1.184:2181" />
+		<property name="zkProxyDir" value="/zk/codis/db_jiuzhi/proxy" />
+	</bean>
+	
+	<bean id="idGenerator" class="com.appleframework.cache.codis.id.CodisIdGenerator">
+		<property name="codisResourcePool" ref="codisResourcePool" />
+	</bean>
+
+</beans>
