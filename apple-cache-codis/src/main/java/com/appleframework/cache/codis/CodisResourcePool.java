@@ -2,6 +2,7 @@ package com.appleframework.cache.codis;
 
 import io.codis.jodis.JedisResourcePool;
 import io.codis.jodis.RoundRobinJedisPool;
+import redis.clients.jedis.Jedis;
 
 /**
  * @author cruise.xu
@@ -50,6 +51,10 @@ public class CodisResourcePool {
 
 	public JedisResourcePool getJedisResourcePool() {
 		return jedisResourcePool;
+	}
+	
+	public Jedis getResource() {
+		return jedisResourcePool.getResource();
 	}
 	
 }
