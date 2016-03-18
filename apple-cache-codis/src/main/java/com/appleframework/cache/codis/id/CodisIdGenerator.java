@@ -27,11 +27,11 @@ public class CodisIdGenerator implements IdGenerator {
 	private Long innerNext(String tab, long shardId) {
 		Jedis jedis = getCodisResourcePool().getResource();
 		long id = jedis.incr(tab);
-		if (id >= shardId) {
-			return id;
-		} else {
-			return jedis.incrBy(tab, shardId);
+		if (id < shardId) {
+			id = jedis.incrBy(tab, shardId);
 		}
+		jedis.close();
+		return id;
 	}
 
 	public void setRetryTimes(int retryTimes) {
