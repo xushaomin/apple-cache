@@ -23,57 +23,37 @@ public class CodisCacheManager implements CacheManager {
 	}
 
 	public void clear() throws CacheException {
-		Jedis jedis = codisResourcePool.getResource();
-		try {
+		try (Jedis jedis = codisResourcePool.getResource()) {
 			jedis.flushDB();
-		} catch (Exception e) {
-			logger.error(e.getMessage());
 		}
 	}
 
-	public Object get(String key) throws CacheException {
-		Jedis jedis = codisResourcePool.getResource();
-		try {
+	public Object get(String key) throws CacheException {		
+		try (Jedis jedis = codisResourcePool.getResource()) {
 			byte[] value = jedis.get(key.getBytes());
 	     	return SerializeUtility.unserialize(value);
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			throw new CacheException(e.getMessage());
 		}
 	}
 
 	@SuppressWarnings({ "unchecked" })
 	@Override
 	public <T> T get(String key, Class<T> clazz) throws CacheException {
-		Jedis jedis = codisResourcePool.getResource();
-		try {
+		try (Jedis jedis = codisResourcePool.getResource()) {
 			byte[] value = jedis.get(key.getBytes());
 	     	return (T)SerializeUtility.unserialize(value);
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			throw new CacheException(e.getMessage());
 		}
 	}
 
 	public boolean remove(String key) throws CacheException {
-		Jedis jedis = codisResourcePool.getResource();
-		try {
+		try (Jedis jedis = codisResourcePool.getResource()) {
 			return jedis.del(key.getBytes())>0;
-		} catch (Exception e) {
-			logger.error(e.getMessage());
 		}
-		return false;
 	}
 
 	public void set(String key, Object obj) throws CacheException {
-		Jedis jedis = codisResourcePool.getResource();
-		if (null != obj) {
-			try {
-				String o = jedis.set(key.getBytes(), SerializeUtility.serialize(obj));
-				logger.info(o);
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-			}
+		try (Jedis jedis = codisResourcePool.getResource()) {
+			String o = jedis.set(key.getBytes(), SerializeUtility.serialize(obj));
+			logger.info(o);
 		}
 	}
 
