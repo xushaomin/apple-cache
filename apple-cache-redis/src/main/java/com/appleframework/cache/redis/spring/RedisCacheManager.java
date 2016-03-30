@@ -14,8 +14,8 @@ import org.springframework.cache.support.AbstractCacheManager;
 public class RedisCacheManager extends AbstractCacheManager {
 
 	private ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>();
-	private Map<String, Integer> expireMap = new HashMap<String, Integer>(); // 缓存的时间
-	private RedissonClient redisson; // redis的客户端
+	private Map<String, Integer> expireMap = new HashMap<String, Integer>();
+	private RedissonClient redisson;
 
 	public RedisCacheManager() {
 	}
