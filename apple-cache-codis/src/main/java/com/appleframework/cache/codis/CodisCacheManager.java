@@ -58,7 +58,11 @@ public class CodisCacheManager implements CacheManager {
 	}
 
 	public void set(String key, Object obj, int expireTime) throws CacheException {
-		this.set(key, obj);
+		try (Jedis jedis = codisResourcePool.getResource()) {
+			String o = jedis.set(key.getBytes(), SerializeUtility.serialize(obj));
+			jedis.expire(key.getBytes(), expireTime);
+			logger.info(o);
+		}
 	}
 
 }
