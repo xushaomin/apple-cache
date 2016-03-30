@@ -11,7 +11,6 @@ import java.io.ObjectOutputStream;
  */
 public class SerializeUtility {
 	
-	// 序列�?
 	public static byte[] serialize(Object object) {
 		ObjectOutputStream oos = null;
 		ByteArrayOutputStream baos = null;
@@ -26,7 +25,6 @@ public class SerializeUtility {
 		}
 	}
 
-	// 反序列化
 	public static Object unserialize(byte[] bytes) {
 		ByteArrayInputStream bais = null;
 		try {
