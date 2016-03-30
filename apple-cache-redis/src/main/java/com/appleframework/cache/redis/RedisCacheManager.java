@@ -89,8 +89,19 @@ public class RedisCacheManager implements CacheManager {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public void set(String key, Object obj, int expireTime) throws CacheException {
-		this.set(key, obj);
+		Jedis jedis = jedisPool.getResource();
+		if (null != obj) {
+			try {
+				jedis.set(key.getBytes(), SerializeUtility.serialize(obj));
+				jedis.expire(key.getBytes(), expireTime);
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+			} finally {
+				jedisPool.returnResource(jedis);
+			}
+		}
 	}
 
 }
