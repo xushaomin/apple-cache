@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.redisson.RedissonClient;
 import org.redisson.core.RBucket;
+import org.redisson.core.RKeys;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager;
@@ -25,6 +26,10 @@ public class RedisCacheManager2 implements CacheManager {
 
 	public void clear() throws CacheException {
 		try {
+			RKeys keys = redisson.getKeys();
+			for (String key : keys.getKeys()) {
+				getCache(key).delete();
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
