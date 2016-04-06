@@ -1,5 +1,7 @@
 package com.appleframework.cache.codis;
 
+import org.springframework.beans.factory.InitializingBean;
+
 import io.codis.jodis.JedisResourcePool;
 import io.codis.jodis.RoundRobinJedisPool;
 import redis.clients.jedis.Jedis;
@@ -8,7 +10,7 @@ import redis.clients.jedis.Jedis;
  * @author cruise.xu
  * 
  */
-public class CodisResourcePool {
+public class CodisResourcePool implements InitializingBean {
 	
 	private JedisResourcePool jedisResourcePool;
 		
@@ -56,5 +58,12 @@ public class CodisResourcePool {
 	public Jedis getResource() {
 		return jedisResourcePool.getResource();
 	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.init();
+	}
+	
+	
 	
 }
