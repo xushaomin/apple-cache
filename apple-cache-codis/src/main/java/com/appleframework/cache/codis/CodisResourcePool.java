@@ -19,6 +19,7 @@ public class CodisResourcePool {
 	private String zkProxyDir;
 	
 	public void init() {
+		Version.logVersion();
 		if(null == jedisResourcePool)
 			jedisResourcePool = RoundRobinJedisPool.create()
 		        .curatorClient(zkAddr, zkSessionTimeoutMs)
