@@ -16,7 +16,7 @@
 		<property name="zkProxyDir" value="/zk/codis/db_jiuzhi/proxy" />
 	</bean>
 	
-	<bean id="cacheManager2" class="com.appleframework.cache.codis.CodisCacheManager">
+	<bean id="cacheManager" class="com.appleframework.cache.codis.CodisCacheManager">
 		<property name="codisResourcePool" ref="codisResourcePool" />
 	</bean>
 
