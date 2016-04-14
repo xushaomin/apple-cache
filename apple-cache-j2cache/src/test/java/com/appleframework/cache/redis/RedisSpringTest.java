@@ -19,7 +19,7 @@ public class RedisSpringTest {
 	@Test
 	public void testAddOpinion1() {
 		try {
-			for (int i = 500; i < 600; i++) {
+			for (int i = 600; i < 700; i++) {
 				j2CacheManager.set("" + i, User.create("" + i, i));
 			}
 			System.in.read();
