@@ -16,7 +16,7 @@
 	
 		<dependency>
 			<groupId>com.appleframework.cache</groupId>
-			<artifactId>apple-cache-redis</artifactId>
+			<artifactId>apple-cache-redisson</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		
