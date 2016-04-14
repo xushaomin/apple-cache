@@ -63,11 +63,5 @@
 			<artifactId>log4j</artifactId>
 		</dependency>
 				
-		<dependency>
-			<groupId>org.redisson</groupId>
-			<artifactId>redisson</artifactId>
-			<version>2.2.11.APPLE</version>
-		</dependency>
-		
 	</dependencies>
 </project>

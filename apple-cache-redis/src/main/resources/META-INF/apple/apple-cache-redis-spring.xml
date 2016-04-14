@@ -14,11 +14,11 @@
 	<!-- turn on declarative caching -->
 	<cache:annotation-driven cache-manager="cacheManager2" />  
 
-	<import resource="apple-cache-redisson-master.xml"/>
+	<import resource="apple-cache-redis.xml"/>
 	
 	<bean id="cacheManager2"
 		class="com.appleframework.cache.redis.spring.RedisCacheManager">
-		<property name="redisson" ref="redisson" />
+		<property name="jedisPool" ref="jedisPool" />
 		<!-- 配置缓存时间 -->
 		<property name="configMap">
 			<map>

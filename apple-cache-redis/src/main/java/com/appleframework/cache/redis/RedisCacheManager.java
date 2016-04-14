@@ -1,5 +1,7 @@
 package com.appleframework.cache.redis;
 
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
@@ -24,7 +26,10 @@ public class RedisCacheManager implements CacheManager {
 	public void clear() throws CacheException {
 		Jedis jedis = jedisPool.getResource();
 		try {
-			jedis.flushDB();
+			Set<byte[]> keys = jedis.keys("*".getBytes());
+			for (byte[] key : keys) {
+				jedis.del(key);
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		} finally {

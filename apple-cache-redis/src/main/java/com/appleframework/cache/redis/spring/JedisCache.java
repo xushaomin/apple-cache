@@ -1,23 +1,23 @@
 package com.appleframework.cache.redis.spring;
 
-import org.redisson.Redisson;
-import org.redisson.RedissonClient;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
 
-public class RedissonCache implements Cache {
+import redis.clients.jedis.JedisPool;
+
+public class JedisCache implements Cache {
 
 	private final String name;
 	private final RedisCache redisCache;
 
-	public RedissonCache(String name, int expire, RedissonClient redisson) {
+	public JedisCache(String name, int expire, JedisPool jedisPool) {
 		this.name = name;
-		this.redisCache = new RedisCache(name, expire, redisson);
+		this.redisCache = new RedisCache(name, expire, jedisPool);
 	}
 	
-	public RedissonCache(String name, Redisson redisson) {
+	public JedisCache(String name, JedisPool jedisPool) {
 		this.name = name;
-		this.redisCache = new RedisCache(name, redisson);
+		this.redisCache = new RedisCache(name, jedisPool);
 	}
 
 	@Override
