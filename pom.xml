@@ -120,6 +120,7 @@
     	<module>apple-cache-hazelcast</module>
     	<module>apple-cache-j2cache</module>
     	<module>apple-cache-codis</module>
+    	<module>apple-cache-redisson</module>
 	</modules>
 	
 	<build>
