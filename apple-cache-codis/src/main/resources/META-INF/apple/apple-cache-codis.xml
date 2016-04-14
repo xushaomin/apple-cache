@@ -16,7 +16,7 @@
 		<property name="zkProxyDir" value="${codis.zkProxyDir}" />
 	</bean>
 	
-	<bean id="idGenerator" class="com.appleframework.cache.codis.id.CodisIdGenerator">
+	<bean id="cacheManager" class="com.appleframework.cache.codis.CodisCacheManager">
 		<property name="codisResourcePool" ref="codisResourcePool" />
 	</bean>
 
