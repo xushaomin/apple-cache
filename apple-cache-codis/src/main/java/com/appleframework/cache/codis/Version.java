@@ -22,7 +22,7 @@ public class Version {
 				}
 				String name = attrs.getValue("Bundle-Name");
 				if (name != null && name.indexOf("apple-cache") > -1) {
-					logger.info(name + " " + attrs.getValue("Bundle-Version"));
+					logger.warn(name + " " + attrs.getValue("Bundle-Version"));
 					break;
 				}
 			}
