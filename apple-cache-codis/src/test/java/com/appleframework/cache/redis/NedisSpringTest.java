@@ -10,8 +10,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.appleframework.cache.core.CacheManager;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"classpath*:config/apple-cache-codis.xml"})
-public class CodisSpringTest {
+@ContextConfiguration(locations={"classpath*:config/apple-cache-nedis.xml"})
+public class NedisSpringTest {
 
 	@Resource
 	private CacheManager cacheManager;

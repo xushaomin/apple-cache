@@ -42,7 +42,15 @@
 			<artifactId>jodis</artifactId>
 			<version>0.3.0</version>
 		</dependency>
-		
+
+		<!-- 
+		<dependency>
+			<groupId>com.wandoulabs.nedis</groupId>
+			<artifactId>codis-client</artifactId>
+			<version>0.1.1</version>
+		</dependency>
+		 -->
+		 
 		<!-- required for @Configuration annotation -->
 		<dependency>
 			<groupId>cglib</groupId>
