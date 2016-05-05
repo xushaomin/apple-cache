@@ -1,5 +1,7 @@
 package com.appleframework.cache.j2cache;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -20,44 +22,41 @@ import net.sf.ehcache.Element;
 public class J2CacheManager implements com.appleframework.cache.core.CacheManager {
 
 	private static Logger logger = Logger.getLogger(J2CacheManager.class);
-	
+
 	private String name = "J2_CACHE_MANAGER";
-	
+
 	private RedissonClient redisson;
 
 	private CacheManager ehcacheManager;
-	
+
 	private RTopic<OperateObject> topic;
-	
+
 	public void setRedisson(RedissonClient redisson) {
-		this.redisson = redisson;		
+		this.redisson = redisson;
 	}
-	
+
 	public void init() {
 		topic = redisson.getTopic(Contants.TOPIC_PREFIX_KEY + name);
 		topic.addListener(new MessageListener<OperateObject>() {
-			
-		    public void onMessage(String channel, OperateObject message) {		    	
-		    	Object key = message.getKey();
-		    	Cache cache = getEhCache();
-		    	if(null != cache) {
-			    	if(message.getOperateType().equals(OperateType.PUT)) {
-			    		cache.remove(key);
-			    	}
-			    	else if(message.getOperateType().equals(OperateType.DELETE)) {
-			    		cache.remove(key);
-			    	}
-			    	else if(message.getOperateType().equals(OperateType.CLEAR)) {
-			    		cache.removeAll();
-			    	}
-			    	else {
-			    		logger.error("ERROR OPERATE TYPE !!!");
-			    	}
-		    	}
-		    }
+
+			public void onMessage(String channel, OperateObject message) {
+				Object key = message.getKey();
+				Cache cache = getEhCache();
+				if (null != cache) {
+					if (message.getOperateType().equals(OperateType.PUT)) {
+						cache.remove(key);
+					} else if (message.getOperateType().equals(OperateType.DELETE)) {
+						cache.remove(key);
+					} else if (message.getOperateType().equals(OperateType.CLEAR)) {
+						cache.removeAll();
+					} else {
+						logger.error("ERROR OPERATE TYPE !!!");
+					}
+				}
+			}
 		});
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -69,14 +68,13 @@ public class J2CacheManager implements com.appleframework.cache.core.CacheManage
 	public RMapCache<String, Object> getRedisCache() {
 		return redisson.getMapCache(name);
 	}
-	
+
 	public Cache getEhCache() {
 		Cache cache = ehcacheManager.getCache(name);
-		if(null == cache) {
+		if (null == cache) {
 			ehcacheManager.addCache(name);
 			return ehcacheManager.getCache(name);
-		}
-		else {
+		} else {
 			return cache;
 		}
 	}
@@ -94,20 +92,19 @@ public class J2CacheManager implements com.appleframework.cache.core.CacheManage
 		try {
 			Object value = null;
 			Element element = getEhCache().get(key);
-			if(null == element) {
+			if (null == element) {
 				value = getRedisCache().get(key);
-				if(null != value)
+				if (null != value)
 					getEhCache().put(new Element(key, value));
-			}
-			else {
+			} else {
 				value = element.getObjectValue();
-			}			
+			}
 			return value;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
 		}
-		
+
 	}
 
 	@SuppressWarnings({ "unchecked" })
@@ -116,14 +113,13 @@ public class J2CacheManager implements com.appleframework.cache.core.CacheManage
 		try {
 			T value = null;
 			Element element = getEhCache().get(key);
-			if(null == element) {
-				value = (T)getRedisCache().get(key);
-				if(null != value)
+			if (null == element) {
+				value = (T) getRedisCache().get(key);
+				if (null != value)
 					getEhCache().put(new Element(key, value));
+			} else {
+				value = (T) element.getObjectValue();
 			}
-			else {
-				value = (T)element.getObjectValue();
-			}			
 			return value;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -163,19 +159,56 @@ public class J2CacheManager implements com.appleframework.cache.core.CacheManage
 			}
 		}
 	}
-	
-	private void publish(Object key, OperateType operateType) {        
+
+	private void publish(Object key, OperateType operateType) {
 		OperateObject object = new OperateObject();
 		object.setKey(key);
 		object.setOperateType(operateType);
 		this.sendWithResson(object);
 	}
-	
+
 	private void sendWithResson(OperateObject object) {
 		try {
 			topic.publish(object);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
+	}
+
+	// 批量获取
+	@Override
+	public List<Object> get(List<String> keyList) throws CacheException {
+		List<Object> list = new ArrayList<Object>();
+		for (String key : keyList) {
+			list.add(this.get(key));
+		}
+		return list;
+	}
+
+	@Override
+	public List<Object> get(String... keys) throws CacheException {
+		List<Object> list = new ArrayList<Object>();
+		for (String key : keys) {
+			list.add(this.get(key));
+		}
+		return list;
+	}
+
+	@Override
+	public <T> List<T> get(Class<T> clazz, List<String> keyList) throws CacheException {
+		List<T> list = new ArrayList<T>();
+		for (String key : keyList) {
+			list.add(this.get(key, clazz));
+		}
+		return list;
+	}
+
+	@Override
+	public <T> List<T> get(Class<T> clazz, String... keys) throws CacheException {
+		List<T> list = new ArrayList<T>();
+		for (String key : keys) {
+			list.add(this.get(key, clazz));
+		}
+		return list;
 	}
 }

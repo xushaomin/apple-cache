@@ -1,5 +1,7 @@
 package com.appleframework.cache.memcache;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
@@ -130,6 +132,43 @@ public class XMemCachedManager implements CacheManager {
 				throw new CacheException(e.getMessage());
 			}
 		}
+	}
+
+	//批量获取
+	@Override
+	public List<Object> get(List<String> keyList) throws CacheException {
+		List<Object> list = new ArrayList<Object>();
+		for (String key : keyList) {
+			list.add(this.get(key));
+		}
+		return list;
+	}
+
+	@Override
+	public List<Object> get(String... keys) throws CacheException {
+		List<Object> list = new ArrayList<Object>();
+		for (String key : keys) {
+			list.add(this.get(key));
+		}
+		return list;
+	}
+
+	@Override
+	public <T> List<T> get(Class<T> clazz, List<String> keyList) throws CacheException {
+		List<T> list = new ArrayList<T>();
+		for (String key : keyList) {
+			list.add(this.get(key, clazz));
+		}
+		return list;
+	}
+
+	@Override
+	public <T> List<T> get(Class<T> clazz, String... keys) throws CacheException {
+		List<T> list = new ArrayList<T>();
+		for (String key : keys) {
+			list.add(this.get(key, clazz));
+		}
+		return list;
 	}
 
 }

@@ -1,5 +1,8 @@
 package com.appleframework.cache.ehcache;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
 import com.appleframework.cache.core.CacheException;
@@ -8,6 +11,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
+@SuppressWarnings("unchecked")
 public class EhCacheManager implements com.appleframework.cache.core.CacheManager {
 
 	private static Logger logger = Logger.getLogger(EhCacheManager.class);
@@ -58,7 +62,6 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 		
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	@Override
 	public <T> T get(String key, Class<T> clazz) throws CacheException {
 		try {
@@ -105,4 +108,77 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 			}
 		}
 	}
+
+	@Override
+	public List<Object> get(List<String> keyList) throws CacheException {
+		try {
+			List<Object> list = new ArrayList<Object>();
+			Cache cache = this.getEhCache();
+			for (String key : keyList) {
+				Element element = cache.get(key);
+				if(null != element) {
+					list.add(element.getObjectValue());
+				}
+			}
+			return list;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<Object> get(String... keys) throws CacheException {
+		try {
+			List<Object> list = new ArrayList<Object>();
+			Cache cache = this.getEhCache();
+			for (String key : keys) {
+				Element element = cache.get(key);
+				if(null != element) {
+					list.add(element.getObjectValue());
+				}
+			}
+			return list;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
+		}
+	}
+
+	@Override
+	public <T> List<T> get(Class<T> clazz, List<String> keyList) throws CacheException {
+		try {
+			List<T> list = new ArrayList<T>();
+			Cache cache = this.getEhCache();
+			for (String key : keyList) {
+				Element element = cache.get(key);
+				if(null != element) {
+					list.add((T)element.getObjectValue());
+				}
+			}
+			return list;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
+		}
+	}
+
+	@Override
+	public <T> List<T> get(Class<T> clazz, String... keys) throws CacheException {
+		try {
+			List<T> list = new ArrayList<T>();
+			Cache cache = this.getEhCache();
+			for (String key : keys) {
+				Element element = cache.get(key);
+				if(null != element) {
+					list.add((T)element.getObjectValue());
+				}
+			}
+			return list;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
+		}
+	}
+	
 }

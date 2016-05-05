@@ -1,5 +1,7 @@
 package com.appleframework.cache.codis;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -10,6 +12,7 @@ import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager;
 import com.appleframework.cache.core.utils.SerializeUtility;
 
+@SuppressWarnings("unchecked")
 public class CodisCacheManager implements CacheManager {
 
 	private static Logger logger = Logger.getLogger(CodisCacheManager.class);
@@ -40,7 +43,6 @@ public class CodisCacheManager implements CacheManager {
 		}
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	@Override
 	public <T> T get(String key, Class<T> clazz) throws CacheException {
 		try (Jedis jedis = codisResourcePool.getResource()) {
@@ -70,4 +72,60 @@ public class CodisCacheManager implements CacheManager {
 		}
 	}
 
+	@Override
+	public List<Object> get(List<String> keyList) throws CacheException {
+		List<Object> list = new ArrayList<Object>();
+		try (Jedis jedis = codisResourcePool.getResource()) {
+			for (String key : keyList) {
+				byte[] value = jedis.get(key.getBytes());
+				if(null != value) {
+					list.add(SerializeUtility.unserialize(value));
+				}
+			}
+		}		
+		return list;
+	}
+
+	@Override
+	public List<Object> get(String... keys) throws CacheException {
+		List<Object> list = new ArrayList<Object>();
+		try (Jedis jedis = codisResourcePool.getResource()) {
+			for (String key : keys) {
+				byte[] value = jedis.get(key.getBytes());
+				if(null != value) {
+					list.add(SerializeUtility.unserialize(value));
+				}
+			}
+		}		
+		return list;
+	}
+
+	@Override
+	public <T> List<T> get(Class<T> clazz, List<String> keyList) throws CacheException {
+		List<T> list = new ArrayList<T>();
+		try (Jedis jedis = codisResourcePool.getResource()) {
+			for (String key : keyList) {
+				byte[] value = jedis.get(key.getBytes());
+				if(null != value) {
+					list.add((T)SerializeUtility.unserialize(value));
+				}
+			}
+		}		
+		return list;
+	}
+
+	@Override
+	public <T> List<T> get(Class<T> clazz, String... keys) throws CacheException {
+		List<T> list = new ArrayList<T>();
+		try (Jedis jedis = codisResourcePool.getResource()) {
+			for (String key : keys) {
+				byte[] value = jedis.get(key.getBytes());
+				if(null != value) {
+					list.add((T)SerializeUtility.unserialize(value));
+				}
+			}
+		}		
+		return list;
+	}
+	
 }

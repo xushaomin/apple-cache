@@ -1,5 +1,7 @@
 package com.appleframework.cache.core;
 
+import java.util.List;
+
 /**
  * @author xusm
  */
@@ -22,5 +24,16 @@ public interface CacheManager {
 
 	// 写入缓存信息，并设置过期时间（单位：秒），如果缓存已经存在，更新缓存和过期时间
 	public void set(String key, Object obj, int timeout) throws CacheException;
+	
+	// 批量获取缓存
+	public List<Object> get(List<String> keyList) throws CacheException;
+	
+	public List<Object> get(String... keys) throws CacheException;
+	
+	public <T> List<T> get(Class<T> clazz, List<String> keyList) throws CacheException;
+	
+	public <T> List<T> get(Class<T> clazz, String... keys) throws CacheException;
+
+
 
 }

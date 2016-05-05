@@ -1,5 +1,7 @@
 package com.appleframework.cache.redis;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -83,6 +85,63 @@ public class RedissonBucketCacheManager implements CacheManager {
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}
+		}
+	}
+	
+	//批量获取
+	@Override
+	public List<Object> get(List<String> keyList) throws CacheException {
+		try {
+			List<Object> list = new ArrayList<Object>();
+			for (String key : keyList) {
+				list.add(this.get(key));
+			}
+			return list;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<Object> get(String... keys) throws CacheException {
+		try {
+			List<Object> list = new ArrayList<Object>();
+			for (String key : keys) {
+				list.add(this.get(key));
+			}
+			return list;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
+		}
+	}
+
+	@Override
+	public <T> List<T> get(Class<T> clazz, List<String> keyList) throws CacheException {
+		try {
+			List<T> list = new ArrayList<T>();
+			for (String key : keyList) {
+				list.add(this.get(key, clazz));
+			}
+			return list;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
+		}
+	}
+
+	@Override
+	public <T> List<T> get(Class<T> clazz, String... keys) throws CacheException {
+		try {
+			List<T> list = new ArrayList<T>();
+			for (String key : keys) {
+				list.add(this.get(key, clazz));
+			}
+			return list;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
 		}
 	}
 	
