@@ -14,6 +14,9 @@
 	<bean id="codisResourcePool" class="com.appleframework.cache.codis.CodisResourcePool" init-method="init">
 		<property name="zkAddr" value="${codis.zkAddr}" />
 		<property name="zkProxyDir" value="${codis.zkProxyDir}" />
+		<property name="maxTotal" value="${codis.maxTotal:8}" />
+		<property name="maxIdle" value="${codis.maxIdle:8}" />
+		<property name="minIdle" value="${codis.minIdle:0}" />
 	</bean>
 	
 	<bean id="cacheManager" class="com.appleframework.cache.codis.CodisCacheManager">
