@@ -14,6 +14,9 @@
 	<bean id="codisResourcePool" class="com.appleframework.cache.codis.CodisResourcePool" init-method="init">
 		<property name="zkAddr" value="192.168.1.182:2181,192.168.1.183:2181,192.168.1.184:2181" />
 		<property name="zkProxyDir" value="/zk/codis/db_jiuzhi/proxy" />
+		<property name="maxTotal" value="500" />
+		<property name="maxIdle" value="500" />
+		<property name="minIdle" value="1" />
 	</bean>
 	
 	<bean id="cacheManager" class="com.appleframework.cache.codis.CodisCacheManager">
