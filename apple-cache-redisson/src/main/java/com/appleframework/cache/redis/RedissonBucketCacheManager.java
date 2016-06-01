@@ -2,6 +2,7 @@ package com.appleframework.cache.redis;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -12,6 +13,7 @@ import org.redisson.core.RKeys;
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager;
 
+@SuppressWarnings("deprecation")
 public class RedissonBucketCacheManager implements CacheManager {
 
 	private static Logger logger = Logger.getLogger(RedissonBucketCacheManager.class);
@@ -90,13 +92,9 @@ public class RedissonBucketCacheManager implements CacheManager {
 	
 	//批量获取
 	@Override
-	public List<Object> get(List<String> keyList) throws CacheException {
+	public List<Object> getList(List<String> keyList) throws CacheException {
 		try {
-			List<Object> list = new ArrayList<Object>();
-			for (String key : keyList) {
-				list.add(this.get(key));
-			}
-			return list;
+			return this.getList(keyList.toArray(new String[keyList.size()]));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
@@ -104,11 +102,12 @@ public class RedissonBucketCacheManager implements CacheManager {
 	}
 
 	@Override
-	public List<Object> get(String... keys) throws CacheException {
+	public List<Object> getList(String... keys) throws CacheException {
 		try {
+			Map<String, Object> map = redisson.loadBucketValues(keys);
 			List<Object> list = new ArrayList<Object>();
 			for (String key : keys) {
-				list.add(this.get(key));
+				list.add(map.get(key));
 			}
 			return list;
 		} catch (Exception e) {
@@ -118,13 +117,9 @@ public class RedissonBucketCacheManager implements CacheManager {
 	}
 
 	@Override
-	public <T> List<T> get(Class<T> clazz, List<String> keyList) throws CacheException {
+	public <T> List<T> getList(Class<T> clazz, List<String> keyList) throws CacheException {
 		try {
-			List<T> list = new ArrayList<T>();
-			for (String key : keyList) {
-				list.add(this.get(key, clazz));
-			}
-			return list;
+			return this.getList(clazz, keyList.toArray(new String[keyList.size()]));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
@@ -132,11 +127,12 @@ public class RedissonBucketCacheManager implements CacheManager {
 	}
 
 	@Override
-	public <T> List<T> get(Class<T> clazz, String... keys) throws CacheException {
+	public <T> List<T> getList(Class<T> clazz, String... keys) throws CacheException {
 		try {
+			Map<String, T> map = redisson.loadBucketValues(keys);
 			List<T> list = new ArrayList<T>();
 			for (String key : keys) {
-				list.add(this.get(key, clazz));
+				list.add(map.get(key));
 			}
 			return list;
 		} catch (Exception e) {
@@ -144,5 +140,25 @@ public class RedissonBucketCacheManager implements CacheManager {
 			throw new CacheException(e.getMessage());
 		}
 	}
-	
+
+	@Override
+	public Map<String, Object> getMap(List<String> keyList) throws CacheException {
+		return redisson.loadBucketValues(keyList);
+	}
+
+	@Override
+	public Map<String, Object> getMap(String... keys) throws CacheException {
+		return redisson.loadBucketValues(keys);
+	}
+
+	@Override
+	public <T> Map<String, T> getMap(Class<T> clazz, List<String> keyList) throws CacheException {
+		return redisson.loadBucketValues(keyList);
+	}
+
+	@Override
+	public <T> Map<String, T> getMap(Class<T> clazz, String... keys) throws CacheException {
+		return redisson.loadBucketValues(keys);
+	}
+		
 }
