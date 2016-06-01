@@ -1,12 +1,16 @@
 package com.appleframework.cache.codis;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Pipeline;
+import redis.clients.jedis.Response;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager;
@@ -73,59 +77,127 @@ public class CodisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public List<Object> get(List<String> keyList) throws CacheException {
+	public List<Object> getList(List<String> keyList) throws CacheException {
+		return this.getList(keyList.toArray(new String[keyList.size()]));
+	}
+
+	@Override
+	public List<Object> getList(String... keys) throws CacheException {
 		List<Object> list = new ArrayList<Object>();
 		try (Jedis jedis = codisResourcePool.getResource()) {
-			for (String key : keyList) {
-				byte[] value = jedis.get(key.getBytes());
+		    Map<String, Response<byte[]>> responses = new HashMap<String, Response<byte[]>>(keys.length);
+
+			Pipeline pipeline = jedis.pipelined();
+			for (String key : keys) {
+				responses.put(key, pipeline.get(key.getBytes()));
+			}
+			pipeline.sync();
+			
+			for(String key : responses.keySet()) {
+				Response<byte[]> response = responses.get(key);
+				byte[] value = response.get();
 				if(null != value) {
 					list.add(SerializeUtility.unserialize(value));
 				}
-			}
-		}		
-		return list;
-	}
-
-	@Override
-	public List<Object> get(String... keys) throws CacheException {
-		List<Object> list = new ArrayList<Object>();
-		try (Jedis jedis = codisResourcePool.getResource()) {
-			for (String key : keys) {
-				byte[] value = jedis.get(key.getBytes());
-				if(null != value) {
-					list.add(SerializeUtility.unserialize(value));
+				else {
+					list.add(null);
 				}
 			}
-		}		
+		}
 		return list;
 	}
 
 	@Override
-	public <T> List<T> get(Class<T> clazz, List<String> keyList) throws CacheException {
+	public <T> List<T> getList(Class<T> clazz, List<String> keyList) throws CacheException {
+		return this.getList(clazz, keyList.toArray(new String[keyList.size()]));
+	}
+
+	@Override
+	public <T> List<T> getList(Class<T> clazz, String... keys) throws CacheException {
 		List<T> list = new ArrayList<T>();
 		try (Jedis jedis = codisResourcePool.getResource()) {
-			for (String key : keyList) {
-				byte[] value = jedis.get(key.getBytes());
+		    Map<String, Response<byte[]>> responses = new HashMap<String, Response<byte[]>>(keys.length);
+
+			Pipeline pipeline = jedis.pipelined();
+			for (String key : keys) {
+				responses.put(key, pipeline.get(key.getBytes()));
+			}
+			pipeline.sync();
+			
+			for(String key : responses.keySet()) {
+				Response<byte[]> response = responses.get(key);
+				byte[] value = response.get();
 				if(null != value) {
 					list.add((T)SerializeUtility.unserialize(value));
 				}
+				else {
+					list.add(null);
+				}
 			}
-		}		
+		}
 		return list;
 	}
 
 	@Override
-	public <T> List<T> get(Class<T> clazz, String... keys) throws CacheException {
-		List<T> list = new ArrayList<T>();
+	public Map<String, Object> getMap(List<String> keyList) throws CacheException {
+		return this.getMap(keyList.toArray(new String[keyList.size()]));
+	}
+
+	@Override
+	public Map<String, Object> getMap(String... keys) throws CacheException {
+		Map<String, Object> map = new HashMap<String, Object>();
 		try (Jedis jedis = codisResourcePool.getResource()) {
+		    Map<String, Response<byte[]>> responses = new HashMap<String, Response<byte[]>>(keys.length);
+
+			Pipeline pipeline = jedis.pipelined();
 			for (String key : keys) {
-				byte[] value = jedis.get(key.getBytes());
+				responses.put(key, pipeline.get(key.getBytes()));
+			}
+			pipeline.sync();
+			
+			for(String key : responses.keySet()) {
+				Response<byte[]> response = responses.get(key);
+				byte[] value = response.get();
 				if(null != value) {
-					list.add((T)SerializeUtility.unserialize(value));
+					map.put(key, SerializeUtility.unserialize(value));
+				}
+				else {
+					map.put(key, null);
 				}
 			}
-		}		
-		return list;
+		}
+		return map;
+	}
+
+	@Override
+	public <T> Map<String, T> getMap(Class<T> clazz, List<String> keyList) throws CacheException {
+		return this.getMap(clazz, keyList.toArray(new String[keyList.size()]));
+	}
+
+	@Override
+	public <T> Map<String, T> getMap(Class<T> clazz, String... keys) throws CacheException {
+		Map<String, T> map = new HashMap<String, T>();
+		try (Jedis jedis = codisResourcePool.getResource()) {
+		    Map<String, Response<byte[]>> responses = new HashMap<String, Response<byte[]>>(keys.length);
+
+			Pipeline pipeline = jedis.pipelined();
+			for (String key : keys) {
+				responses.put(key, pipeline.get(key.getBytes()));
+			}
+			pipeline.sync();
+			
+			for(String key : responses.keySet()) {
+				Response<byte[]> response = responses.get(key);
+				byte[] value = response.get();
+				if(null != value) {
+					map.put(key, (T)SerializeUtility.unserialize(value));
+				}
+				else {
+					map.put(key, null);
+				}
+			}
+		}
+		return map;
 	}
 	
 }
