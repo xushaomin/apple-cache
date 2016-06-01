@@ -1,7 +1,9 @@
 package com.appleframework.cache.ehcache;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -110,25 +112,12 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 	}
 
 	@Override
-	public List<Object> get(List<String> keyList) throws CacheException {
-		try {
-			List<Object> list = new ArrayList<Object>();
-			Cache cache = this.getEhCache();
-			for (String key : keyList) {
-				Element element = cache.get(key);
-				if(null != element) {
-					list.add(element.getObjectValue());
-				}
-			}
-			return list;
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			throw new CacheException(e.getMessage());
-		}
+	public List<Object> getList(List<String> keyList) throws CacheException {
+		return this.getList(keyList.toArray(new String[keyList.size()]));
 	}
 
 	@Override
-	public List<Object> get(String... keys) throws CacheException {
+	public List<Object> getList(String... keys) throws CacheException {
 		try {
 			List<Object> list = new ArrayList<Object>();
 			Cache cache = this.getEhCache();
@@ -137,23 +126,8 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 				if(null != element) {
 					list.add(element.getObjectValue());
 				}
-			}
-			return list;
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			throw new CacheException(e.getMessage());
-		}
-	}
-
-	@Override
-	public <T> List<T> get(Class<T> clazz, List<String> keyList) throws CacheException {
-		try {
-			List<T> list = new ArrayList<T>();
-			Cache cache = this.getEhCache();
-			for (String key : keyList) {
-				Element element = cache.get(key);
-				if(null != element) {
-					list.add((T)element.getObjectValue());
+				else {
+					list.add(null);
 				}
 			}
 			return list;
@@ -164,7 +138,12 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 	}
 
 	@Override
-	public <T> List<T> get(Class<T> clazz, String... keys) throws CacheException {
+	public <T> List<T> getList(Class<T> clazz, List<String> keyList) throws CacheException {
+		return this.getList(clazz, keyList.toArray(new String[keyList.size()]));
+	}
+
+	@Override
+	public <T> List<T> getList(Class<T> clazz, String... keys) throws CacheException {
 		try {
 			List<T> list = new ArrayList<T>();
 			Cache cache = this.getEhCache();
@@ -173,8 +152,63 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 				if(null != element) {
 					list.add((T)element.getObjectValue());
 				}
+				else {
+					list.add(null);
+				}
 			}
 			return list;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
+		}
+	}
+
+	@Override
+	public Map<String, Object> getMap(List<String> keyList) throws CacheException {
+		return this.getMap(keyList.toArray(new String[keyList.size()]));
+	}
+
+	@Override
+	public Map<String, Object> getMap(String... keys) throws CacheException {
+		try {
+			Map<String, Object> map = new HashMap<String, Object>();
+			Cache cache = this.getEhCache();
+			for (String key : keys) {
+				Element element = cache.get(key);
+				if(null != element) {
+					map.put(key, element.getObjectValue());
+				}
+				else {
+					map.put(key, null);
+				}
+			}
+			return map;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
+		}
+	}
+
+	@Override
+	public <T> Map<String, T> getMap(Class<T> clazz, List<String> keyList) throws CacheException {
+		return this.getMap(clazz, keyList.toArray(new String[keyList.size()]));
+	}
+
+	@Override
+	public <T> Map<String, T> getMap(Class<T> clazz, String... keys) throws CacheException {
+		try {
+			Map<String, T> map = new HashMap<String, T>();
+			Cache cache = this.getEhCache();
+			for (String key : keys) {
+				Element element = cache.get(key);
+				if(null != element) {
+					map.put(key, (T)element.getObjectValue());
+				}
+				else {
+					map.put(key, null);
+				}
+			}
+			return map;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());

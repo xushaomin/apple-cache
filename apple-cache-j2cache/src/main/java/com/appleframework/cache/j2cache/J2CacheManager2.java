@@ -2,6 +2,7 @@ package com.appleframework.cache.j2cache;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -181,7 +182,7 @@ public class J2CacheManager2 implements com.appleframework.cache.core.CacheManag
 
 	// 批量获取
 	@Override
-	public List<Object> get(List<String> keyList) throws CacheException {
+	public List<Object> getList(List<String> keyList) throws CacheException {
 		List<Object> list = new ArrayList<Object>();
 		for (String key : keyList) {
 			list.add(this.get(key));
@@ -190,7 +191,7 @@ public class J2CacheManager2 implements com.appleframework.cache.core.CacheManag
 	}
 
 	@Override
-	public List<Object> get(String... keys) throws CacheException {
+	public List<Object> getList(String... keys) throws CacheException {
 		List<Object> list = new ArrayList<Object>();
 		for (String key : keys) {
 			list.add(this.get(key));
@@ -199,7 +200,7 @@ public class J2CacheManager2 implements com.appleframework.cache.core.CacheManag
 	}
 
 	@Override
-	public <T> List<T> get(Class<T> clazz, List<String> keyList) throws CacheException {
+	public <T> List<T> getList(Class<T> clazz, List<String> keyList) throws CacheException {
 		List<T> list = new ArrayList<T>();
 		for (String key : keyList) {
 			list.add(this.get(key, clazz));
@@ -208,11 +209,35 @@ public class J2CacheManager2 implements com.appleframework.cache.core.CacheManag
 	}
 
 	@Override
-	public <T> List<T> get(Class<T> clazz, String... keys) throws CacheException {
+	public <T> List<T> getList(Class<T> clazz, String... keys) throws CacheException {
 		List<T> list = new ArrayList<T>();
 		for (String key : keys) {
 			list.add(this.get(key, clazz));
 		}
 		return list;
+	}
+
+	@Override
+	public Map<String, Object> getMap(List<String> keyList) throws CacheException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<String, Object> getMap(String... keys) throws CacheException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T> Map<String, T> getMap(Class<T> clazz, List<String> keyList) throws CacheException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T> Map<String, T> getMap(Class<T> clazz, String... keys) throws CacheException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

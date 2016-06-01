@@ -1,6 +1,7 @@
 package com.appleframework.cache.hazelcast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,10 @@ public class HazelcastMapCacheManager implements CacheManager {
 	}
 	
 	public Map<String, Object> getMap() {
+		return hazelcastInstance.getMap(CACHE_KEY);
+	}
+	
+	public <T> Map<String, T> getMapT() {
 		return hazelcastInstance.getMap(CACHE_KEY);
 	}
 
@@ -88,12 +93,17 @@ public class HazelcastMapCacheManager implements CacheManager {
 	}
 
 	@Override
-	public List<Object> get(List<String> keyList) throws CacheException {
+	public List<Object> getList(List<String> keyList) throws CacheException {
+		return this.getList(keyList.toArray(new String[keyList.size()]));
+	}
+
+	@Override
+	public List<Object> getList(String... keys) throws CacheException {
 		try {
 			List<Object> list = new ArrayList<Object>();
-			 Map<String, Object> map = this.getMap();
-			 for (String key : keyList) {
-				 list.add(map.get(key));
+			Map<String, Object> map = this.getMap();
+			for (String key : keys) {
+				list.add(map.get(key));
 			}
 			return list;
 		} catch (Exception e) {
@@ -103,27 +113,17 @@ public class HazelcastMapCacheManager implements CacheManager {
 	}
 
 	@Override
-	public List<Object> get(String... keys) throws CacheException {
-		try {
-			List<Object> list = new ArrayList<Object>();
-			 Map<String, Object> map = this.getMap();
-			 for (String key : keys) {
-				 list.add(map.get(key));
-			}
-			return list;
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			throw new CacheException(e.getMessage());
-		}
+	public <T> List<T> getList(Class<T> clazz, List<String> keyList) throws CacheException {
+		return this.getList(clazz, keyList.toArray(new String[keyList.size()]));
 	}
 
 	@Override
-	public <T> List<T> get(Class<T> clazz, List<String> keyList) throws CacheException {
+	public <T> List<T> getList(Class<T> clazz, String... keys) throws CacheException {
 		try {
 			List<T> list = new ArrayList<T>();
-			 Map<String, Object> map = this.getMap();
-			 for (String key : keyList) {
-				 list.add((T)map.get(key));
+			Map<String, Object> map = this.getMap();
+			for (String key : keys) {
+				list.add((T) map.get(key));
 			}
 			return list;
 		} catch (Exception e) {
@@ -133,18 +133,33 @@ public class HazelcastMapCacheManager implements CacheManager {
 	}
 
 	@Override
-	public <T> List<T> get(Class<T> clazz, String... keys) throws CacheException {
-		try {
-			List<T> list = new ArrayList<T>();
-			 Map<String, Object> map = this.getMap();
-			 for (String key : keys) {
-				 list.add((T)map.get(key));
-			}
-			return list;
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			throw new CacheException(e.getMessage());
+	public Map<String, Object> getMap(List<String> keyList) throws CacheException {
+		return this.getMap(keyList.toArray(new String[keyList.size()]));
+	}
+
+	@Override
+	public Map<String, Object> getMap(String... keys) throws CacheException {
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		Map<String, Object> cacheMap = this.getMap();
+		for (String key : keys) {
+			returnMap.put(key, cacheMap.get(key));
 		}
+		return returnMap;
+	}
+
+	@Override
+	public <T> Map<String, T> getMap(Class<T> clazz, List<String> keyList) throws CacheException {
+		return this.getMap(clazz, keyList.toArray(new String[keyList.size()]));
+	}
+
+	@Override
+	public <T> Map<String, T> getMap(Class<T> clazz, String... keys) throws CacheException {
+		Map<String, T> returnMap = new HashMap<String, T>();
+		Map<String, T> cacheMap = this.getMapT();
+		for (String key : keys) {
+			returnMap.put(key, cacheMap.get(key));
+		}
+		return returnMap;
 	}
 
 }
