@@ -52,7 +52,7 @@
 		<dependency>
 			<groupId>org.redisson</groupId>
 			<artifactId>redisson</artifactId>
-			<version>2.2.15.APPLE</version>
+			<version>2.2.16.APPLE</version>
 		</dependency>
 		
 	</dependencies>
