@@ -1,6 +1,7 @@
 package com.appleframework.cache.ehcache;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,16 +114,11 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 
 	@Override
 	public List<Object> getList(List<String> keyList) throws CacheException {
-		return this.getList(keyList.toArray(new String[keyList.size()]));
-	}
-
-	@Override
-	public List<Object> getList(String... keys) throws CacheException {
 		try {
 			List<Object> list = new ArrayList<Object>();
-			Cache cache = this.getEhCache();
-			for (String key : keys) {
-				Element element = cache.get(key);
+			Map<Object, Element> map = this.getEhCache().getAll(keyList);
+			for (String key : keyList) {
+				Element element = map.get(key);
 				if(null != element) {
 					list.add(element.getObjectValue());
 				}
@@ -138,8 +134,29 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 	}
 
 	@Override
+	public List<Object> getList(String... keys) throws CacheException {
+		return this.getList(Arrays.asList(keys));
+	}
+
+	@Override
 	public <T> List<T> getList(Class<T> clazz, List<String> keyList) throws CacheException {
-		return this.getList(clazz, keyList.toArray(new String[keyList.size()]));
+		try {
+			List<T> list = new ArrayList<T>();
+			Map<Object, Element> map = this.getEhCache().getAll(keyList);
+			for (String key : keyList) {
+				Element element = map.get(key);
+				if(null != element) {
+					list.add((T)element.getObjectValue());
+				}
+				else {
+					list.add(null);
+				}
+			}
+			return list;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
+		}
 	}
 
 	@Override
@@ -165,16 +182,11 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 
 	@Override
 	public Map<String, Object> getMap(List<String> keyList) throws CacheException {
-		return this.getMap(keyList.toArray(new String[keyList.size()]));
-	}
-
-	@Override
-	public Map<String, Object> getMap(String... keys) throws CacheException {
 		try {
 			Map<String, Object> map = new HashMap<String, Object>();
-			Cache cache = this.getEhCache();
-			for (String key : keys) {
-				Element element = cache.get(key);
+			Map<Object, Element> cacheMap = this.getEhCache().getAll(keyList);
+			for (String key : keyList) {
+				Element element = cacheMap.get(key);
 				if(null != element) {
 					map.put(key, element.getObjectValue());
 				}
@@ -190,17 +202,17 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 	}
 
 	@Override
-	public <T> Map<String, T> getMap(Class<T> clazz, List<String> keyList) throws CacheException {
-		return this.getMap(clazz, keyList.toArray(new String[keyList.size()]));
+	public Map<String, Object> getMap(String... keys) throws CacheException {
+		return this.getMap(Arrays.asList(keys));
 	}
 
 	@Override
-	public <T> Map<String, T> getMap(Class<T> clazz, String... keys) throws CacheException {
+	public <T> Map<String, T> getMap(Class<T> clazz, List<String> keyList) throws CacheException {
 		try {
 			Map<String, T> map = new HashMap<String, T>();
-			Cache cache = this.getEhCache();
-			for (String key : keys) {
-				Element element = cache.get(key);
+			Map<Object, Element> cacheMap = this.getEhCache().getAll(keyList);
+			for (String key : keyList) {
+				Element element = cacheMap.get(key);
 				if(null != element) {
 					map.put(key, (T)element.getObjectValue());
 				}
@@ -213,6 +225,11 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
 		}
+	}
+
+	@Override
+	public <T> Map<String, T> getMap(Class<T> clazz, String... keys) throws CacheException {
+		return this.getMap(clazz, Arrays.asList(keys));
 	}
 	
 }
