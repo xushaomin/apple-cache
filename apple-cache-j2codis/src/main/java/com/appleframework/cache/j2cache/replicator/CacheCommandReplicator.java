@@ -31,7 +31,7 @@ public class CacheCommandReplicator {
 	
 	public void replicate(Command command) {
 		try {
-			logger.warn("发送同步数据");
+			logger.warn("send command: " + command);
 			Message msg = new Message(null, null, command);
 			channel.send(msg);
 		} catch (Exception e) {

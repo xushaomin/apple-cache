@@ -54,4 +54,9 @@ public class Command implements Serializable {
 		return new Command();
 	}
 
+	@Override
+	public String toString() {
+		return "Command [type=" + type + ", key=" + key + "]";
+	}
+
 }
