@@ -28,6 +28,8 @@ public class J2CodisCacheManager implements com.appleframework.cache.core.CacheM
 	private CodisResourcePool codisResourcePool;
 
 	private CacheManager ehcacheManager;
+	
+	private CacheCommandReplicator cacheCommandReplicator;
 
 	public void setName(String name) {
 		this.name = name;
@@ -39,6 +41,10 @@ public class J2CodisCacheManager implements com.appleframework.cache.core.CacheM
 
 	public void setCodisResourcePool(CodisResourcePool codisResourcePool) {
 		this.codisResourcePool = codisResourcePool;
+	}
+
+	public void setCacheCommandReplicator(CacheCommandReplicator cacheCommandReplicator) {
+		this.cacheCommandReplicator = cacheCommandReplicator;
 	}
 
 	public Cache getEhCache() {
@@ -232,7 +238,7 @@ public class J2CodisCacheManager implements com.appleframework.cache.core.CacheM
 	}
 	
 	private void replicate(Command command) {
-		CacheCommandReplicator.replicate(name, command);
+		cacheCommandReplicator.replicate(command);
 	}
 	
 }

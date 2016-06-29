@@ -8,7 +8,28 @@ public class CacheCommandReplicator {
 	
 	private static Logger logger = Logger.getLogger(CacheCommandReplicator.class);
 	
-	public static void replicate(String regsion, Command command) {
+	private String name = "J2_CACHE_MANAGER";
+
+	private JChannel channel;	
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void init() {
+		try {
+			channel = new JChannel();
+			channel.connect(name);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
+
+	public void destroy() {
+		channel.close();
+	}
+	
+	public void replicate(Command command) {
 		try {
 			/**
 			 * 参数里指定Channel使用的协议栈，如果是空的，则使用默认的协议栈，
@@ -16,9 +37,7 @@ public class CacheCommandReplicator {
 			 */
 			logger.warn("发送同步数据");
 			// 创建一个通道
-			JChannel channel = new JChannel();
-			// 加入一个群
-			channel.connect(regsion);
+			
 			// 发送事件
 			// 这里的Message的第一个参数是发送端地址
 			// 第二个是接收端地址
@@ -27,8 +46,6 @@ public class CacheCommandReplicator {
 			Message msg = new Message(null, null, command);
 			// 发送
 			channel.send(msg);
-			// 关闭通道
-			channel.close();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}

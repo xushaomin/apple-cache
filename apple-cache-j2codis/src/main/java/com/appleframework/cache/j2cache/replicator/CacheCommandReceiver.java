@@ -21,16 +21,16 @@ public class CacheCommandReceiver extends ReceiverAdapter {
 	
 	private CacheManager ehcacheManager;
 
-	public void start() throws Exception {
-		// 创建一个通道
-		channel = new JChannel();
-		// 创建一个接收器
-		channel.setReceiver(this);
-		// 加入一个群
-		channel.connect(name);
+	public void init() {
+		try {
+			channel = new JChannel();
+			channel.setReceiver(this);
+			channel.connect(name);
+		} catch (Exception e) {
+			logger.warn(e.getMessage());
+		}
 	}
 
-	// 覆盖父类的方法
 	@Override
 	public void receive(Message msg) {
 		Object object = msg.getObject();
@@ -76,6 +76,10 @@ public class CacheCommandReceiver extends ReceiverAdapter {
 		} else {
 			return cache;
 		}
+	}
+	
+	public void destroy(){
+		channel.close();
 	}
 	
 }
