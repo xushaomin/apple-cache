@@ -14,13 +14,19 @@
 	<import resource="apple-cache-codis.xml"/>
 	
 	<bean id="ehcacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/> 
-	
-	<bean id="cacheCommandReceiver" class="com.appleframework.cache.j2cache.replicator.CacheCommandReceiver" init-method="init">
+		
+	<bean id="cacheCommandReceiver" class="com.appleframework.cache.j2cache.replicator.CacheCommandReceiver" 
+		init-method="init" destroy-method="destroy">
 		<property name="ehcacheManager" ref="ehcacheManager" />
 		<property name="name" value="${j2codis.region.name:j2codis}" />
 	</bean>
 	
-	<bean id="j2CacheManager" class="com.appleframework.cache.j2cache.J2CodisCacheManager">
+	<bean id="cacheCommandReplicator" class="com.appleframework.cache.j2cache.replicator.CacheCommandReplicator" 
+		init-method="init" destroy-method="destroy">
+		<property name="name" value="${j2codis.region.name:j2codis}" />
+	</bean>
+	
+	<bean id="j2CodisCacheManager" class="com.appleframework.cache.j2cache.J2CodisCacheManager">
 		<property name="codisResourcePool" ref="codisResourcePool" />
 		<property name="ehcacheManager" ref="ehcacheManager" />
 		<property name="name" value="${j2codis.region.name:j2codis}" />
