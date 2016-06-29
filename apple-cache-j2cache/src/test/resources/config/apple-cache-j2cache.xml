@@ -14,7 +14,7 @@
 	<bean id="masterSlaveServersConfig" class="org.redisson.MasterSlaveServersConfig">
 		<property name="masterAddressUri" value="192.168.1.177:6379" />
 		<property name="slaveAddressUris" value="192.168.1.177:6379" />
-		<property name="database" value="3" />
+		<property name="database" value="8" />
 	</bean>
 	
 	<bean id="redissonCodec" class="org.redisson.codec.SerializationCodec" />
@@ -30,7 +30,7 @@
 	
 	<bean id="ehcacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/> 
 	
-	<bean id="j2CacheManager" class="com.appleframework.cache.j2cache.J2CacheManager" init-method="init">
+	<bean id="j2CacheManager" class="com.appleframework.cache.j2cache.J2RedissonBucketCacheManager" init-method="init">
 		<property name="redisson" ref="redisson" />
 		<property name="ehcacheManager" ref="ehcacheManager" />
 		<property name="name" value="test" />
