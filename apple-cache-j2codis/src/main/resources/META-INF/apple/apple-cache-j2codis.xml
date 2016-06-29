@@ -15,6 +15,11 @@
 	
 	<bean id="ehcacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/> 
 	
+	<bean id="cacheCommandReceiver" class="com.appleframework.cache.j2cache.replicator.CacheCommandReceiver" init-method="init">
+		<property name="ehcacheManager" ref="ehcacheManager" />
+		<property name="name" value="${j2codis.region.name:j2codis}" />
+	</bean>
+	
 	<bean id="j2CacheManager" class="com.appleframework.cache.j2cache.J2CodisCacheManager">
 		<property name="codisResourcePool" ref="codisResourcePool" />
 		<property name="ehcacheManager" ref="ehcacheManager" />

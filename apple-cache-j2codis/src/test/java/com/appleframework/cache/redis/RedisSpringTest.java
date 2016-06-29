@@ -1,5 +1,7 @@
 package com.appleframework.cache.redis;
 
+import java.util.Date;
+
 import javax.annotation.Resource;
 
 import org.junit.Test;
@@ -10,23 +12,25 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.appleframework.cache.core.CacheManager;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"classpath*:config/apple-cache-j2cache.xml"})
+@ContextConfiguration(locations = { "classpath*:config/apple-cache-j2codis.xml" })
 public class RedisSpringTest {
 
 	@Resource
 	private CacheManager j2CacheManager;
-	    
+
 	@Test
 	public void testAddOpinion1() {
 		try {
-			for (int i = 600; i < 700; i++) {
-				j2CacheManager.set("" + i, User.create("" + i, i));
+			while (true) {
+				for (int i = 1; i < 100; i++) {
+					System.out.println(j2CacheManager.get(String.valueOf(i)));
+				}
+				System.out.println("-------------------------------------"+ new Date());
+				Thread.sleep(10000);
 			}
-			System.in.read();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 }
-

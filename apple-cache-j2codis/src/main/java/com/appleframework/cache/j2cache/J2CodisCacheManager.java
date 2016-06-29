@@ -10,6 +10,9 @@ import org.apache.log4j.Logger;
 import com.appleframework.cache.codis.CodisResourcePool;
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.utils.SerializeUtility;
+import com.appleframework.cache.j2cache.replicator.Command;
+import com.appleframework.cache.j2cache.replicator.Command.CommandType;
+import com.appleframework.cache.j2cache.replicator.CacheCommandReplicator;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -57,6 +60,7 @@ public class J2CodisCacheManager implements com.appleframework.cache.core.CacheM
 				}
 			}
 			getEhCache().removeAll();
+			this.replicate(Command.create(CommandType.CLEAR));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
@@ -113,6 +117,7 @@ public class J2CodisCacheManager implements com.appleframework.cache.core.CacheM
 				jedis.del(key.getBytes());
 			}
 			getEhCache().remove(key);
+			this.replicate(Command.create(CommandType.DELETE, key));
 			return true;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -128,6 +133,7 @@ public class J2CodisCacheManager implements com.appleframework.cache.core.CacheM
 					logger.info(o);
 				}
 				getEhCache().remove(key);
+				this.replicate(Command.create(CommandType.DELETE, key));
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}
@@ -143,6 +149,7 @@ public class J2CodisCacheManager implements com.appleframework.cache.core.CacheM
 					logger.info(o);
 				}
 				getEhCache().remove(key);
+				this.replicate(Command.create(CommandType.DELETE, key));
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}
@@ -222,6 +229,10 @@ public class J2CodisCacheManager implements com.appleframework.cache.core.CacheM
 	@Override
 	public <T> Map<String, T> getMap(Class<T> clazz, String... keys) throws CacheException {
 		return null;
+	}
+	
+	private void replicate(Command command) {
+		CacheCommandReplicator.replicate(name, command);
 	}
 	
 }
