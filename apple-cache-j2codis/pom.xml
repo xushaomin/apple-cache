@@ -48,6 +48,11 @@
       		<version>2.10.1</version>
       	</dependency>
       	
-
+      	<dependency>
+	    	<groupId>org.jgroups</groupId>
+	  		<artifactId>jgroups</artifactId>
+	    	<version>3.4.5.Final</version>
+		</dependency>
+		
 	</dependencies>
 </project>
