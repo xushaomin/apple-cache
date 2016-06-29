@@ -122,7 +122,8 @@
     	<module>apple-cache-codis</module>
     	<module>apple-cache-redisson</module>
 		<module>apple-cache-ehcache</module>
-	</modules>
+    	<module>apple-cache-j2codis</module>
+  </modules>
 	
 	<build>
 		<plugins>
