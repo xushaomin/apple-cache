@@ -10,26 +10,34 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
      default-lazy-init="true">
+     
+     <bean id="masterSlaveServersConfig" class="com.appleframework.cache.redis.config.MasterSlaveServersConfig">
+		<property name="masterAddressUri" value="192.168.1.177:6379" />
+		<property name="slaveAddressUris" value="192.168.1.177:6379" />
+		<property name="database" value="13" />
+	</bean>
 	
-	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+	<!-- 
+	redis.maxIdle=300  
+	redis.maxActive=600  
+	redis.maxWait=1000  
+	redis.testOnBorrow=true 
+	 -->
+	
+	<bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
 		<property name="maxTotal" value="24" />
 		<property name="maxIdle" value="24" />
 		<property name="minIdle" value="0" />
 	</bean>
+		
+	<bean id="poolFactory" class="com.appleframework.cache.redis.factory.MasterSlavePoolFactory"
+		destroy-method="destroy" init-method="init">
+		<property name="serverConfig" ref="masterSlaveServersConfig" />
+		<property name="poolConfig" ref="poolConfig" />
+	</bean>	
 	
-	<bean id="jedisPool" class="redis.clients.jedis.JedisPool" >
-		<constructor-arg ref="jedisPoolConfig" />
-		<constructor-arg value="192.168.1.177" />
-		<constructor-arg value="6379" />
-		<constructor-arg value="500" />
-		<constructor-arg ><null/></constructor-arg>
-		<constructor-arg value="0" />
+	<bean id="cacheManager" class="com.appleframework.cache.redis.MasterSlaveRedisCacheManager">
+		<property name="poolFactory" ref="poolFactory" />
 	</bean>
-
-	<!-- declare Redis Cache Manager -->
-	<bean id="cacheManager" class="com.appleframework.cache.redis.RedisCacheManager">
-		<property name="jedisPool" ref="jedisPool" />
-		<property name="serializeType" value="1" />
-	</bean>
-
+	
 </beans>
