@@ -13,8 +13,8 @@
      
      <bean id="masterSlaveServersConfig" class="com.appleframework.cache.redis.config.MasterSlaveServersConfig">
 		<property name="masterAddressUri" value="192.168.1.177:6379" />
-		<property name="slaveAddressUris" value="192.168.1.177:6379" />
-		<property name="database" value="13" />
+		<property name="slaveAddressUris" value="192.168.1.214:6379,192.168.1.241:6379" />
+		<property name="database" value="9" />
 	</bean>
 	
 	<!-- 
