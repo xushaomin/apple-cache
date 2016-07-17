@@ -17,7 +17,9 @@ public class MasterSlavePoolFactory extends PoolFactory {
 
 	private MasterSlaveServersConfig serverConfig;
 	
-	private JedisPoolConfig poolConfig;
+	private JedisPoolConfig masterPoolConfig;
+	
+	private JedisPoolConfig slavePoolConfig;
 	
 	private LoadBalancer loadBalancer;
 	
@@ -25,18 +27,24 @@ public class MasterSlavePoolFactory extends PoolFactory {
 		this.serverConfig = serverConfig;
 	}
 
-	public void setPoolConfig(JedisPoolConfig poolConfig) {
-		this.poolConfig = poolConfig;
+	public void setMasterPoolConfig(JedisPoolConfig masterPoolConfig) {
+		this.masterPoolConfig = masterPoolConfig;
+	}
+
+	public void setSlavePoolConfig(JedisPoolConfig slavePoolConfig) {
+		this.slavePoolConfig = slavePoolConfig;
 	}
 
 	public void init() {
 		JedisPool masterPool = null;
 		List<JedisPool> slavePools = new ArrayList<JedisPool>();
 		if(null != serverConfig) {
-			masterPool = new JedisPool(poolConfig, URIBuilder.create(serverConfig.getMasterAddress(), serverConfig.getDatabase()));
+			masterPool = new JedisPool(masterPoolConfig, 
+					URIBuilder.create(serverConfig.getMasterAddress(), serverConfig.getDatabase(), serverConfig.getPassword()));
 			Set<String> slaveConfigSet = serverConfig.getSlaveAddresses();
 			for (String slaveUri : slaveConfigSet) {
-				JedisPool slavePool = new JedisPool(poolConfig, URIBuilder.create(slaveUri,serverConfig.getDatabase()));
+				JedisPool slavePool = new JedisPool(slavePoolConfig, 
+						URIBuilder.create(slaveUri, serverConfig.getDatabase(), serverConfig.getPassword()));
 				slavePools.add(slavePool);
 			}
 			loadBalancer = serverConfig.getLoadBalancer();

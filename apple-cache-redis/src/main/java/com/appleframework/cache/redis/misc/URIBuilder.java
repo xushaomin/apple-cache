@@ -17,15 +17,21 @@ package com.appleframework.cache.redis.misc;
 
 import java.net.URI;
 
+import org.springframework.util.StringUtils;
+
 public class URIBuilder {
 
-    public static URI create(String uri, int database) {
+    public static URI create(String uri, int database, String password) {
         String[] parts = uri.split(":");
         if (parts.length-1 >= 3) {
             String port = parts[parts.length-1];
             uri = "[" + uri.replace(":" + port, "") + "]:" + port;
         }
-        return URI.create("redis://" + uri + "/" + database);
+        if(StringUtils.isEmpty(password)) {
+            return URI.create("redis://" + uri + "/" + database);
+        } else {
+            return URI.create("redis://" + password + "@" + uri + "/" + database);
+        }
     }
     
 }
