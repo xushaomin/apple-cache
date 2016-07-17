@@ -26,6 +26,8 @@ public class CodisSpringTest {
 			for (int i = 0; i < 100; i++) {
 				System.out.println(cacheManager.get("" + i, User.class));
 			}
+			
+			System.out.println(cacheManager.getList("1", "2", "3"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
