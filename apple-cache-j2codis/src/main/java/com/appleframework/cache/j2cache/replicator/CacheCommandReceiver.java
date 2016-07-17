@@ -6,7 +6,8 @@ import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
 
-import com.appleframework.cache.j2cache.replicator.Command.CommandType;
+import com.appleframework.cache.core.replicator.Command;
+import com.appleframework.cache.core.replicator.Command.CommandType;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;

@@ -8,22 +8,21 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.redisson.RedissonClient;
 import org.redisson.core.MessageListener;
-import org.redisson.core.RBucket;
-import org.redisson.core.RKeys;
+import org.redisson.core.RMapCache;
 import org.redisson.core.RTopic;
 
 import com.appleframework.cache.core.CacheException;
-import com.appleframework.cache.j2cache.topic.OperateObject;
+import com.appleframework.cache.core.replicator.Command;
+import com.appleframework.cache.core.replicator.Command.CommandType;
 import com.appleframework.cache.j2cache.utils.Contants;
-import com.appleframework.cache.j2cache.topic.OperateObject.OperateType;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
-public class J2CacheManager2 implements com.appleframework.cache.core.CacheManager {
+public class J2RedissonMapCacheManager implements com.appleframework.cache.core.CacheManager {
 
-	private static Logger logger = Logger.getLogger(J2CacheManager2.class);
+	private static Logger logger = Logger.getLogger(J2RedissonMapCacheManager.class);
 
 	private String name = "J2_CACHE_MANAGER";
 
@@ -31,7 +30,7 @@ public class J2CacheManager2 implements com.appleframework.cache.core.CacheManag
 
 	private CacheManager ehcacheManager;
 
-	private RTopic<OperateObject> topic;
+	private RTopic<Command> topic;
 
 	public void setRedisson(RedissonClient redisson) {
 		this.redisson = redisson;
@@ -39,17 +38,17 @@ public class J2CacheManager2 implements com.appleframework.cache.core.CacheManag
 
 	public void init() {
 		topic = redisson.getTopic(Contants.TOPIC_PREFIX_KEY + name);
-		topic.addListener(new MessageListener<OperateObject>() {
+		topic.addListener(new MessageListener<Command>() {
 
-			public void onMessage(String channel, OperateObject message) {
+			public void onMessage(String channel, Command message) {
 				Object key = message.getKey();
 				Cache cache = getEhCache();
 				if (null != cache) {
-					if (message.getOperateType().equals(OperateType.PUT)) {
+					if (message.getType().equals(CommandType.PUT)) {
 						cache.remove(key);
-					} else if (message.getOperateType().equals(OperateType.DELETE)) {
+					} else if (message.getType().equals(CommandType.DELETE)) {
 						cache.remove(key);
-					} else if (message.getOperateType().equals(OperateType.CLEAR)) {
+					} else if (message.getType().equals(CommandType.CLEAR)) {
 						cache.removeAll();
 					} else {
 						logger.error("ERROR OPERATE TYPE !!!");
@@ -67,8 +66,8 @@ public class J2CacheManager2 implements com.appleframework.cache.core.CacheManag
 		this.ehcacheManager = ehcacheManager;
 	}
 
-	public RBucket<Object> getRedisCache(String name) {
-		return redisson.getBucket(name);
+	public <T> RMapCache<String, T> getRedisCache() {
+		return redisson.getMapCache(name);
 	}
 
 	public Cache getEhCache() {
@@ -83,11 +82,8 @@ public class J2CacheManager2 implements com.appleframework.cache.core.CacheManag
 
 	public void clear() throws CacheException {
 		try {
-			RKeys keys = redisson.getKeys();
-			for (String key : keys.getKeys()) {
-				getRedisCache(key).delete();
-			}
-			publish(null, OperateType.CLEAR);
+			getRedisCache().clear();
+			publish(null, CommandType.CLEAR);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
@@ -98,7 +94,7 @@ public class J2CacheManager2 implements com.appleframework.cache.core.CacheManag
 			Object value = null;
 			Element element = getEhCache().get(key);
 			if (null == element) {
-				value = getRedisCache(key).get();
+				value = getRedisCache().get(key);
 				if (null != value)
 					getEhCache().put(new Element(key, value));
 			} else {
@@ -119,7 +115,7 @@ public class J2CacheManager2 implements com.appleframework.cache.core.CacheManag
 			T value = null;
 			Element element = getEhCache().get(key);
 			if (null == element) {
-				value = (T) getRedisCache(key).get();
+				value = (T) getRedisCache().get(key);
 				if (null != value)
 					getEhCache().put(new Element(key, value));
 			} else {
@@ -134,8 +130,8 @@ public class J2CacheManager2 implements com.appleframework.cache.core.CacheManag
 
 	public boolean remove(String key) throws CacheException {
 		try {
-			getRedisCache(key).delete();
-			publish(key, OperateType.DELETE);
+			getRedisCache().remove(key);
+			publish(key, CommandType.DELETE);
 			return true;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -146,8 +142,8 @@ public class J2CacheManager2 implements com.appleframework.cache.core.CacheManag
 	public void set(String key, Object value) throws CacheException {
 		if (null != value) {
 			try {
-				getRedisCache(key).set(value);
-				publish(key, OperateType.PUT);
+				getRedisCache().put(key, value);
+				publish(key, CommandType.PUT);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}
@@ -157,29 +153,25 @@ public class J2CacheManager2 implements com.appleframework.cache.core.CacheManag
 	public void set(String key, Object value, int expireTime) throws CacheException {
 		if (null != value) {
 			try {
-				getRedisCache(key).set(value, expireTime, TimeUnit.SECONDS);
-				publish(key, OperateType.PUT);
+				getRedisCache().put(key, value, expireTime, TimeUnit.SECONDS);
+				publish(key, CommandType.PUT);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}
 		}
 	}
 
-	private void publish(Object key, OperateType operateType) {
-		OperateObject object = new OperateObject();
-		object.setKey(key);
-		object.setOperateType(operateType);
-		this.sendWithResson(object);
-	}
-
-	private void sendWithResson(OperateObject object) {
+	private void publish(Object key, CommandType commandType) {
 		try {
+			Command object = new Command();
+			object.setKey(key);
+			object.setType(commandType);
 			topic.publish(object);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
 	}
-
+	
 	// 批量获取
 	@Override
 	public List<Object> getList(List<String> keyList) throws CacheException {

@@ -9,9 +9,9 @@ import org.apache.log4j.Logger;
 
 import com.appleframework.cache.codis.CodisResourcePool;
 import com.appleframework.cache.core.CacheException;
+import com.appleframework.cache.core.replicator.Command;
+import com.appleframework.cache.core.replicator.Command.CommandType;
 import com.appleframework.cache.core.utils.SerializeUtility;
-import com.appleframework.cache.j2cache.replicator.Command;
-import com.appleframework.cache.j2cache.replicator.Command.CommandType;
 import com.appleframework.cache.j2cache.replicator.CacheCommandReplicator;
 
 import net.sf.ehcache.Cache;

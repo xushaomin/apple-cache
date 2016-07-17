@@ -7,8 +7,8 @@ import org.redisson.RedissonClient;
 import org.redisson.core.MessageListener;
 import org.redisson.core.RTopic;
 
-import com.appleframework.cache.j2cache.topic.OperateObject;
-import com.appleframework.cache.j2cache.topic.OperateObject.OperateType;
+import com.appleframework.cache.core.replicator.Command;
+import com.appleframework.cache.core.replicator.Command.CommandType;
 import com.appleframework.cache.j2cache.utils.Contants;
 
 import net.sf.ehcache.Cache;
@@ -23,7 +23,7 @@ public class J2CacheOp {
 	private int expire;
 	private RedissonClient redisson;
 	private CacheManager ehcacheManager;
-	private RTopic<OperateObject> topic;
+	private RTopic<Command> topic;
 	
 	public Map<String, Object> getRedisCache() {
 		return redisson.getMap(name);
@@ -58,22 +58,22 @@ public class J2CacheOp {
 	
 	public void init() {
 		topic = redisson.getTopic(Contants.TOPIC_PREFIX_KEY + name);
-		topic.addListener(new MessageListener<OperateObject>() {
+		topic.addListener(new MessageListener<Command>() {
 			
-		    public void onMessage(String channel, OperateObject message) {
+		    public void onMessage(String channel, Command message) {
 		    	
 		    	Object key = message.getKey();
 		    	Cache cache = getEhCache();
 		    	
 		    	if(null != cache) {
 			    	
-			    	if(message.getOperateType().equals(OperateType.PUT)) {
+			    	if(message.getType().equals(CommandType.PUT)) {
 			    		cache.remove(key);
 			    	}
-			    	else if(message.getOperateType().equals(OperateType.DELETE)) {
+			    	else if(message.getType().equals(CommandType.DELETE)) {
 			    		cache.remove(key);
 			    	}
-			    	else if(message.getOperateType().equals(OperateType.CLEAR)) {
+			    	else if(message.getType().equals(CommandType.CLEAR)) {
 			    		cache.removeAll();
 			    	}
 			    	else {
@@ -108,7 +108,7 @@ public class J2CacheOp {
 			return;
 		try {
 			getRedisCache().put(key, value);
-			publish(key, OperateType.PUT);
+			publish(key, CommandType.PUT);
 		} catch (Exception e) {
 			logger.warn("更新 Cache 缓存错误", e);
 		}
@@ -120,13 +120,13 @@ public class J2CacheOp {
 		} catch (Exception e) {
 			logger.warn("删除 Cache 缓存错误", e);
 		}
-		publish(null, OperateType.CLEAR);
+		publish(null, CommandType.CLEAR);
 	}
 
 	public void delete(String key) {
 		try {
 			getRedisCache().remove(key);
-			publish(key, OperateType.DELETE);
+			publish(key, CommandType.DELETE);
 		} catch (Exception e) {
 			logger.warn("删除 Cache 缓存错误", e);
 		}
@@ -136,10 +136,10 @@ public class J2CacheOp {
 		return expire;
 	}
 	
-	private void publish(Object key, OperateType operateType) {        
-		OperateObject object = new OperateObject();
+	private void publish(Object key, CommandType commandType) {        
+		Command object = new Command();
 		object.setKey(key);
-		object.setOperateType(operateType);
+		object.setType(commandType);
 		try {
 			topic.publish(object);
 		} catch (Exception e) {

@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
 
+import com.appleframework.cache.core.replicator.Command;
+
 public class CacheCommandReplicator {
 	
 	private static Logger logger = Logger.getLogger(CacheCommandReplicator.class);
