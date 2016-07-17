@@ -19,12 +19,20 @@ public class RedisSpringTest7 {
 	@Test
 	public void testAddOpinion1() {
 		try {
-			String key = "123456";
-			cacheManager.set(key, "123"); // tom的好友列表
-			System.out.println(cacheManager.get(key));
-			System.in.read();
+			int i = 0;
+			while (true) {
+				try {
+					String key = "xxxx:" + i;
+					cacheManager.set(key, key); // tom的好友列表
+					System.out.println(cacheManager.get(key));
+					Thread.sleep(5000);
+					i++;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}			
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 	}
 

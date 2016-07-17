@@ -20,6 +20,7 @@ public class RedisSpringTest6 {
 	@Resource
 	private JedisPool jedisPool;
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testAddOpinion1() {
 
