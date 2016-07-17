@@ -7,14 +7,14 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.appleframework.cache.j2cache.J2CacheManager;
+import com.appleframework.cache.core.CacheManager;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations={"classpath*:config/apple-cache-j2cache.xml"})
 public class RedisSpringTest {
 
 	@Resource
-	private J2CacheManager j2CacheManager;
+	private CacheManager j2CacheManager;
 	    
 	@Test
 	public void testAddOpinion1() {

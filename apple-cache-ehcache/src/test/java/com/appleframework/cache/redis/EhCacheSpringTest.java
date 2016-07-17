@@ -19,8 +19,11 @@ public class EhCacheSpringTest {
 	@Test
 	public void testAddOpinion1() {
 		try {
-			for (int i = 600; i < 700; i++) {
+			/*for (int i = 1; i < 100; i++) {
 				cacheManager.set("" + i, User.create("" + i, i));
+			}*/
+			for (int i = 1; i < 100; i++) {
+				cacheManager.remove(String.valueOf(i));
 			}
 			System.in.read();
 		} catch (Exception e) {
