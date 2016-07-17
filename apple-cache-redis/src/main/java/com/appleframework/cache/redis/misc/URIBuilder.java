@@ -19,13 +19,13 @@ import java.net.URI;
 
 public class URIBuilder {
 
-    public static URI create(String uri) {
+    public static URI create(String uri, int database) {
         String[] parts = uri.split(":");
         if (parts.length-1 >= 3) {
             String port = parts[parts.length-1];
             uri = "[" + uri.replace(":" + port, "") + "]:" + port;
         }
-        return URI.create("redis://" + uri);
+        return URI.create("redis://" + uri + "/" + database);
     }
     
 }

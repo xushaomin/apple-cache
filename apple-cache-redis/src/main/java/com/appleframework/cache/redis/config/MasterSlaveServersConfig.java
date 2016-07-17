@@ -15,26 +15,23 @@
  */
 package com.appleframework.cache.redis.config;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.appleframework.cache.redis.misc.URIBuilder;
-
 public class MasterSlaveServersConfig extends BaseMasterSlaveServersConfig {
 
 	/**
 	 * Redis slave servers addresses
 	 */
-	private Set<URI> slaveAddresses = new HashSet<URI>();
+	private Set<String> slaveAddresses = new HashSet<String>();
 
 	/**
 	 * Redis master server address
 	 */
-	private List<URI> masterAddress;
+	private List<String> masterAddress;
 
 	/**
 	 * Database index used for Redis connection
@@ -53,21 +50,21 @@ public class MasterSlaveServersConfig extends BaseMasterSlaveServersConfig {
 
 	public void setMasterAddressUri(String masterAddressUri) {
 		if (null == masterAddress)
-			masterAddress = new ArrayList<URI>();
-		masterAddress.add(URIBuilder.create(masterAddressUri));
+			masterAddress = new ArrayList<String>();
+		masterAddress.add(masterAddressUri);
 	}
 
 	public void setMasterAddressUris(String masterAddressUris) {
 		String[] masterAddressUriss = masterAddressUris.split(",");
 		for (String address : masterAddressUriss) {
-			masterAddress.add(URIBuilder.create(address));
+			masterAddress.add(address);
 		}
 	}
 
 	public void setSlaveAddressUris(String slaveAddressUris) {
 		String[] slaveAddressesUriss = slaveAddressUris.split(",");
 		for (String address : slaveAddressesUriss) {
-			slaveAddresses.add(URIBuilder.create(address));
+			slaveAddresses.add(address);
 		}
 	}
 
@@ -78,22 +75,16 @@ public class MasterSlaveServersConfig extends BaseMasterSlaveServersConfig {
 	 */
 	public MasterSlaveServersConfig setMasterAddress(String masterAddress) {
 		if (masterAddress != null) {
-			this.masterAddress = Collections.singletonList(URIBuilder.create(masterAddress));
+			this.masterAddress = Collections.singletonList(masterAddress);
 		}
 		return this;
 	}
 
-	public URI getMasterAddress() {
+	public String getMasterAddress() {
 		if (masterAddress != null) {
 			return masterAddress.get(0);
 		}
 		return null;
-	}
-
-	public void setMasterAddress(URI masterAddress) {
-		if (masterAddress != null) {
-			this.masterAddress = Collections.singletonList(masterAddress);
-		}
 	}
 
 	/**
@@ -104,21 +95,21 @@ public class MasterSlaveServersConfig extends BaseMasterSlaveServersConfig {
 	 */
 	public MasterSlaveServersConfig addSlaveAddress(String... sAddresses) {
 		for (String address : sAddresses) {
-			slaveAddresses.add(URIBuilder.create(address));
+			slaveAddresses.add(address);
 		}
 		return this;
 	}
 
-	public MasterSlaveServersConfig addSlaveAddress(URI slaveAddress) {
+	public MasterSlaveServersConfig addSlaveAddress(String slaveAddress) {
 		slaveAddresses.add(slaveAddress);
 		return this;
 	}
 
-	public Set<URI> getSlaveAddresses() {
+	public Set<String> getSlaveAddresses() {
 		return slaveAddresses;
 	}
 
-	public void setSlaveAddresses(Set<URI> readAddresses) {
+	public void setSlaveAddresses(Set<String> readAddresses) {
 		this.slaveAddresses = readAddresses;
 	}
 

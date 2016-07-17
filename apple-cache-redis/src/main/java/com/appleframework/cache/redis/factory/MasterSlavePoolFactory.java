@@ -1,12 +1,12 @@
 package com.appleframework.cache.redis.factory;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import com.appleframework.cache.redis.balancer.LoadBalancer;
 import com.appleframework.cache.redis.config.MasterSlaveServersConfig;
+import com.appleframework.cache.redis.misc.URIBuilder;
 
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -33,10 +33,10 @@ public class MasterSlavePoolFactory extends PoolFactory {
 		JedisPool masterPool = null;
 		List<JedisPool> slavePools = new ArrayList<JedisPool>();
 		if(null != serverConfig) {
-			masterPool = new JedisPool(poolConfig, serverConfig.getMasterAddress());
-			Set<URI> slaveConfigSet = serverConfig.getSlaveAddresses();
-			for (URI slaveUri : slaveConfigSet) {
-				JedisPool slavePool = new JedisPool(poolConfig, slaveUri);
+			masterPool = new JedisPool(poolConfig, URIBuilder.create(serverConfig.getMasterAddress(), serverConfig.getDatabase()));
+			Set<String> slaveConfigSet = serverConfig.getSlaveAddresses();
+			for (String slaveUri : slaveConfigSet) {
+				JedisPool slavePool = new JedisPool(poolConfig, URIBuilder.create(slaveUri,serverConfig.getDatabase()));
 				slavePools.add(slavePool);
 			}
 			loadBalancer = serverConfig.getLoadBalancer();
