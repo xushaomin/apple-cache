@@ -34,26 +34,31 @@ public class CacheCommandReceiver extends ReceiverAdapter {
 
 	@Override
 	public void receive(Message msg) {
-		Object object = msg.getObject();
-		if (object instanceof Command) {
-			
-			Command command = (Command)object;
-			Object key = command.getKey();
-			if(command.getType().equals(CommandType.CLEAR)) {
-				this.getEhCache().removeAll();
+		try {
+			Object object = msg.getObject();
+			if (object instanceof Command) {
+				
+				Command command = (Command)object;
+				Object key = command.getKey();
+				if(command.getType().equals(CommandType.CLEAR)) {
+					this.getEhCache().removeAll();
+				}
+				else if(command.getType().equals(CommandType.PUT)) {
+					this.getEhCache().remove(key);
+				}
+				else if(command.getType().equals(CommandType.DELETE)) {
+					this.getEhCache().remove(key);
+				}
+				else {
+					logger.warn(command.getType().name());
+				}
+			} else if (object instanceof String) {
+				logger.warn(object.toString());
 			}
-			else if(command.getType().equals(CommandType.PUT)) {
-				this.getEhCache().remove(key);
-			}
-			else if(command.getType().equals(CommandType.DELETE)) {
-				this.getEhCache().remove(key);
-			}
-			else {
-				logger.warn(command.getType().name());
-			}
-		} else if (object instanceof String) {
-			logger.warn(object.toString());
+		} catch (Exception e) {
+			logger.error(e.getMessage());
 		}
+		
 	}
 
 	@Override
