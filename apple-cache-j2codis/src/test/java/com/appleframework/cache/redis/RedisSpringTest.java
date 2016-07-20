@@ -22,11 +22,11 @@ public class RedisSpringTest {
 	public void testAddOpinion1() {
 		try {
 			while (true) {
+				Thread.sleep(10000);
 				for (int i = 1; i < 100; i++) {
 					System.out.println(j2CacheManager.get(String.valueOf(i)));
 				}
 				System.out.println("-------------------------------------"+ new Date());
-				Thread.sleep(10000);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

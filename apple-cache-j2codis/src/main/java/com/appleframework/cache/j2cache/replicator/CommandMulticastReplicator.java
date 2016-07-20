@@ -5,10 +5,11 @@ import org.jgroups.JChannel;
 import org.jgroups.Message;
 
 import com.appleframework.cache.core.replicator.Command;
+import com.appleframework.cache.core.replicator.CommandReplicator;
 
-public class CacheCommandReplicator {
+public class CommandMulticastReplicator implements CommandReplicator {
 	
-	private static Logger logger = Logger.getLogger(CacheCommandReplicator.class);
+	private static Logger logger = Logger.getLogger(CommandMulticastReplicator.class);
 	
 	private String name = "J2_CACHE_MANAGER";
 

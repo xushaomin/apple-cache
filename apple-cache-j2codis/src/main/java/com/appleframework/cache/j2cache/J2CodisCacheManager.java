@@ -11,8 +11,8 @@ import com.appleframework.cache.codis.CodisResourcePool;
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.Command.CommandType;
+import com.appleframework.cache.core.replicator.CommandReplicator;
 import com.appleframework.cache.core.utils.SerializeUtility;
-import com.appleframework.cache.j2cache.replicator.CacheCommandReplicator;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -29,7 +29,7 @@ public class J2CodisCacheManager implements com.appleframework.cache.core.CacheM
 
 	private CacheManager ehcacheManager;
 	
-	private CacheCommandReplicator cacheCommandReplicator;
+	private CommandReplicator commandReplicator;
 
 	public void setName(String name) {
 		this.name = name;
@@ -43,8 +43,8 @@ public class J2CodisCacheManager implements com.appleframework.cache.core.CacheM
 		this.codisResourcePool = codisResourcePool;
 	}
 
-	public void setCacheCommandReplicator(CacheCommandReplicator cacheCommandReplicator) {
-		this.cacheCommandReplicator = cacheCommandReplicator;
+	public void setCommandReplicator(CommandReplicator commandReplicator) {
+		this.commandReplicator = commandReplicator;
 	}
 
 	public Cache getEhCache() {
@@ -138,8 +138,8 @@ public class J2CodisCacheManager implements com.appleframework.cache.core.CacheM
 					String o = jedis.set(key.getBytes(), SerializeUtility.serialize(value));
 					logger.info(o);
 				}
-				getEhCache().remove(key);
-				this.replicate(Command.create(CommandType.DELETE, key));
+				getEhCache().put(new Element(key, value));
+				this.replicate(Command.create(CommandType.PUT, key));
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}
@@ -154,8 +154,8 @@ public class J2CodisCacheManager implements com.appleframework.cache.core.CacheM
 					jedis.expire(key.getBytes(), expireTime);
 					logger.info(o);
 				}
-				getEhCache().remove(key);
-				this.replicate(Command.create(CommandType.DELETE, key));
+				getEhCache().put(new Element(key, value, expireTime));
+				this.replicate(Command.create(CommandType.PUT, key, expireTime));
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}
@@ -238,7 +238,7 @@ public class J2CodisCacheManager implements com.appleframework.cache.core.CacheM
 	}
 	
 	private void replicate(Command command) {
-		cacheCommandReplicator.replicate(command);
+		commandReplicator.replicate(command);
 	}
 	
 }
