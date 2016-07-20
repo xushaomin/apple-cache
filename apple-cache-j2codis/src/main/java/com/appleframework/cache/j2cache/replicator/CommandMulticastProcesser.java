@@ -40,7 +40,7 @@ public class CommandMulticastProcesser implements CommandProcesser {
 				} else {
 					getEhCache().put(new Element(key, value, timeout));
 				}
-		}
+			}
 		}
 		else if(command.getType().equals(CommandType.DELETE)) {
 			this.getEhCache().remove(key);

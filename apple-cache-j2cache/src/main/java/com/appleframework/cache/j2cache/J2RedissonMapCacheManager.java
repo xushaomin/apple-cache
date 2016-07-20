@@ -7,14 +7,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.redisson.RedissonClient;
-import org.redisson.core.MessageListener;
 import org.redisson.core.RMapCache;
-import org.redisson.core.RTopic;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.Command.CommandType;
-import com.appleframework.cache.j2cache.utils.Contants;
+import com.appleframework.cache.core.replicator.CommandReplicator;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -30,32 +28,14 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 
 	private CacheManager ehcacheManager;
 
-	private RTopic<Command> topic;
-
+	private CommandReplicator commandReplicator;
+	
 	public void setRedisson(RedissonClient redisson) {
 		this.redisson = redisson;
 	}
 
-	public void init() {
-		topic = redisson.getTopic(Contants.TOPIC_PREFIX_KEY + name);
-		topic.addListener(new MessageListener<Command>() {
-
-			public void onMessage(String channel, Command message) {
-				Object key = message.getKey();
-				Cache cache = getEhCache();
-				if (null != cache) {
-					if (message.getType().equals(CommandType.PUT)) {
-						cache.remove(key);
-					} else if (message.getType().equals(CommandType.DELETE)) {
-						cache.remove(key);
-					} else if (message.getType().equals(CommandType.CLEAR)) {
-						cache.removeAll();
-					} else {
-						logger.error("ERROR OPERATE TYPE !!!");
-					}
-				}
-			}
-		});
+	public void setCommandReplicator(CommandReplicator commandReplicator) {
+		this.commandReplicator = commandReplicator;
 	}
 
 	public void setName(String name) {
@@ -83,7 +63,7 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 	public void clear() throws CacheException {
 		try {
 			getRedisCache().clear();
-			publish(null, CommandType.CLEAR);
+			publish(null, CommandType.CLEAR, 0);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
@@ -131,7 +111,7 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 	public boolean remove(String key) throws CacheException {
 		try {
 			getRedisCache().remove(key);
-			publish(key, CommandType.DELETE);
+			publish(key, CommandType.DELETE, 0);
 			return true;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -143,7 +123,7 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 		if (null != value) {
 			try {
 				getRedisCache().put(key, value);
-				publish(key, CommandType.PUT);
+				publish(key, CommandType.PUT, 0);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}
@@ -154,19 +134,20 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 		if (null != value) {
 			try {
 				getRedisCache().put(key, value, expireTime, TimeUnit.SECONDS);
-				publish(key, CommandType.PUT);
+				publish(key, CommandType.PUT, expireTime);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}
 		}
 	}
 
-	private void publish(Object key, CommandType commandType) {
+	private void publish(Object key, CommandType commandType, Integer timeout) {
 		try {
-			Command object = new Command();
-			object.setKey(key);
-			object.setType(commandType);
-			topic.publish(object);
+			Command command = new Command();
+			command.setKey(key);
+			command.setType(commandType);
+			command.setTimeout(timeout);
+			commandReplicator.replicate(command);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}

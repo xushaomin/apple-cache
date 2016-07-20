@@ -7,15 +7,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.redisson.RedissonClient;
-import org.redisson.core.MessageListener;
 import org.redisson.core.RBucket;
 import org.redisson.core.RKeys;
-import org.redisson.core.RTopic;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.Command.CommandType;
-import com.appleframework.cache.j2cache.utils.Contants;
+import com.appleframework.cache.core.replicator.CommandReplicator;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -31,35 +29,17 @@ public class J2RedissonBucketCacheManager implements com.appleframework.cache.co
 	private RedissonClient redisson;
 
 	private CacheManager ehcacheManager;
+	
+	private CommandReplicator commandReplicator;
 
-	private RTopic<Command> topic;
+	public void setCommandReplicator(CommandReplicator commandReplicator) {
+		this.commandReplicator = commandReplicator;
+	}
 
 	public void setRedisson(RedissonClient redisson) {
 		this.redisson = redisson;
 	}
-
-	public void init() {
-		topic = redisson.getTopic(Contants.TOPIC_PREFIX_KEY + name);
-		topic.addListener(new MessageListener<Command>() {
-
-			public void onMessage(String channel, Command message) {
-				Object key = message.getKey();
-				Cache cache = getEhCache();
-				if (null != cache) {
-					if (message.getType().equals(CommandType.PUT)) {
-						cache.remove(key);
-					} else if (message.getType().equals(CommandType.DELETE)) {
-						cache.remove(key);
-					} else if (message.getType().equals(CommandType.CLEAR)) {
-						cache.removeAll();
-					} else {
-						logger.error("ERROR OPERATE TYPE !!!");
-					}
-				}
-			}
-		});
-	}
-
+	
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -93,7 +73,7 @@ public class J2RedissonBucketCacheManager implements com.appleframework.cache.co
 				logger.error(e.getMessage());
 				throw new CacheException(e.getMessage());
 			}
-			publish(null, CommandType.CLEAR);
+			publish(Command.create(CommandType.CLEAR));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
@@ -146,7 +126,7 @@ public class J2RedissonBucketCacheManager implements com.appleframework.cache.co
 	public boolean remove(String key) throws CacheException {
 		try {
 			getRedisCache(key).delete();
-			publish(key, CommandType.DELETE);
+			publish(Command.create(CommandType.DELETE, key));
 			return true;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -158,7 +138,7 @@ public class J2RedissonBucketCacheManager implements com.appleframework.cache.co
 		if (null != value) {
 			try {
 				getRedisCache(key).set(value);
-				publish(key, CommandType.PUT);
+				publish(Command.create(CommandType.PUT, key));
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}
@@ -169,23 +149,16 @@ public class J2RedissonBucketCacheManager implements com.appleframework.cache.co
 		if (null != value) {
 			try {
 				getRedisCache(key).set(value, expireTime, TimeUnit.SECONDS);
-				publish(key, CommandType.PUT);
+				publish(Command.create(CommandType.PUT, key, expireTime));
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}
 		}
 	}
 
-	private void publish(Object key, CommandType commandType) {
-		Command object = new Command();
-		object.setKey(key);
-		object.setType(commandType);
-		this.sendToTopic(object);
-	}
-
-	private void sendToTopic(Command object) {
+	private void publish(Command command) {
 		try {
-			topic.publish(object);
+			commandReplicator.replicate(command);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
