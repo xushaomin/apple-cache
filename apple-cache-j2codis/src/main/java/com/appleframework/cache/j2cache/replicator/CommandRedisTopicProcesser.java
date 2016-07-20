@@ -15,24 +15,23 @@ import redis.clients.jedis.BinaryJedisPubSub;
 import redis.clients.jedis.Jedis;
 
 public class CommandRedisTopicProcesser extends BinaryJedisPubSub implements CommandProcesser {
-	
+
 	protected final static Logger logger = Logger.getLogger(CommandRedisTopicProcesser.class);
-	
+
 	private String name = "J2_CACHE_MANAGER";
-		
+
 	private CacheManager ehcacheManager;
-	
+
 	private CodisResourcePool codisResourcePool;
-	
-	
+
 	@Override
-	// È¡µÃ¶©ÔÄµÄÏûÏ¢ºóµÄ´¦Àí   
+	// å–å¾—è®¢é˜…çš„æ¶ˆæ¯åçš„å¤„ç†
 	public void onMessage(byte[] channel, byte[] message) {
 		Object omessage = SerializeUtility.unserialize(message);
 		try {
-	        logger.info("È¡µÃ¶©ÔÄµÄÏûÏ¢ºóµÄ´¦Àí : " + omessage.toString());  
+			logger.info("å–å¾—è®¢é˜…çš„æ¶ˆæ¯åçš„å¤„ç† : " + omessage.toString());
 			if (omessage instanceof Command) {
-				Command command = (Command)omessage;
+				Command command = (Command) omessage;
 				this.onProcess(command);
 			} else if (omessage instanceof String) {
 				logger.warn(omessage.toString());
@@ -41,7 +40,7 @@ public class CommandRedisTopicProcesser extends BinaryJedisPubSub implements Com
 			logger.error(e.getMessage());
 		}
 	}
-	
+
 	public void onProcess(Command command) {
 		Object key = command.getKey();
 		if (command.getType().equals(CommandType.CLEAR)) {
@@ -72,7 +71,7 @@ public class CommandRedisTopicProcesser extends BinaryJedisPubSub implements Com
 	public void setEhcacheManager(CacheManager ehcacheManager) {
 		this.ehcacheManager = ehcacheManager;
 	}
-	
+
 	public Cache getEhCache() {
 		Cache cache = ehcacheManager.getCache(name);
 		if (null == cache) {
@@ -86,5 +85,5 @@ public class CommandRedisTopicProcesser extends BinaryJedisPubSub implements Com
 	public void setCodisResourcePool(CodisResourcePool codisResourcePool) {
 		this.codisResourcePool = codisResourcePool;
 	}
-	
+
 }
