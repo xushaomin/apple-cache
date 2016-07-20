@@ -38,7 +38,7 @@ public class CommandMulticastProcesser implements CommandProcesser {
 				if(timeout == 0) {
 					getEhCache().put(new Element(key, value));
 				} else {
-					getEhCache().put(new Element(key, value, timeout));
+					getEhCache().put(new Element(key, value, timeout, timeout));
 				}
 			}
 		}

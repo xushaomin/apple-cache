@@ -154,7 +154,7 @@ public class J2CodisCacheManager implements com.appleframework.cache.core.CacheM
 					jedis.expire(key.getBytes(), expireTime);
 					logger.info(o);
 				}
-				getEhCache().put(new Element(key, value, expireTime));
+				getEhCache().put(new Element(key, value, expireTime, expireTime));
 				this.replicate(Command.create(CommandType.PUT, key, expireTime));
 			} catch (Exception e) {
 				logger.error(e.getMessage());

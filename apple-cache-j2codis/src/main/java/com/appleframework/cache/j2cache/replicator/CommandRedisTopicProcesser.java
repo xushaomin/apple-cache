@@ -54,7 +54,7 @@ public class CommandRedisTopicProcesser extends BinaryJedisPubSub implements Com
 				if (timeout == 0) {
 					getEhCache().put(new Element(key, value));
 				} else {
-					getEhCache().put(new Element(key, value, timeout));
+					getEhCache().put(new Element(key, value, timeout, timeout));
 				}
 			}
 		} else if (command.getType().equals(CommandType.DELETE)) {
