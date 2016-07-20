@@ -24,6 +24,24 @@ public class CommandRedisTopicProcesser extends BinaryJedisPubSub implements Com
 	
 	private CodisResourcePool codisResourcePool;
 	
+	
+	@Override
+	// 取得订阅的消息后的处理   
+	public void onMessage(byte[] channel, byte[] message) {
+		Object omessage = SerializeUtility.unserialize(message);
+		try {
+	        logger.info("取得订阅的消息后的处理 : " + omessage.toString());  
+			if (omessage instanceof Command) {
+				Command command = (Command)omessage;
+				this.onProcess(command);
+			} else if (omessage instanceof String) {
+				logger.warn(omessage.toString());
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
+	
 	public void onProcess(Command command) {
 		Object key = command.getKey();
 		if (command.getType().equals(CommandType.CLEAR)) {
