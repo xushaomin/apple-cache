@@ -9,8 +9,9 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
-     default-lazy-init="true">
+     default-lazy-init="false">
 	
+	<!-- codis -->
 	<bean id="codisResourcePool" class="com.appleframework.cache.codis.CodisResourcePool" init-method="init">
 		<property name="zkAddr" value="192.168.1.182:2181,192.168.1.183:2181,192.168.1.184:2181" />
 		<property name="zkProxyDir" value="/zk/codis/db_jiuzhi/proxy" />
@@ -19,22 +20,51 @@
 		<property name="minIdle" value="1" />
 	</bean>
 	
+	<!-- ehcache -->
 	<bean id="ehcacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/> 
 	
-	<bean id="cacheCommandReceiver" class="com.appleframework.cache.j2cache.replicator.CacheCommandReceiver" 
-		init-method="init" destroy-method="destroy">
+	<!-- redis -->
+	<bean id="masterSlaveServersConfig" class="com.appleframework.cache.redis.config.MasterSlaveServersConfig">
+		<property name="masterAddressUri" value="192.168.1.177:6379" />
+		<property name="slaveAddressUris" value="192.168.1.214:6379,192.168.1.241:6379" />
+		<property name="database" value="7" />
+	</bean>
+		
+	<bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal" value="24" />
+		<property name="maxIdle" value="24" />
+		<property name="minIdle" value="0" />
+	</bean>
+		
+	<bean id="poolFactory" class="com.appleframework.cache.redis.factory.MasterSlavePoolFactory"
+		destroy-method="destroy" init-method="init">
+		<property name="serverConfig" ref="masterSlaveServersConfig" />
+		<property name="masterPoolConfig" ref="poolConfig" />
+		<property name="slavePoolConfig" ref="poolConfig" />
+	</bean>	
+	
+	<!-- receiver -->
+	<bean id="commandProcesser" class="com.appleframework.cache.j2cache.replicator.CommandRedisTopicProcesser">
+		<property name="name" value="userCache" />
 		<property name="ehcacheManager" ref="ehcacheManager" />
-		<property name="name" value="userCache" />
-	</bean>
-	
-	<bean id="cacheCommandReplicator" class="com.appleframework.cache.j2cache.replicator.CacheCommandReplicator" 
-		init-method="init" destroy-method="destroy">
-		<property name="name" value="userCache" />
-	</bean>
-	
-	<bean id="j2CacheManager" class="com.appleframework.cache.j2cache.J2CodisCacheManager">
 		<property name="codisResourcePool" ref="codisResourcePool" />
-		<property name="cacheCommandReplicator" ref="cacheCommandReplicator" />
+	</bean>	
+	
+	<bean id="commandReceiver" class="com.appleframework.cache.j2cache.replicator.CommandRedisTopicReceiver" 
+		init-method="init">
+		<property name="name" value="userCache" />
+		<property name="poolFactory" ref="poolFactory" />
+		<property name="commandProcesser" ref="commandProcesser" />
+	</bean>
+	
+	<bean id="commandReplicator" class="com.appleframework.cache.j2cache.replicator.CommandRedisTopicReplicator">
+		<property name="name" value="userCache" />
+		<property name="poolFactory" ref="poolFactory" />
+	</bean>
+	
+	<bean id="j2CodisCacheManager" class="com.appleframework.cache.j2cache.J2CodisCacheManager">
+		<property name="codisResourcePool" ref="codisResourcePool" />
+		<property name="commandReplicator" ref="commandReplicator" />
 		<property name="ehcacheManager" ref="ehcacheManager" />
 		<property name="name" value="userCache" />
 	</bean>
