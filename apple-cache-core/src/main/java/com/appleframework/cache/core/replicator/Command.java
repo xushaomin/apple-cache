@@ -12,6 +12,7 @@ public class Command implements Serializable {
 
 	private CommandType type;
 	private Object key;
+	private Integer timeout = 0;
 
 	public Object getKey() {
 		return key;
@@ -37,9 +38,20 @@ public class Command implements Serializable {
 		this.key = key;
 	}
 	
+	public Command(CommandType commandType, Object key, Integer timeout) {
+		super();
+		this.type = commandType;
+		this.key = key;
+		this.timeout = timeout;
+	}
+	
 	public Command(CommandType commandType) {
 		super();
 		this.type = commandType;
+	}
+	
+	public static Command create(CommandType commandType, Object key, Integer timeout) {
+		return new Command(commandType, key, timeout);
 	}
 	
 	public static Command create(CommandType commandType, Object key) {
@@ -56,7 +68,15 @@ public class Command implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Command [type=" + type + ", key=" + key + "]";
+		return "Command [type=" + type + ", key=" + key + ", timeout=" + timeout + "]";
+	}
+
+	public void setTimeout(Integer timeout) {
+		this.timeout = timeout;
+	}
+
+	public Integer getTimeout() {
+		return timeout;
 	}
 
 }
