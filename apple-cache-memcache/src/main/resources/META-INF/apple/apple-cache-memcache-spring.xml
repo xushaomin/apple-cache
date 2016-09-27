@@ -10,13 +10,13 @@
 	default-lazy-init="true">
 
 	<!-- 开启缓存 -->
-	<cache:annotation-driven cache-manager="cacheManager2" proxy-target-class="true" />
+	<cache:annotation-driven cache-manager="springCacheManager" proxy-target-class="true" />
 	
 	<!-- 配置memcached的缓存服务器 -->
 	<import resource="apple-cache-memcache.xml"/>
 		
-	<bean id="cacheManager2"
-		class="com.appleframework.cache.memcache.spring.MemcachedCacheManager">
+	<bean id="springCacheManager"
+		class="com.appleframework.cache.memcache.spring.SpringMemcachedCacheManager">
 		<property name="memcachedClient" ref="memcachedClient" />
 		<!-- 配置缓存时间 -->
 		<property name="configMap">

@@ -14,12 +14,12 @@ import com.appleframework.cache.core.CacheManager;
 public class MemcacedSpringTest {
 
 	@Resource
-	private CacheManager cacheManager2;
+	private CacheManager cacheManager;
 	    
 	@Test
 	public void testAddOpinion1() {
 		try {			
-			cacheManager2.set("test", "---xusm");
+			cacheManager.set("test", "---xusm");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

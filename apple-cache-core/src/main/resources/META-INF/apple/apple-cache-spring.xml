@@ -22,9 +22,9 @@
 	-->
 
 	<!-- 启用缓存注解功能-->
-	<cache:annotation-driven cache-manager="cacheManager2" />
+	<cache:annotation-driven cache-manager="springCacheManager" />
 
-	<bean id="cacheManager2" class="org.springframework.cache.support.SimpleCacheManager">
+	<bean id="springCacheManager" class="org.springframework.cache.support.SimpleCacheManager">
 		<property name="caches">
 			<set>
 				<bean

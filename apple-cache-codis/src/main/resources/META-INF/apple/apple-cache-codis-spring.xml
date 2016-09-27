@@ -10,15 +10,15 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
      default-lazy-init="true">
-
+	
 	<!-- turn on declarative caching -->
 	<cache:annotation-driven cache-manager="springCacheManager" />  
 
-	<import resource="apple-cache-redisson-master.xml"/>
+	<import resource="apple-cache-codis.xml"/>
 	
 	<bean id="springCacheManager"
-		class="com.appleframework.cache.redis.spring.SpringRedissonCacheManager">
-		<property name="redisson" ref="redisson" />
+		class="com.appleframework.cache.codis.spring.SpringCodisCacheManager">
+		<property name="codisResourcePool" ref="codisResourcePool" />
 		<!-- 配置缓存时间 -->
 		<property name="configMap">
 			<map>

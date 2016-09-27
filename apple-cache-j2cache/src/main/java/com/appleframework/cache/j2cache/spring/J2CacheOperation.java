@@ -15,9 +15,9 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
-public class J2CacheOp {
+public class J2CacheOperation {
 
-	private static Logger logger = Logger.getLogger(J2CacheOp.class);
+	private static Logger logger = Logger.getLogger(J2CacheOperation.class);
 
 	private String name;
 	private int expire;
@@ -40,7 +40,7 @@ public class J2CacheOp {
 		}
 	}
 
-	public J2CacheOp(String name, int expire, CacheManager ehcacheManager, RedissonClient redisson) {
+	public J2CacheOperation(String name, int expire, CacheManager ehcacheManager, RedissonClient redisson) {
 		this.name = name;
 		this.expire = expire;
 		this.redisson = redisson;
@@ -48,7 +48,7 @@ public class J2CacheOp {
 		init();
 	}
 	
-	public J2CacheOp(String name, CacheManager ehcacheManager, RedissonClient redisson) {
+	public J2CacheOperation(String name, CacheManager ehcacheManager, RedissonClient redisson) {
 		this.name = name;
 		this.expire = 0;
 		this.redisson = redisson;

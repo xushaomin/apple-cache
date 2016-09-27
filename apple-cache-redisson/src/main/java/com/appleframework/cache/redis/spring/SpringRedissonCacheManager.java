@@ -11,13 +11,13 @@ import org.redisson.RedissonClient;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.AbstractCacheManager;
 
-public class RedisCacheManager extends AbstractCacheManager {
+public class SpringRedissonCacheManager extends AbstractCacheManager {
 
 	private ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>();
 	private Map<String, Integer> expireMap = new HashMap<String, Integer>();
 	private RedissonClient redisson;
 
-	public RedisCacheManager() {
+	public SpringRedissonCacheManager() {
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class RedisCacheManager extends AbstractCacheManager {
 				expire = 0;
 				expireMap.put(name, expire);
 			}
-			cache = new RedissonCache(name, expire.intValue(), redisson);
+			cache = new SpringRedissonCache(name, expire.intValue(), redisson);
 			cacheMap.put(name, cache);
 		}
 		return cache;

@@ -6,9 +6,9 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
-public class EhCacheOp {
+public class EhcacheOperation {
 
-	private static Logger logger = Logger.getLogger(EhCacheOp.class);
+	private static Logger logger = Logger.getLogger(EhcacheOperation.class);
 
 	private String name;
 	private int expire;
@@ -25,13 +25,13 @@ public class EhCacheOp {
 		}
 	}
 
-	public EhCacheOp(String name, int expire, CacheManager ehcacheManager) {
+	public EhcacheOperation(String name, int expire, CacheManager ehcacheManager) {
 		this.name = name;
 		this.expire = expire;
 		this.ehcacheManager = ehcacheManager;
 	}
 	
-	public EhCacheOp(String name, CacheManager ehcacheManager) {
+	public EhcacheOperation(String name, CacheManager ehcacheManager) {
 		this.name = name;
 		this.expire = 0;
 		this.ehcacheManager = ehcacheManager;

@@ -1,39 +1,39 @@
-package com.appleframework.cache.memcache.spring;
-
-import net.rubyeye.xmemcached.MemcachedClient;
+package com.appleframework.cache.ehcache.spring;
 
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
 
-public class MemcachedCache implements Cache {
+import net.sf.ehcache.CacheManager;
+
+public class SpringEhCache implements Cache {
 
 	private final String name;
-	private final MemCache memCache;
+	private final EhcacheOperation ehCacheOp;
 
-	public MemcachedCache(String name, int expire, MemcachedClient memcachedClient) {
+	public SpringEhCache(String name, int expire, CacheManager cacheManager) {
 		this.name = name;
-		this.memCache = new MemCache(name, expire, memcachedClient);
+		this.ehCacheOp = new EhcacheOperation(name, expire, cacheManager);
 	}
 	
-	public MemcachedCache(String name, MemcachedClient memcachedClient) {
+	public SpringEhCache(String name, CacheManager cacheManager) {
 		this.name = name;
-		this.memCache = new MemCache(name, memcachedClient);
+		this.ehCacheOp = new EhcacheOperation(name, cacheManager);
 	}
 
 	@Override
 	public void clear() {
-		memCache.clear();
+		ehCacheOp.clear();
 	}
 
 	@Override
 	public void evict(Object key) {
-		memCache.delete(key.toString());
+		ehCacheOp.delete(key.toString());
 	}
 
 	@Override
 	public ValueWrapper get(Object key) {
 		ValueWrapper wrapper = null;
-		Object value = memCache.get(key.toString());
+		Object value = ehCacheOp.get(key.toString());
 		if (value != null) {
 			wrapper = new SimpleValueWrapper(value);
 		}
@@ -46,19 +46,19 @@ public class MemcachedCache implements Cache {
 	}
 
 	@Override
-	public MemCache getNativeCache() {
-		return this.memCache;
+	public EhcacheOperation getNativeCache() {
+		return this.ehCacheOp;
 	}
 
 	@Override
 	public void put(Object key, Object value) {
-		memCache.put(key.toString(), value);
+		ehCacheOp.put(key.toString(), value);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T get(Object key, Class<T> type) {
-		Object cacheValue = this.memCache.get(key.toString());
+		Object cacheValue = this.ehCacheOp.get(key.toString());
 		Object value = (cacheValue != null ? cacheValue : null);
 		if (type != null && !type.isInstance(value)) {
 			throw new IllegalStateException(
@@ -70,15 +70,15 @@ public class MemcachedCache implements Cache {
 	@Override
 	public ValueWrapper putIfAbsent(Object key, Object value) {
 		ValueWrapper wrapper = null;
-		Object objValue = this.memCache.get(key.toString());
+		Object objValue = this.ehCacheOp.get(key.toString());
 		if (objValue != null) {
 			wrapper = new SimpleValueWrapper(objValue);
 		}
 		else {
 			wrapper = new SimpleValueWrapper(value);
-			this.memCache.put(key.toString(), value);
+			this.ehCacheOp.put(key.toString(), value);
 		}
 		return wrapper;
 	}
-	
+
 }

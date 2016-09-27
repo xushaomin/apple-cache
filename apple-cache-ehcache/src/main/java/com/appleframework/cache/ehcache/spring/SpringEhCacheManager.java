@@ -1,4 +1,4 @@
-package com.appleframework.cache.redis.spring;
+package com.appleframework.cache.ehcache.spring;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,15 +9,15 @@ import java.util.concurrent.ConcurrentMap;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.AbstractCacheManager;
 
-import redis.clients.jedis.JedisPool;
+import net.sf.ehcache.CacheManager;
 
-public class RedisCacheManager extends AbstractCacheManager {
+public class SpringEhCacheManager extends AbstractCacheManager {
 
 	private ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>();
 	private Map<String, Integer> expireMap = new HashMap<String, Integer>();
-	private JedisPool jedisPool;
+	private CacheManager ehcacheManager;
 
-	public RedisCacheManager() {
+	public SpringEhCacheManager() {
 	}
 
 	@Override
@@ -35,19 +35,18 @@ public class RedisCacheManager extends AbstractCacheManager {
 				expire = 0;
 				expireMap.put(name, expire);
 			}
-			cache = new JedisCache(name, expire.intValue(), jedisPool);
+			cache = new SpringEhCache(name, expire.intValue(), ehcacheManager);
 			cacheMap.put(name, cache);
 		}
 		return cache;
 	}
-
+	
+	public void setEhcacheManager(CacheManager ehcacheManager) {
+		this.ehcacheManager = ehcacheManager;
+	}
 
 	public void setConfigMap(Map<String, Integer> configMap) {
 		this.expireMap = configMap;
-	}
-
-	public void setJedisPool(JedisPool jedisPool) {
-		this.jedisPool = jedisPool;
 	}
 
 }

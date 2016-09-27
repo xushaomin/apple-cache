@@ -14,17 +14,17 @@ import com.appleframework.cache.core.CacheManager;
 public class RedisSpringTest {
 
 	@Resource
-	private CacheManager cacheManager2;
+	private CacheManager cacheManager;
 	    
 	@Test
 	public void testAddOpinion1() {
 		try {
 			for (int i = 0; i < 100; i++) {
-				cacheManager2.set("" + i, User.create("" + i, i));
+				cacheManager.set("" + i, User.create("" + i, i));
 			}
 			
 			for (int i = 0; i < 100; i++) {
-				System.out.println(cacheManager2.get("" + i, User.class));
+				System.out.println(cacheManager.get("" + i, User.class));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

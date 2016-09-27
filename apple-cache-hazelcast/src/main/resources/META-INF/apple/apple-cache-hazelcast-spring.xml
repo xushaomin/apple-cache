@@ -7,11 +7,11 @@
         	http://www.hazelcast.com/schema/spring http://www.hazelcast.com/schema/spring/hazelcast-spring-3.3.xsd
             http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd">
 
-    <cache:annotation-driven cache-manager="cacheManager2" />
+    <cache:annotation-driven cache-manager="springCacheManager" />
 
     <import resource="apple-cache-hazelcast.xml" />
 
-    <bean id="cacheManager2" class="com.hazelcast.spring.cache.HazelcastCacheManager">
+    <bean id="springCacheManager" class="com.hazelcast.spring.cache.HazelcastCacheManager">
         <constructor-arg ref="hazelcastInstance"/>
     </bean>
 

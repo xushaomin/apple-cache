@@ -1,39 +1,39 @@
-package com.appleframework.cache.ehcache.spring;
+package com.appleframework.cache.redis.spring;
 
+import org.redisson.Redisson;
+import org.redisson.RedissonClient;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
 
-import net.sf.ehcache.CacheManager;
-
-public class EhCache implements Cache {
+public class SpringRedissonCache implements Cache {
 
 	private final String name;
-	private final EhCacheOp ehCacheOp;
+	private final RedissonCache redisCache;
 
-	public EhCache(String name, int expire, CacheManager cacheManager) {
+	public SpringRedissonCache(String name, int expire, RedissonClient redisson) {
 		this.name = name;
-		this.ehCacheOp = new EhCacheOp(name, expire, cacheManager);
+		this.redisCache = new RedissonCache(name, expire, redisson);
 	}
 	
-	public EhCache(String name, CacheManager cacheManager) {
+	public SpringRedissonCache(String name, Redisson redisson) {
 		this.name = name;
-		this.ehCacheOp = new EhCacheOp(name, cacheManager);
+		this.redisCache = new RedissonCache(name, redisson);
 	}
 
 	@Override
 	public void clear() {
-		ehCacheOp.clear();
+		redisCache.clear();
 	}
 
 	@Override
 	public void evict(Object key) {
-		ehCacheOp.delete(key.toString());
+		redisCache.delete(key.toString());
 	}
 
 	@Override
 	public ValueWrapper get(Object key) {
 		ValueWrapper wrapper = null;
-		Object value = ehCacheOp.get(key.toString());
+		Object value = redisCache.get(key.toString());
 		if (value != null) {
 			wrapper = new SimpleValueWrapper(value);
 		}
@@ -46,19 +46,19 @@ public class EhCache implements Cache {
 	}
 
 	@Override
-	public EhCacheOp getNativeCache() {
-		return this.ehCacheOp;
+	public RedissonCache getNativeCache() {
+		return this.redisCache;
 	}
 
 	@Override
 	public void put(Object key, Object value) {
-		ehCacheOp.put(key.toString(), value);
+		redisCache.put(key.toString(), value);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T get(Object key, Class<T> type) {
-		Object cacheValue = this.ehCacheOp.get(key.toString());
+		Object cacheValue = this.redisCache.get(key.toString());
 		Object value = (cacheValue != null ? cacheValue : null);
 		if (type != null && !type.isInstance(value)) {
 			throw new IllegalStateException(
@@ -70,13 +70,13 @@ public class EhCache implements Cache {
 	@Override
 	public ValueWrapper putIfAbsent(Object key, Object value) {
 		ValueWrapper wrapper = null;
-		Object objValue = this.ehCacheOp.get(key.toString());
+		Object objValue = this.redisCache.get(key.toString());
 		if (objValue != null) {
 			wrapper = new SimpleValueWrapper(objValue);
 		}
 		else {
 			wrapper = new SimpleValueWrapper(value);
-			this.ehCacheOp.put(key.toString(), value);
+			this.redisCache.put(key.toString(), value);
 		}
 		return wrapper;
 	}

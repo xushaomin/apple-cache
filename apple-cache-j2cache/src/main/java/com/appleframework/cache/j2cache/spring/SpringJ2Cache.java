@@ -1,39 +1,40 @@
-package com.appleframework.cache.redis.spring;
+package com.appleframework.cache.j2cache.spring;
 
+import org.redisson.RedissonClient;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
 
-import redis.clients.jedis.JedisPool;
+import net.sf.ehcache.CacheManager;
 
-public class JedisCache implements Cache {
+public class SpringJ2Cache implements Cache {
 
 	private final String name;
-	private final RedisCache redisCache;
+	private final J2CacheOperation j2CacheOp;
 
-	public JedisCache(String name, int expire, JedisPool jedisPool) {
+	public SpringJ2Cache(String name, int expire, CacheManager cacheManager, RedissonClient redisson) {
 		this.name = name;
-		this.redisCache = new RedisCache(name, expire, jedisPool);
+		this.j2CacheOp = new J2CacheOperation(name, expire, cacheManager, redisson);
 	}
 	
-	public JedisCache(String name, JedisPool jedisPool) {
+	public SpringJ2Cache(String name, CacheManager cacheManager, RedissonClient redisson) {
 		this.name = name;
-		this.redisCache = new RedisCache(name, jedisPool);
+		this.j2CacheOp = new J2CacheOperation(name, cacheManager, redisson);
 	}
 
 	@Override
 	public void clear() {
-		redisCache.clear();
+		j2CacheOp.clear();
 	}
 
 	@Override
 	public void evict(Object key) {
-		redisCache.delete(key.toString());
+		j2CacheOp.delete(key.toString());
 	}
 
 	@Override
 	public ValueWrapper get(Object key) {
 		ValueWrapper wrapper = null;
-		Object value = redisCache.get(key.toString());
+		Object value = j2CacheOp.get(key.toString());
 		if (value != null) {
 			wrapper = new SimpleValueWrapper(value);
 		}
@@ -46,19 +47,19 @@ public class JedisCache implements Cache {
 	}
 
 	@Override
-	public RedisCache getNativeCache() {
-		return this.redisCache;
+	public J2CacheOperation getNativeCache() {
+		return this.j2CacheOp;
 	}
 
 	@Override
 	public void put(Object key, Object value) {
-		redisCache.put(key.toString(), value);
+		j2CacheOp.put(key.toString(), value);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T get(Object key, Class<T> type) {
-		Object cacheValue = this.redisCache.get(key.toString());
+		Object cacheValue = this.j2CacheOp.get(key.toString());
 		Object value = (cacheValue != null ? cacheValue : null);
 		if (type != null && !type.isInstance(value)) {
 			throw new IllegalStateException(
@@ -70,13 +71,13 @@ public class JedisCache implements Cache {
 	@Override
 	public ValueWrapper putIfAbsent(Object key, Object value) {
 		ValueWrapper wrapper = null;
-		Object objValue = this.redisCache.get(key.toString());
+		Object objValue = this.j2CacheOp.get(key.toString());
 		if (objValue != null) {
 			wrapper = new SimpleValueWrapper(objValue);
 		}
 		else {
 			wrapper = new SimpleValueWrapper(value);
-			this.redisCache.put(key.toString(), value);
+			this.j2CacheOp.put(key.toString(), value);
 		}
 		return wrapper;
 	}

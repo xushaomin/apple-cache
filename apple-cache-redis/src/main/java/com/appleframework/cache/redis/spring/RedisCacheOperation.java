@@ -9,9 +9,9 @@ import com.appleframework.cache.core.utils.SerializeUtility;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
-public class RedisCache {
+public class RedisCacheOperation {
 
-	private static Logger logger = Logger.getLogger(RedisCache.class);
+	private static Logger logger = Logger.getLogger(RedisCacheOperation.class);
 
 	private String name;
 	private int expireTime = 0;
@@ -21,13 +21,13 @@ public class RedisCache {
 		return jedisPool.getResource();
 	}
 
-	public RedisCache(String name, int expireTime, JedisPool jedisPool) {
+	public RedisCacheOperation(String name, int expireTime, JedisPool jedisPool) {
 		this.name = name;
 		this.expireTime = expireTime;
 		this.jedisPool = jedisPool;
 	}
 	
-	public RedisCache(String name, JedisPool jedisPool) {
+	public RedisCacheOperation(String name, JedisPool jedisPool) {
 		this.name = name;
 		this.expireTime = 0;
 		this.jedisPool = jedisPool;

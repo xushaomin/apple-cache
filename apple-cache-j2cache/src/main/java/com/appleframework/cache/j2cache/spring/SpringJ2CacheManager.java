@@ -12,14 +12,14 @@ import org.springframework.cache.support.AbstractCacheManager;
 
 import net.sf.ehcache.CacheManager;
 
-public class J2CacheManager extends AbstractCacheManager {
+public class SpringJ2CacheManager extends AbstractCacheManager {
 
 	private ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>();
 	private Map<String, Integer> expireMap = new HashMap<String, Integer>();
 	private RedissonClient redisson;
 	private CacheManager ehcacheManager;
 
-	public J2CacheManager() {
+	public SpringJ2CacheManager() {
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class J2CacheManager extends AbstractCacheManager {
 				expire = 0;
 				expireMap.put(name, expire);
 			}
-			cache = new J2Cache(name, expire.intValue(), ehcacheManager, redisson);
+			cache = new SpringJ2Cache(name, expire.intValue(), ehcacheManager, redisson);
 			cacheMap.put(name, cache);
 		}
 		return cache;

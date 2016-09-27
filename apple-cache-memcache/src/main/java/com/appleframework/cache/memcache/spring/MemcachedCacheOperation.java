@@ -9,22 +9,22 @@ import net.rubyeye.xmemcached.exception.MemcachedException;
 
 import org.apache.log4j.Logger;
 
-public class MemCache {
+public class MemcachedCacheOperation {
 
-	private static Logger log = Logger.getLogger(MemCache.class);
+	private static Logger log = Logger.getLogger(MemcachedCacheOperation.class);
 
 	private Set<String> keySet = new HashSet<String>();
 	private final String name;
 	private final int expire;
 	private final MemcachedClient memcachedClient;
 
-	public MemCache(String name, int expire, MemcachedClient memcachedClient) {
+	public MemcachedCacheOperation(String name, int expire, MemcachedClient memcachedClient) {
 		this.name = name;
 		this.expire = expire;
 		this.memcachedClient = memcachedClient;
 	}
 	
-	public MemCache(String name, MemcachedClient memcachedClient) {
+	public MemcachedCacheOperation(String name, MemcachedClient memcachedClient) {
 		this.name = name;
 		this.expire = 0;
 		this.memcachedClient = memcachedClient;
@@ -36,11 +36,11 @@ public class MemCache {
 			key = this.getKey(key);
 			value = memcachedClient.get(key);
 		} catch (TimeoutException e) {
-			log.warn("获取 Memcached 缓存超时", e);
+			log.warn("��ȡ Memcached ���泬ʱ", e);
 		} catch (InterruptedException e) {
-			log.warn("获取 Memcached 缓存被中断", e);
+			log.warn("��ȡ Memcached ���汻�ж�", e);
 		} catch (MemcachedException e) {
-			log.warn("获取 Memcached 缓存错误", e);
+			log.warn("��ȡ Memcached �������", e);
 		}
 		return value;
 	}
@@ -53,9 +53,9 @@ public class MemCache {
 			memcachedClient.setWithNoReply(key, expire, value);
 			keySet.add(key);
 		} catch (InterruptedException e) {
-			log.warn("更新 Memcached 缓存被中断", e);
+			log.warn("���� Memcached ���汻�ж�", e);
 		} catch (MemcachedException e) {
-			log.warn("更新 Memcached 缓存错误", e);
+			log.warn("���� Memcached �������", e);
 		}
 	}
 
@@ -64,9 +64,9 @@ public class MemCache {
 			try {
 				memcachedClient.deleteWithNoReply(this.getKey(key));
 			} catch (InterruptedException e) {
-				log.warn("删除 Memcached 缓存被中断", e);
+				log.warn("ɾ�� Memcached ���汻�ж�", e);
 			} catch (MemcachedException e) {
-				log.warn("删除 Memcached 缓存错误", e);
+				log.warn("ɾ�� Memcached �������", e);
 			}
 		}
 	}
@@ -76,9 +76,9 @@ public class MemCache {
 			key = this.getKey(key);
 			memcachedClient.deleteWithNoReply(key);
 		} catch (InterruptedException e) {
-			log.warn("删除 Memcached 缓存被中断", e);
+			log.warn("ɾ�� Memcached ���汻�ж�", e);
 		} catch (MemcachedException e) {
-			log.warn("删除 Memcached 缓存错误", e);
+			log.warn("ɾ�� Memcached �������", e);
 		}
 	}
 
