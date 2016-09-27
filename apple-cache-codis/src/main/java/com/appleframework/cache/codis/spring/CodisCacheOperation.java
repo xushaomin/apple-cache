@@ -28,7 +28,10 @@ public class CodisCacheOperation {
 	public Object get(String key) {
 		Object value = null;
 		try (Jedis jedis = codisResourcePool.getResource()) {
-			value = jedis.get(SerializeUtility.serialize(key));
+			byte[] cacheValue = jedis.get(SerializeUtility.serialize(key));
+			if(null != cacheValue) {
+				value = SerializeUtility.unserialize(cacheValue);
+			}
 		}
 		return value;
 	}
@@ -39,7 +42,7 @@ public class CodisCacheOperation {
 		try (Jedis jedis = codisResourcePool.getResource()) {
 			jedis.set(SerializeUtility.serialize(key), SerializeUtility.serialize(value));
 			if(expireTime > 0)
-				jedis.expire(key.getBytes(), expireTime);
+				jedis.expire(SerializeUtility.serialize(key), expireTime);
 		}
 	}
 

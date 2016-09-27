@@ -35,16 +35,17 @@ public class RedisCacheOperation {
 
 	@SuppressWarnings("deprecation")
 	public Object get(String key) {
-		Object value = null;
+		Object object = null;
 		Jedis jedis = getResource(name);
 		try {
-			value = jedis.get(SerializeUtility.serialize(key));
+			byte[] value = jedis.get(SerializeUtility.serialize(key));
+			object = SerializeUtility.unserialize(value);
 		} catch (Exception e) {
 			logger.warn("获取 Cache 缓存错误", e);
 		} finally {
 			jedisPool.returnResource(jedis);
 		}
-		return value;
+		return object;
 	}
 
 	@SuppressWarnings({ "deprecation" })
