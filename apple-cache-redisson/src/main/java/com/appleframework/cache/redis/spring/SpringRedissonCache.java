@@ -8,16 +8,16 @@ import org.springframework.cache.support.SimpleValueWrapper;
 public class SpringRedissonCache implements Cache {
 
 	private final String name;
-	private final RedissonCache redisCache;
+	private final RedissonCacheOperation redisCache;
 
 	public SpringRedissonCache(String name, int expire, RedissonClient redisson) {
 		this.name = name;
-		this.redisCache = new RedissonCache(name, expire, redisson);
+		this.redisCache = new RedissonCacheOperation(name, expire, redisson);
 	}
 	
 	public SpringRedissonCache(String name, Redisson redisson) {
 		this.name = name;
-		this.redisCache = new RedissonCache(name, redisson);
+		this.redisCache = new RedissonCacheOperation(name, redisson);
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class SpringRedissonCache implements Cache {
 	}
 
 	@Override
-	public RedissonCache getNativeCache() {
+	public RedissonCacheOperation getNativeCache() {
 		return this.redisCache;
 	}
 

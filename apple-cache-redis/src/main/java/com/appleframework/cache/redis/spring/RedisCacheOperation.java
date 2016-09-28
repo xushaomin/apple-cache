@@ -1,6 +1,8 @@
 package com.appleframework.cache.redis.spring;
 
-import java.util.Set;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -33,13 +35,28 @@ public class RedisCacheOperation {
 		this.jedisPool = jedisPool;
 	}
 
+	private byte[] genByteKey(String key) {
+		return SerializeUtility.serialize(key);
+	}
+	
+	private byte[] genByteName() {
+		return SerializeUtility.serialize(name);
+	}
+	
 	@SuppressWarnings("deprecation")
 	public Object get(String key) {
 		Object object = null;
 		Jedis jedis = getResource(name);
 		try {
-			byte[] value = jedis.get(SerializeUtility.serialize(key));
-			object = SerializeUtility.unserialize(value);
+			byte[] field = genByteKey(key);
+			
+			List<byte[]> list = jedis.hmget(genByteName(), field);
+			if(list.size() > 0) {
+				byte[] cacheValue = list.get(0);
+				if(null != cacheValue) {
+					object = SerializeUtility.unserialize(cacheValue);
+				}
+			}
 		} catch (Exception e) {
 			logger.warn("获取 Cache 缓存错误", e);
 		} finally {
@@ -54,9 +71,15 @@ public class RedisCacheOperation {
 			return;
 		Jedis jedis = getResource(name);
 		try {
-			jedis.set(SerializeUtility.serialize(key), SerializeUtility.serialize(value));
+			byte[] byteName = genByteName();
+			byte[] byteKey = genByteKey(key);
+			byte[] byteValue = SerializeUtility.serialize(value);
+			
+			Map<byte[], byte[]> hash = new HashMap<>();
+			hash.put(byteKey, byteValue);
+			jedis.hmset(byteName, hash);
 			if(expireTime > 0)
-				jedis.expire(key.getBytes(), expireTime);
+				jedis.expire(byteName, expireTime);
 		} catch (Exception e) {
 			logger.warn("更新 Cache 缓存错误", e);
 		} finally {
@@ -68,10 +91,7 @@ public class RedisCacheOperation {
 	public void clear() {
 		Jedis jedis = getResource(name);
 		try {
-			Set<byte[]> keys = jedis.keys("*".getBytes());
-			for (byte[] key : keys) {
-				jedis.del(key);
-			}
+			jedis.del(genByteName());
 		} catch (Exception e) {
 			logger.warn("删除 Cache 缓存错误", e);
 		} finally {
@@ -82,7 +102,7 @@ public class RedisCacheOperation {
 	public void delete(String key) {
 		Jedis jedis = getResource(name);
 		try {
-			jedis.del(SerializeUtility.serialize(key));
+			jedis.hdel(genByteName(), genByteKey(key));
 		} catch (Exception e) {
 			logger.warn("删除 Cache 缓存错误", e);
 		}

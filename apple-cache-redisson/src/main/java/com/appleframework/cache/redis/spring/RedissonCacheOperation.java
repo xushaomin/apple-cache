@@ -6,9 +6,9 @@ import org.apache.log4j.Logger;
 import org.redisson.RedissonClient;
 import org.redisson.core.RMapCache;
 
-public class RedissonCache {
+public class RedissonCacheOperation {
 
-	private static Logger logger = Logger.getLogger(RedissonCache.class);
+	private static Logger logger = Logger.getLogger(RedissonCacheOperation.class);
 
 	private final String name;
 	private final int expire;
@@ -18,13 +18,13 @@ public class RedissonCache {
 		return redisson.getMapCache(name);
 	}
 
-	public RedissonCache(String name, int expire, RedissonClient redisson) {
+	public RedissonCacheOperation(String name, int expire, RedissonClient redisson) {
 		this.name = name;
 		this.expire = expire;
 		this.redisson = redisson;
 	}
 	
-	public RedissonCache(String name, RedissonClient redisson) {
+	public RedissonCacheOperation(String name, RedissonClient redisson) {
 		this.name = name;
 		this.expire = 0;
 		this.redisson = redisson;
