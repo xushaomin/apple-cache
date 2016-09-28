@@ -1,6 +1,8 @@
 package com.appleframework.cache.codis.spring;
 
-import java.util.Set;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.appleframework.cache.codis.CodisResourcePool;
 import com.appleframework.cache.core.utils.SerializeUtility;
@@ -24,13 +26,26 @@ public class CodisCacheOperation {
 		this.expireTime = 0;
 		this.codisResourcePool = codisResourcePool;
 	}
+	
+	private byte[] genByteKey(String key) {
+		return SerializeUtility.serialize(key);
+	}
+	
+	private byte[] genByteName() {
+		return SerializeUtility.serialize(name);
+	}
 
 	public Object get(String key) {
 		Object value = null;
 		try (Jedis jedis = codisResourcePool.getResource()) {
-			byte[] cacheValue = jedis.get(SerializeUtility.serialize(key));
-			if(null != cacheValue) {
-				value = SerializeUtility.unserialize(cacheValue);
+			byte[] field = genByteKey(key);
+			
+			List<byte[]> list = jedis.hmget(genByteName(), field);
+			if(list.size() > 0) {
+				byte[] cacheValue = list.get(0);
+				if(null != cacheValue) {
+					value = SerializeUtility.unserialize(cacheValue);
+				}
 			}
 		}
 		return value;
@@ -40,24 +55,27 @@ public class CodisCacheOperation {
 		if (value == null)
 			return;
 		try (Jedis jedis = codisResourcePool.getResource()) {
-			jedis.set(SerializeUtility.serialize(key), SerializeUtility.serialize(value));
+			byte[] byteName = genByteName();
+			byte[] byteKey = genByteKey(key);
+			byte[] byteValue = SerializeUtility.serialize(value);
+			
+			Map<byte[], byte[]> hash = new HashMap<>();
+			hash.put(byteKey, byteValue);
+			jedis.hmset(byteName, hash);
 			if(expireTime > 0)
-				jedis.expire(SerializeUtility.serialize(key), expireTime);
+				jedis.expire(byteName, expireTime);
 		}
 	}
 
 	public void clear() {
 		try (Jedis jedis = codisResourcePool.getResource()) {
-			Set<byte[]> keys = jedis.keys("*".getBytes());
-			for (byte[] key : keys) {
-				jedis.del(key);
-			}
+			jedis.del(genByteName());
 		}
 	}
 
 	public void delete(String key) {
 		try (Jedis jedis = codisResourcePool.getResource()) {
-			jedis.del(SerializeUtility.serialize(key));
+			jedis.hdel(genByteName(), genByteKey(key));
 		}
 	}
 
