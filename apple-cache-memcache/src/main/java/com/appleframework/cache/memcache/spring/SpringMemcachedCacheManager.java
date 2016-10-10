@@ -42,8 +42,8 @@ public class SpringMemcachedCacheManager extends AbstractCacheManager {
 				isOpen = true;
 				openMap.put(name, isOpen);
 			}
-			if(isOpen) {
-				cache = new SpringMemcachedCache(memcachedClient, name, expire.intValue(), true);
+			if(!isOpen) {
+				cache = new SpringMemcachedCache(memcachedClient, name, expire.intValue(), false);
 			}
 			else {
 				cache = new SpringMemcachedCache(memcachedClient, name, expire.intValue());

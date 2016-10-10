@@ -42,8 +42,8 @@ public class SpringEhCacheManager extends AbstractCacheManager {
 				isOpen = true;
 				openMap.put(name, isOpen);
 			}
-			if(isOpen) {
-				cache = new SpringEhCache(ehcacheManager, name, expire.intValue(), true);
+			if(!isOpen) {
+				cache = new SpringEhCache(ehcacheManager, name, expire.intValue(), false);
 			}
 			else {
 				cache = new SpringEhCache(ehcacheManager, name, expire.intValue());

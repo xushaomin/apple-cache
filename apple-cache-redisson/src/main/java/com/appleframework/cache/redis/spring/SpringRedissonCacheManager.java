@@ -42,8 +42,8 @@ public class SpringRedissonCacheManager extends AbstractCacheManager {
 				isOpen = true;
 				openMap.put(name, isOpen);
 			}
-			if(isOpen) {
-				cache = new SpringRedissonCache(redisson, name, expire.intValue(), true);
+			if(!isOpen) {
+				cache = new SpringRedissonCache(redisson, name, expire.intValue(), false);
 			}
 			else {
 				cache = new SpringRedissonCache(redisson, name, expire.intValue());

@@ -41,8 +41,8 @@ public class SpringCodisCacheManager extends AbstractCacheManager {
 				isOpen = true;
 				openMap.put(name, isOpen);
 			}
-			if(openMap.get(name)) {
-				cache = new SpringCodisCache(codisResourcePool, name, expire.intValue(), true);
+			if(!isOpen) {
+				cache = new SpringCodisCache(codisResourcePool, name, expire.intValue(), false);
 			}
 			else {
 				cache = new SpringCodisCache(codisResourcePool, name, expire.intValue());

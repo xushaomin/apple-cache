@@ -42,8 +42,8 @@ public class SpringRedisCacheManager extends AbstractCacheManager {
 				isOpen = true;
 				openMap.put(name, isOpen);
 			}
-			if(openMap.get(name)) {
-				cache = new SpringRedisCache(jedisPool, name, expire.intValue(), true);
+			if(!isOpen) {
+				cache = new SpringRedisCache(jedisPool, name, expire.intValue(), false);
 			}
 			else {
 				cache = new SpringRedisCache(jedisPool, name, expire.intValue());
