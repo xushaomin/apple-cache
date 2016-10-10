@@ -16,6 +16,8 @@ public class SpringJ2CacheManager extends AbstractCacheManager {
 
 	private ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>();
 	private Map<String, Integer> expireMap = new HashMap<String, Integer>();
+	private Map<String, Boolean> openMap = new HashMap<String, Boolean>();
+
 	private RedissonClient redisson;
 	private CacheManager ehcacheManager;
 
@@ -37,7 +39,17 @@ public class SpringJ2CacheManager extends AbstractCacheManager {
 				expire = 0;
 				expireMap.put(name, expire);
 			}
-			cache = new SpringJ2Cache(name, expire.intValue(), ehcacheManager, redisson);
+			Boolean isOpen = openMap.get(name);
+			if (isOpen == null) {
+				isOpen = true;
+				openMap.put(name, isOpen);
+			}
+			if(isOpen) {
+				cache = new SpringJ2Cache(ehcacheManager, redisson, name, expire.intValue(), true);
+			}
+			else {
+				cache = new SpringJ2Cache(ehcacheManager, redisson, name, expire.intValue());
+			}
 			cacheMap.put(name, cache);
 		}
 		return cache;
@@ -51,8 +63,12 @@ public class SpringJ2CacheManager extends AbstractCacheManager {
 		this.ehcacheManager = ehcacheManager;
 	}
 
-	public void setConfigMap(Map<String, Integer> configMap) {
-		this.expireMap = configMap;
+	public void setExpireConfig(Map<String, Integer> expireConfig) {
+		this.expireMap = expireConfig;
+	}
+
+	public void setOpenConfig(Map<String, Boolean> openConfig) {
+		this.openMap = openConfig;
 	}
 
 }

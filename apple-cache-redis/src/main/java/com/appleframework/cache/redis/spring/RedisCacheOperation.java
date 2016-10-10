@@ -15,6 +15,7 @@ public class RedisCacheOperation {
 
 	private static Logger logger = Logger.getLogger(RedisCacheOperation.class);
 
+	private boolean isOpen = true;
 	private String name;
 	private int expireTime = 0;
 	private JedisPool jedisPool;
@@ -45,6 +46,8 @@ public class RedisCacheOperation {
 	
 	@SuppressWarnings("deprecation")
 	public Object get(String key) {
+		if(!isOpen)
+			return null;
 		Object object = null;
 		Jedis jedis = getResource(name);
 		try {
@@ -67,7 +70,7 @@ public class RedisCacheOperation {
 
 	@SuppressWarnings({ "deprecation" })
 	public void put(String key, Object value) {
-		if (value == null)
+		if (value == null || !isOpen)
 			return;
 		Jedis jedis = getResource(name);
 		try {

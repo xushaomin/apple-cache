@@ -20,7 +20,7 @@
 		class="com.appleframework.cache.redis.spring.SpringRedissonCacheManager">
 		<property name="redisson" ref="redisson" />
 		<!-- 配置缓存时间 -->
-		<property name="configMap">
+		<property name="expireConfig">
 			<map>
 				<entry key="typeList" value="3600" />   <!-- key缓存对象名称 value缓存过期时间 -->
 			</map>

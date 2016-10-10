@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>apple-cache</artifactId>
 		<groupId>com.appleframework.cache</groupId>
-		<version>0.2.2.RELEASE</version>
+		<version>0.2.3.RELEASE</version>
 	</parent>
 	<artifactId>apple-cache-ehcache</artifactId>
 	<name>apple-cache-ehcache</name>

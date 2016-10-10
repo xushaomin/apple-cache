@@ -6,33 +6,45 @@ import org.springframework.cache.support.SimpleValueWrapper;
 import com.appleframework.cache.codis.CodisResourcePool;
 
 public class SpringCodisCache implements Cache {
+	
+	private CodisCacheOperation codisCache;
 
-	private final String name;
-	private final CodisCacheOperation codisCache;
-
-	public SpringCodisCache(String name, int expire, CodisResourcePool codisResourcePool) {
+	private String name;
+	private boolean isOpen = true;
+	
+	public SpringCodisCache(CodisResourcePool codisResourcePool, String name) {
 		this.name = name;
-		this.codisCache = new CodisCacheOperation(name, expire, codisResourcePool);
+		this.codisCache = new CodisCacheOperation(codisResourcePool, name);
 	}
 	
-	public SpringCodisCache(String name, CodisResourcePool codisResourcePool) {
+	public SpringCodisCache(CodisResourcePool codisResourcePool, String name, int expire) {
 		this.name = name;
-		this.codisCache = new CodisCacheOperation(name, codisResourcePool);
+		this.codisCache = new CodisCacheOperation(codisResourcePool, name, expire);
+	}
+	
+	public SpringCodisCache(CodisResourcePool codisResourcePool, String name, int expire, boolean isOpen) {
+		this.name = name;
+		this.isOpen = isOpen;
+		this.codisCache = new CodisCacheOperation(codisResourcePool, name, expire);
 	}
 
 	@Override
 	public void clear() {
-		codisCache.clear();
+		if(isOpen)
+			codisCache.clear();
 	}
 
 	@Override
 	public void evict(Object key) {
-		codisCache.delete(key.toString());
+		if(isOpen)
+			codisCache.delete(key.toString());
 	}
 
 	@Override
 	public ValueWrapper get(Object key) {
 		ValueWrapper wrapper = null;
+		if(!isOpen)
+			return wrapper;
 		Object value = codisCache.get(key.toString());
 		if (value != null) {
 			wrapper = new SimpleValueWrapper(value);
@@ -52,12 +64,15 @@ public class SpringCodisCache implements Cache {
 
 	@Override
 	public void put(Object key, Object value) {
-		codisCache.put(key.toString(), value);
+		if(isOpen)
+			codisCache.put(key.toString(), value);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T get(Object key, Class<T> type) {
+		if(!isOpen)
+			return null;
 		Object cacheValue = this.codisCache.get(key.toString());
 		Object value = (cacheValue != null ? cacheValue : null);
 		if (type != null && !type.isInstance(value)) {
@@ -69,6 +84,8 @@ public class SpringCodisCache implements Cache {
 
 	@Override
 	public ValueWrapper putIfAbsent(Object key, Object value) {
+		if(!isOpen)
+			return null;
 		ValueWrapper wrapper = null;
 		Object objValue = this.codisCache.get(key.toString());
 		if (objValue != null) {

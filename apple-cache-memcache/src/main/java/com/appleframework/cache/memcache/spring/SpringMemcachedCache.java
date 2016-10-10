@@ -7,32 +7,43 @@ import org.springframework.cache.support.SimpleValueWrapper;
 
 public class SpringMemcachedCache implements Cache {
 
-	private final String name;
-	private final MemcachedCacheOperation operation;
-
-	public SpringMemcachedCache(String name, int expire, MemcachedClient memcachedClient) {
-		this.name = name;
-		this.operation = new MemcachedCacheOperation(name, expire, memcachedClient);
-	}
+	private String name;
+	private MemcachedCacheOperation operation;
+	private boolean isOpen = true;
 	
 	public SpringMemcachedCache(String name, MemcachedClient memcachedClient) {
 		this.name = name;
-		this.operation = new MemcachedCacheOperation(name, memcachedClient);
+		this.operation = new MemcachedCacheOperation(memcachedClient, name);
+	}
+	
+	public SpringMemcachedCache(MemcachedClient memcachedClient, String name, int expire) {
+		this.name = name;
+		this.operation = new MemcachedCacheOperation(memcachedClient, name, expire);
+	}
+	
+	public SpringMemcachedCache(MemcachedClient memcachedClient, String name, int expire, boolean isOpen) {
+		this.name = name;
+		this.isOpen = isOpen;
+		this.operation = new MemcachedCacheOperation(memcachedClient, name, expire);
 	}
 
 	@Override
 	public void clear() {
-		operation.clear();
+		if(isOpen)
+			operation.clear();
 	}
 
 	@Override
 	public void evict(Object key) {
-		operation.delete(key.toString());
+		if(isOpen)
+			operation.delete(key.toString());
 	}
 
 	@Override
 	public ValueWrapper get(Object key) {
 		ValueWrapper wrapper = null;
+		if(!isOpen)
+			return wrapper;
 		Object value = operation.get(key.toString());
 		if (value != null) {
 			wrapper = new SimpleValueWrapper(value);
@@ -52,7 +63,8 @@ public class SpringMemcachedCache implements Cache {
 
 	@Override
 	public void put(Object key, Object value) {
-		operation.put(key.toString(), value);
+		if(isOpen)
+			operation.put(key.toString(), value);
 	}
 
 	@Override
@@ -70,6 +82,8 @@ public class SpringMemcachedCache implements Cache {
 	@Override
 	public ValueWrapper putIfAbsent(Object key, Object value) {
 		ValueWrapper wrapper = null;
+		if(!isOpen)
+			return wrapper;
 		Object objValue = this.operation.get(key.toString());
 		if (objValue != null) {
 			wrapper = new SimpleValueWrapper(objValue);
