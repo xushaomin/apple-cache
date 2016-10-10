@@ -10,20 +10,21 @@ import com.appleframework.cache.core.utils.SerializeUtility;
 import redis.clients.jedis.Jedis;
 
 public class CodisCacheOperation {
-
-	private String name;
-	private int expireTime = 0;
+	
 	private CodisResourcePool codisResourcePool;
 
-	public CodisCacheOperation(String name, int expireTime, CodisResourcePool codisResourcePool) {
+	private String name;
+	private int expireTime = 0;	
+	
+	public CodisCacheOperation(CodisResourcePool codisResourcePool, String name) {
 		this.name = name;
-		this.expireTime = expireTime;
+		this.expireTime = 0;
 		this.codisResourcePool = codisResourcePool;
 	}
 	
-	public CodisCacheOperation(String name, CodisResourcePool codisResourcePool) {
+	public CodisCacheOperation(CodisResourcePool codisResourcePool, String name, int expireTime) {
 		this.name = name;
-		this.expireTime = 0;
+		this.expireTime = expireTime;
 		this.codisResourcePool = codisResourcePool;
 	}
 	

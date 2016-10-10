@@ -15,6 +15,7 @@ public class SpringCodisCacheManager extends AbstractCacheManager {
 
 	private ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>();
 	private Map<String, Integer> expireMap = new HashMap<String, Integer>();
+	private Map<String, Boolean> openMap = new HashMap<String, Boolean>();
 	private CodisResourcePool codisResourcePool;
 
 	public SpringCodisCacheManager() {
@@ -35,16 +36,30 @@ public class SpringCodisCacheManager extends AbstractCacheManager {
 				expire = 0;
 				expireMap.put(name, expire);
 			}
-			cache = new SpringCodisCache(name, expire.intValue(), codisResourcePool);
+			Boolean isOpen = openMap.get(name);
+			if (isOpen == null) {
+				isOpen = true;
+				openMap.put(name, isOpen);
+			}
+			if(openMap.get(name)) {
+				cache = new SpringCodisCache(codisResourcePool, name, expire.intValue(), true);
+			}
+			else {
+				cache = new SpringCodisCache(codisResourcePool, name, expire.intValue());
+			}
 			cacheMap.put(name, cache);
 		}
 		return cache;
 	}
 
-	public void setConfigMap(Map<String, Integer> configMap) {
-		this.expireMap = configMap;
+	public void setExpireConfig(Map<String, Integer> expireConfig) {
+		this.expireMap = expireConfig;
 	}
 
+	public void setOpenConfig(Map<String, Boolean> openConfig) {
+		this.openMap = openConfig;
+	}
+	
 	public void setCodisResourcePool(CodisResourcePool codisResourcePool) {
 		this.codisResourcePool = codisResourcePool;
 	}

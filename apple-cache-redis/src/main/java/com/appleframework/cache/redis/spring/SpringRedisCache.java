@@ -7,32 +7,43 @@ import redis.clients.jedis.JedisPool;
 
 public class SpringRedisCache implements Cache {
 
-	private final String name;
-	private final RedisCacheOperation redisCache;
-
-	public SpringRedisCache(String name, int expire, JedisPool jedisPool) {
+	private String name;
+	private boolean isOpen = true;
+	private RedisCacheOperation redisCache;
+	
+	public SpringRedisCache(JedisPool jedisPool, String name) {
+		this.name = name;
+		this.redisCache = new RedisCacheOperation(name, jedisPool);
+	}
+	
+	public SpringRedisCache(JedisPool jedisPool, String name, int expire) {
 		this.name = name;
 		this.redisCache = new RedisCacheOperation(name, expire, jedisPool);
 	}
 	
-	public SpringRedisCache(String name, JedisPool jedisPool) {
+	public SpringRedisCache(JedisPool jedisPool, String name, int expire, boolean isOpen) {
 		this.name = name;
-		this.redisCache = new RedisCacheOperation(name, jedisPool);
+		this.isOpen = isOpen;
+		this.redisCache = new RedisCacheOperation(name, expire, jedisPool);
 	}
 
 	@Override
 	public void clear() {
-		redisCache.clear();
+		if(isOpen)
+			redisCache.clear();
 	}
 
 	@Override
 	public void evict(Object key) {
-		redisCache.delete(key.toString());
+		if(isOpen)
+			redisCache.delete(key.toString());
 	}
 
 	@Override
 	public ValueWrapper get(Object key) {
 		ValueWrapper wrapper = null;
+		if(!isOpen)
+			return wrapper;
 		Object value = redisCache.get(key.toString());
 		if (value != null) {
 			wrapper = new SimpleValueWrapper(value);
@@ -52,12 +63,15 @@ public class SpringRedisCache implements Cache {
 
 	@Override
 	public void put(Object key, Object value) {
-		redisCache.put(key.toString(), value);
+		if(isOpen)
+			redisCache.put(key.toString(), value);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T get(Object key, Class<T> type) {
+		if(!isOpen)
+			return null;
 		Object cacheValue = this.redisCache.get(key.toString());
 		Object value = (cacheValue != null ? cacheValue : null);
 		if (type != null && !type.isInstance(value)) {
@@ -70,6 +84,8 @@ public class SpringRedisCache implements Cache {
 	@Override
 	public ValueWrapper putIfAbsent(Object key, Object value) {
 		ValueWrapper wrapper = null;
+		if(!isOpen)
+			return wrapper;
 		Object objValue = this.redisCache.get(key.toString());
 		if (objValue != null) {
 			wrapper = new SimpleValueWrapper(objValue);

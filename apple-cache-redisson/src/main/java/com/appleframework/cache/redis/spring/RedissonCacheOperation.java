@@ -10,21 +10,22 @@ public class RedissonCacheOperation {
 
 	private static Logger logger = Logger.getLogger(RedissonCacheOperation.class);
 
-	private final String name;
-	private final int expire;
+	private String name;
+	private int expire = 0;
+	
 	private final RedissonClient redisson;
 	
 	public RMapCache<String, Object> getCacheMap() {
 		return redisson.getMapCache(name);
 	}
 
-	public RedissonCacheOperation(String name, int expire, RedissonClient redisson) {
+	public RedissonCacheOperation(RedissonClient redisson, String name, int expire) {
 		this.name = name;
 		this.expire = expire;
 		this.redisson = redisson;
 	}
 	
-	public RedissonCacheOperation(String name, RedissonClient redisson) {
+	public RedissonCacheOperation(RedissonClient redisson, String name) {
 		this.name = name;
 		this.expire = 0;
 		this.redisson = redisson;
@@ -35,7 +36,7 @@ public class RedissonCacheOperation {
 		try {
 			value = getCacheMap().get(key);
 		} catch (Exception e) {
-			logger.warn("获取 Cache 缓存错误", e);
+			logger.warn("cache error", e);
 		}
 		return value;
 	}
@@ -49,7 +50,7 @@ public class RedissonCacheOperation {
 			else
 				getCacheMap().put(key, value, expire, TimeUnit.SECONDS);
 		} catch (Exception e) {
-			logger.warn("更新 Cache 缓存错误", e);
+			logger.warn("cache error", e);
 		}
 	}
 
@@ -57,7 +58,7 @@ public class RedissonCacheOperation {
 		try {
 			getCacheMap().clear();
 		} catch (Exception e) {
-			logger.warn("删除 Cache 缓存错误", e);
+			logger.warn("cache error", e);
 		}
 	}
 
@@ -65,7 +66,7 @@ public class RedissonCacheOperation {
 		try {
 			getCacheMap().remove(key);
 		} catch (Exception e) {
-			logger.warn("删除 Cache 缓存错误", e);
+			logger.warn("cache error", e);
 		}
 	}
 

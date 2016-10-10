@@ -20,10 +20,35 @@ public class J2CacheOperation {
 	private static Logger logger = Logger.getLogger(J2CacheOperation.class);
 
 	private String name;
-	private int expire;
+	private int expire = 0;
+	private boolean isOpen = true;
 	private RedissonClient redisson;
 	private CacheManager ehcacheManager;
 	private RTopic<Command> topic;
+	
+	public J2CacheOperation(CacheManager ehcacheManager, RedissonClient redisson, String name) {
+		this.name = name;
+		this.redisson = redisson;
+		this.ehcacheManager = ehcacheManager;
+		init();
+	}
+	
+	public J2CacheOperation(CacheManager ehcacheManager, RedissonClient redisson, String name, int expire) {
+		this.name = name;
+		this.expire = expire;
+		this.redisson = redisson;
+		this.ehcacheManager = ehcacheManager;
+		init();
+	}
+	
+	public J2CacheOperation(CacheManager ehcacheManager, RedissonClient redisson, String name, int expire, boolean isOpen) {
+		this.name = name;
+		this.expire = expire;
+		this.isOpen = isOpen;
+		this.redisson = redisson;
+		this.ehcacheManager = ehcacheManager;
+		init();
+	}
 	
 	public Map<String, Object> getRedisCache() {
 		return redisson.getMap(name);
@@ -38,22 +63,6 @@ public class J2CacheOperation {
 		else {
 			return cache;
 		}
-	}
-
-	public J2CacheOperation(String name, int expire, CacheManager ehcacheManager, RedissonClient redisson) {
-		this.name = name;
-		this.expire = expire;
-		this.redisson = redisson;
-		this.ehcacheManager = ehcacheManager;
-		init();
-	}
-	
-	public J2CacheOperation(String name, CacheManager ehcacheManager, RedissonClient redisson) {
-		this.name = name;
-		this.expire = 0;
-		this.redisson = redisson;
-		this.ehcacheManager = ehcacheManager;
-		init();
 	}
 	
 	public void init() {
@@ -86,6 +95,8 @@ public class J2CacheOperation {
 	}
 
 	public Object get(String key) {
+		if(!isOpen)
+			return null;
 		Object value = null;
 		try {
 			Element element = getEhCache().get(key);
@@ -98,19 +109,19 @@ public class J2CacheOperation {
 				value = element.getObjectValue();
 			}
 		} catch (Exception e) {
-			logger.warn("获取 Cache 缓存错误", e);
+			logger.warn("cache error", e);
 		}
 		return value;
 	}
 
 	public void put(String key, Object value) {
-		if (value == null)
+		if (value == null || !isOpen)
 			return;
 		try {
 			getRedisCache().put(key, value);
 			publish(key, CommandType.PUT);
 		} catch (Exception e) {
-			logger.warn("更新 Cache 缓存错误", e);
+			logger.warn("cache error", e);
 		}
 	}
 
@@ -118,7 +129,7 @@ public class J2CacheOperation {
 		try {
 			getRedisCache().clear();
 		} catch (Exception e) {
-			logger.warn("删除 Cache 缓存错误", e);
+			logger.warn("cache error", e);
 		}
 		publish(null, CommandType.CLEAR);
 	}
@@ -128,7 +139,7 @@ public class J2CacheOperation {
 			getRedisCache().remove(key);
 			publish(key, CommandType.DELETE);
 		} catch (Exception e) {
-			logger.warn("删除 Cache 缓存错误", e);
+			logger.warn("cache error", e);
 		}
 	}
 

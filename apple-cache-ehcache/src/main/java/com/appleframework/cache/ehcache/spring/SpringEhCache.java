@@ -7,32 +7,43 @@ import net.sf.ehcache.CacheManager;
 
 public class SpringEhCache implements Cache {
 
-	private final String name;
-	private final EhcacheOperation ehCacheOp;
+	private String name;
+	private boolean isOpen = true;
+	private EhcacheOperation ehCacheOp;
 
-	public SpringEhCache(String name, int expire, CacheManager cacheManager) {
+	public SpringEhCache(CacheManager cacheManager, String name) {
 		this.name = name;
-		this.ehCacheOp = new EhcacheOperation(name, expire, cacheManager);
+		this.ehCacheOp = new EhcacheOperation(cacheManager, name);
 	}
 	
-	public SpringEhCache(String name, CacheManager cacheManager) {
+	public SpringEhCache(CacheManager cacheManager, String name, int expire) {
 		this.name = name;
-		this.ehCacheOp = new EhcacheOperation(name, cacheManager);
+		this.ehCacheOp = new EhcacheOperation(cacheManager, name, expire);
+	}
+	
+	public SpringEhCache(CacheManager cacheManager, String name, int expire, boolean isOpen) {
+		this.name = name;
+		this.isOpen = isOpen;
+		this.ehCacheOp = new EhcacheOperation(cacheManager, name, expire);
 	}
 
 	@Override
 	public void clear() {
-		ehCacheOp.clear();
+		if(isOpen)
+			ehCacheOp.clear();
 	}
 
 	@Override
 	public void evict(Object key) {
-		ehCacheOp.delete(key.toString());
+		if(isOpen)
+			ehCacheOp.delete(key.toString());
 	}
 
 	@Override
 	public ValueWrapper get(Object key) {
 		ValueWrapper wrapper = null;
+		if(!isOpen)
+			return wrapper;
 		Object value = ehCacheOp.get(key.toString());
 		if (value != null) {
 			wrapper = new SimpleValueWrapper(value);
@@ -52,12 +63,15 @@ public class SpringEhCache implements Cache {
 
 	@Override
 	public void put(Object key, Object value) {
-		ehCacheOp.put(key.toString(), value);
+		if(isOpen)
+			ehCacheOp.put(key.toString(), value);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T get(Object key, Class<T> type) {
+		if(!isOpen)
+			return null;
 		Object cacheValue = this.ehCacheOp.get(key.toString());
 		Object value = (cacheValue != null ? cacheValue : null);
 		if (type != null && !type.isInstance(value)) {
@@ -70,6 +84,8 @@ public class SpringEhCache implements Cache {
 	@Override
 	public ValueWrapper putIfAbsent(Object key, Object value) {
 		ValueWrapper wrapper = null;
+		if(!isOpen)
+			return wrapper;
 		Object objValue = this.ehCacheOp.get(key.toString());
 		if (objValue != null) {
 			wrapper = new SimpleValueWrapper(objValue);

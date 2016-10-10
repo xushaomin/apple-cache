@@ -8,32 +8,43 @@ import net.sf.ehcache.CacheManager;
 
 public class SpringJ2Cache implements Cache {
 
-	private final String name;
-	private final J2CacheOperation j2CacheOp;
-
-	public SpringJ2Cache(String name, int expire, CacheManager cacheManager, RedissonClient redisson) {
+	private String name;
+	private boolean isOpen = true;
+	private J2CacheOperation j2CacheOp;
+	
+	public SpringJ2Cache(CacheManager cacheManager, RedissonClient redisson, String name) {
 		this.name = name;
-		this.j2CacheOp = new J2CacheOperation(name, expire, cacheManager, redisson);
+		this.j2CacheOp = new J2CacheOperation(cacheManager, redisson, name);
+	}
+
+	public SpringJ2Cache(CacheManager cacheManager, RedissonClient redisson, String name, int expire) {
+		this.name = name;
+		this.j2CacheOp = new J2CacheOperation(cacheManager, redisson, name, expire);
 	}
 	
-	public SpringJ2Cache(String name, CacheManager cacheManager, RedissonClient redisson) {
+	public SpringJ2Cache(CacheManager cacheManager, RedissonClient redisson, String name, int expire, boolean isOpen) {
 		this.name = name;
-		this.j2CacheOp = new J2CacheOperation(name, cacheManager, redisson);
+		this.isOpen = isOpen;
+		this.j2CacheOp = new J2CacheOperation(cacheManager, redisson, name, expire, isOpen);
 	}
 
 	@Override
 	public void clear() {
-		j2CacheOp.clear();
+		if(isOpen)
+			j2CacheOp.clear();
 	}
 
 	@Override
 	public void evict(Object key) {
-		j2CacheOp.delete(key.toString());
+		if(isOpen)
+			j2CacheOp.delete(key.toString());
 	}
 
 	@Override
 	public ValueWrapper get(Object key) {
 		ValueWrapper wrapper = null;
+		if(!isOpen)
+			return wrapper;
 		Object value = j2CacheOp.get(key.toString());
 		if (value != null) {
 			wrapper = new SimpleValueWrapper(value);
@@ -53,12 +64,15 @@ public class SpringJ2Cache implements Cache {
 
 	@Override
 	public void put(Object key, Object value) {
-		j2CacheOp.put(key.toString(), value);
+		if(isOpen)
+			j2CacheOp.put(key.toString(), value);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T get(Object key, Class<T> type) {
+		if(!isOpen)
+			return null;
 		Object cacheValue = this.j2CacheOp.get(key.toString());
 		Object value = (cacheValue != null ? cacheValue : null);
 		if (type != null && !type.isInstance(value)) {
@@ -71,6 +85,8 @@ public class SpringJ2Cache implements Cache {
 	@Override
 	public ValueWrapper putIfAbsent(Object key, Object value) {
 		ValueWrapper wrapper = null;
+		if(!isOpen)
+			return wrapper;
 		Object objValue = this.j2CacheOp.get(key.toString());
 		if (objValue != null) {
 			wrapper = new SimpleValueWrapper(objValue);

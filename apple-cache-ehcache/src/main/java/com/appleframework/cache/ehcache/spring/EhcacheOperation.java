@@ -11,7 +11,8 @@ public class EhcacheOperation {
 	private static Logger logger = Logger.getLogger(EhcacheOperation.class);
 
 	private String name;
-	private int expire;
+	private int expire = 0;
+	
 	private CacheManager ehcacheManager;
 	
 	public Cache getEhCache() {
@@ -24,16 +25,15 @@ public class EhcacheOperation {
 			return cache;
 		}
 	}
-
-	public EhcacheOperation(String name, int expire, CacheManager ehcacheManager) {
+	
+	public EhcacheOperation(CacheManager ehcacheManager, String name) {
 		this.name = name;
-		this.expire = expire;
 		this.ehcacheManager = ehcacheManager;
 	}
-	
-	public EhcacheOperation(String name, CacheManager ehcacheManager) {
+
+	public EhcacheOperation(CacheManager ehcacheManager, String name, int expire) {
 		this.name = name;
-		this.expire = 0;
+		this.expire = expire;
 		this.ehcacheManager = ehcacheManager;
 	}
 
@@ -45,7 +45,7 @@ public class EhcacheOperation {
 				value = element.getObjectValue();
 			}
 		} catch (Exception e) {
-			logger.warn("获取 Cache 缓存错误", e);
+			logger.warn("cache error", e);
 		}
 		return value;
 	}
@@ -57,7 +57,7 @@ public class EhcacheOperation {
 			Element element = new Element(key, value);
 			getEhCache().put(element);
 		} catch (Exception e) {
-			logger.warn("更新 Cache 缓存错误", e);
+			logger.warn("cache error", e);
 		}
 	}
 
@@ -65,7 +65,7 @@ public class EhcacheOperation {
 		try {
 			getEhCache().removeAll();
 		} catch (Exception e) {
-			logger.warn("删除 Cache 缓存错误", e);
+			logger.warn("cache error", e);
 		}
 	}
 
@@ -73,7 +73,7 @@ public class EhcacheOperation {
 		try {
 			getEhCache().remove(key);
 		} catch (Exception e) {
-			logger.warn("删除 Cache 缓存错误", e);
+			logger.warn("cache error", e);
 		}
 	}
 

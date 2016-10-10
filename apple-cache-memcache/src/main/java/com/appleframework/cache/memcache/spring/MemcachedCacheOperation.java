@@ -14,17 +14,17 @@ public class MemcachedCacheOperation {
 	private static Logger log = Logger.getLogger(MemcachedCacheOperation.class);
 
 	private Set<String> keySet = new HashSet<String>();
-	private final String name;
-	private final int expire;
-	private final MemcachedClient memcachedClient;
+	private String name;
+	private int expire = 0;
+	private MemcachedClient memcachedClient;
 
-	public MemcachedCacheOperation(String name, int expire, MemcachedClient memcachedClient) {
+	public MemcachedCacheOperation(MemcachedClient memcachedClient, String name, int expire) {
 		this.name = name;
 		this.expire = expire;
 		this.memcachedClient = memcachedClient;
 	}
 	
-	public MemcachedCacheOperation(String name, MemcachedClient memcachedClient) {
+	public MemcachedCacheOperation(MemcachedClient memcachedClient, String name) {
 		this.name = name;
 		this.expire = 0;
 		this.memcachedClient = memcachedClient;
@@ -36,11 +36,11 @@ public class MemcachedCacheOperation {
 			key = this.getKey(key);
 			value = memcachedClient.get(key);
 		} catch (TimeoutException e) {
-			log.warn("��ȡ Memcached ���泬ʱ", e);
+			log.warn("get cache error :", e);
 		} catch (InterruptedException e) {
-			log.warn("��ȡ Memcached ���汻�ж�", e);
+			log.warn("get cache error :", e);
 		} catch (MemcachedException e) {
-			log.warn("��ȡ Memcached �������", e);
+			log.warn("get cache error :", e);
 		}
 		return value;
 	}
@@ -53,9 +53,9 @@ public class MemcachedCacheOperation {
 			memcachedClient.setWithNoReply(key, expire, value);
 			keySet.add(key);
 		} catch (InterruptedException e) {
-			log.warn("���� Memcached ���汻�ж�", e);
+			log.warn("set cache error :", e);
 		} catch (MemcachedException e) {
-			log.warn("���� Memcached �������", e);
+			log.warn("set cache error :", e);
 		}
 	}
 
@@ -64,9 +64,9 @@ public class MemcachedCacheOperation {
 			try {
 				memcachedClient.deleteWithNoReply(this.getKey(key));
 			} catch (InterruptedException e) {
-				log.warn("ɾ�� Memcached ���汻�ж�", e);
+				log.warn("clear cache error :", e);
 			} catch (MemcachedException e) {
-				log.warn("ɾ�� Memcached �������", e);
+				log.warn("clear cache error :", e);
 			}
 		}
 	}
@@ -76,9 +76,9 @@ public class MemcachedCacheOperation {
 			key = this.getKey(key);
 			memcachedClient.deleteWithNoReply(key);
 		} catch (InterruptedException e) {
-			log.warn("ɾ�� Memcached ���汻�ж�", e);
+			log.warn("delete cache error :", e);
 		} catch (MemcachedException e) {
-			log.warn("ɾ�� Memcached �������", e);
+			log.warn("delete cache error :", e);
 		}
 	}
 
