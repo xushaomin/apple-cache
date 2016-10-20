@@ -50,7 +50,10 @@ public class MemcachedCacheOperation {
 			return;
 		try {
 			key = this.getKey(key);
-			memcachedClient.setWithNoReply(key, expire, value);
+			if(expire > 0)
+				memcachedClient.setWithNoReply(key, expire, value);
+			else
+				memcachedClient.setWithNoReply(key, 0, value);
 			keySet.add(key);
 		} catch (InterruptedException e) {
 			log.warn("set cache error :", e);

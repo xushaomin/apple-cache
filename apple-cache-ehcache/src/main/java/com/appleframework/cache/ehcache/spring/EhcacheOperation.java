@@ -55,10 +55,10 @@ public class EhcacheOperation {
 			return;
 		try {
 			Element element = null;
-			if(expire <= 0)
-				element = new Element(key, value);
-			else
+			if(expire > 0)
 				element = new Element(key, value, expire, expire);
+			else
+				element = new Element(key, value);
 			getEhCache().put(element);
 		} catch (Exception e) {
 			logger.warn("cache error", e);

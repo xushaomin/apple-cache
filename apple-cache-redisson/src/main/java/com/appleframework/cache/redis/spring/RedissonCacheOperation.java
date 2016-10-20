@@ -45,10 +45,10 @@ public class RedissonCacheOperation {
 		if (value == null)
 			return;
 		try {
-			if(expire == 0)
-				getCacheMap().put(key, value);
-			else
+			if(expire > 0)
 				getCacheMap().put(key, value, expire, TimeUnit.SECONDS);
+			else
+				getCacheMap().put(key, value);
 		} catch (Exception e) {
 			logger.warn("cache error", e);
 		}
