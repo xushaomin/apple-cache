@@ -7,4 +7,7 @@ public interface CacheObject {
 	long getExpiredTime();
 	
 	boolean isExpired();
+	
+	void setExpiredTime(long expiredTime);
+
 }
