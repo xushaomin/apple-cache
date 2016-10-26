@@ -10,6 +10,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.support.AbstractCacheManager;
 
 import com.appleframework.cache.codis.CodisResourcePool;
+import com.appleframework.cache.core.config.CacheConfig;
 
 public class SpringCodisCacheManager extends AbstractCacheManager {
 
@@ -62,6 +63,10 @@ public class SpringCodisCacheManager extends AbstractCacheManager {
 	
 	public void setCodisResourcePool(CodisResourcePool codisResourcePool) {
 		this.codisResourcePool = codisResourcePool;
+	}
+	
+	public void setCacheObject(Boolean isCacheObject) {
+		CacheConfig.isCacheObject = isCacheObject;
 	}
 
 }

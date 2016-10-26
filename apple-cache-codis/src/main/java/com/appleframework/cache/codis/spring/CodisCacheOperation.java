@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.appleframework.cache.codis.CodisResourcePool;
+import com.appleframework.cache.core.CacheObject;
+import com.appleframework.cache.core.CacheObjectImpl;
+import com.appleframework.cache.core.config.CacheConfig;
 import com.appleframework.cache.core.utils.SerializeUtility;
 
 import redis.clients.jedis.Jedis;
@@ -45,7 +48,19 @@ public class CodisCacheOperation {
 			if(list.size() > 0) {
 				byte[] cacheValue = list.get(0);
 				if(null != cacheValue) {
-					value = SerializeUtility.unserialize(cacheValue);
+					if(CacheConfig.isCacheObject) {
+						CacheObject cache = (CacheObject) SerializeUtility.unserialize(cacheValue);
+						if (null != cache) {
+							if (cache.isExpired()) {
+								this.resetCacheObject(key, cache);
+							} else {
+								value = cache.getObject();
+							}
+						}
+					}
+					else {
+						value = SerializeUtility.unserialize(cacheValue);
+					}
 				}
 			}
 		}
@@ -55,17 +70,47 @@ public class CodisCacheOperation {
 	public void put(String key, Object value) {
 		if (value == null)
 			return;
+		Object cache = null;
 		try (Jedis jedis = codisResourcePool.getResource()) {
 			byte[] byteName = genByteName();
 			byte[] byteKey = genByteKey(key);
-			byte[] byteValue = SerializeUtility.serialize(value);
+			
+			if(CacheConfig.isCacheObject) {
+				cache = new CacheObjectImpl(value, getExpiredTime());
+			}
+			else {
+				cache = value;
+			}			
+			byte[] byteValue = SerializeUtility.serialize(cache);
 			
 			Map<byte[], byte[]> hash = new HashMap<>();
 			hash.put(byteKey, byteValue);
 			jedis.hmset(byteName, hash);
-			if(expireTime > 0)
+			if(expireTime > 0 && !CacheConfig.isCacheObject)
 				jedis.expire(byteName, expireTime);
 		}
+	}
+	
+	private void resetCacheObject(String key, CacheObject cache) {
+		cache.setExpiredTime(getExpiredTime());
+		try (Jedis jedis = codisResourcePool.getResource()) {
+			byte[] byteName = genByteName();
+			byte[] byteKey = genByteKey(key);
+			byte[] byteValue = SerializeUtility.serialize(cache);
+
+			Map<byte[], byte[]> hash = new HashMap<>();
+			hash.put(byteKey, byteValue);
+			jedis.hmset(byteName, hash);
+		}
+
+	}
+	
+	private long getExpiredTime() {
+		long lastTime = 2592000000L;
+		if (expireTime > 0) {
+			lastTime = expireTime * 1000;
+		}
+		return System.currentTimeMillis() + lastTime;
 	}
 
 	public void clear() {
