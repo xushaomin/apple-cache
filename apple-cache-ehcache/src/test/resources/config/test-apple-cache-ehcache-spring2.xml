@@ -23,8 +23,10 @@
 	</bean>
 	
 	<bean id="springCacheManager"
-		class="com.appleframework.cache.ehcache.spring2.SpringEhCacheManager">
+		class="com.appleframework.cache.ehcache.spring.SpringEhCacheManager">
 		<property name="ehcacheManager" ref="ehCacheManagerFactoryBean" />
+		<property name="cacheObject" value="true" />
+		
 		<!-- 配置缓存时间 -->
 		<property name="expireConfig">
 			<map>

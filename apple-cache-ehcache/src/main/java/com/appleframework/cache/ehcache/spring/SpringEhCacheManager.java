@@ -9,6 +9,8 @@ import java.util.concurrent.ConcurrentMap;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.AbstractCacheManager;
 
+import com.appleframework.cache.core.config.CacheConfig;
+
 import net.sf.ehcache.CacheManager;
 
 public class SpringEhCacheManager extends AbstractCacheManager {
@@ -63,6 +65,10 @@ public class SpringEhCacheManager extends AbstractCacheManager {
 
 	public void setOpenConfig(Map<String, Boolean> openConfig) {
 		this.openMap = openConfig;
+	}
+
+	public void setCacheObject(Boolean isCacheObject) {
+		CacheConfig.isCacheObject = isCacheObject;
 	}
 
 }
