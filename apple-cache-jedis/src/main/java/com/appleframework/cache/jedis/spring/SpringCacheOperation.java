@@ -1,9 +1,5 @@
 package com.appleframework.cache.jedis.spring;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 
 import com.appleframework.cache.core.CacheObject;
@@ -24,7 +20,7 @@ public class SpringCacheOperation implements CacheOperation {
 	private int expireTime = 0;
 	private JedisPool jedisPool;
 	
-	private Jedis getResource(String name) {
+	private Jedis getResource() {
 		return jedisPool.getResource();
 	}
 
@@ -39,45 +35,32 @@ public class SpringCacheOperation implements CacheOperation {
 		this.expireTime = 0;
 		this.jedisPool = jedisPool;
 	}
-
-	private byte[] genByteKey(String key) {
-		return SerializeUtility.serialize(key);
-	}
-	
-	private byte[] genByteName() {
-		return SerializeUtility.serialize(name);
-	}
 	
 	@SuppressWarnings("deprecation")
 	public Object get(String key) {
 		if(!isOpen)
 			return null;
 		Object object = null;
-		Jedis jedis = getResource(name);
+		Jedis jedis = getResource();
 		try {
-			byte[] field = genByteKey(key);
-			
-			List<byte[]> list = jedis.hmget(genByteName(), field);
-			if(list.size() > 0) {
-				byte[] cacheValue = list.get(0);
-				if(null != cacheValue) {
-					if(CacheConfig.isCacheObject) {
-						CacheObject cache = (CacheObject) SerializeUtility.unserialize(cacheValue);
-						if (null != cache) {
-							if (cache.isExpired()) {
-								this.resetCacheObject(key, cache);
-							} else {
-								object = cache.getObject();
-							}
+			byte[] cacheValue = jedis.hget(name.getBytes(), key.getBytes());
+			if (null != cacheValue) {
+				if (CacheConfig.isCacheObject) {
+					CacheObject cache = (CacheObject) SerializeUtility.unserialize(cacheValue);
+					if (null != cache) {
+						if (cache.isExpired()) {
+							this.resetCacheObject(key, cache);
+						} else {
+							object = cache.getObject();
 						}
 					}
-					else {
-						object = SerializeUtility.unserialize(cacheValue);
-					}
+				} else {
+					object = SerializeUtility.unserialize(cacheValue);
 				}
 			}
+
 		} catch (Exception e) {
-			logger.warn("获取 Cache 缓存错误", e);
+			logger.warn("Cache Error : ", e);
 		} finally {
 			jedisPool.returnResource(jedis);
 		}
@@ -86,19 +69,13 @@ public class SpringCacheOperation implements CacheOperation {
 	
 	@SuppressWarnings({ "deprecation" })
 	private void resetCacheObject(String key, CacheObject cache) {
-		Jedis jedis = getResource(name);
+		Jedis jedis = getResource();
 		try {
 			cache.setExpiredTime(getExpiredTime());
-			
-			byte[] byteName = genByteName();
-			byte[] byteKey = genByteKey(key);
 			byte[] byteValue = SerializeUtility.serialize(cache);
-			
-			Map<byte[], byte[]> hash = new HashMap<>();
-			hash.put(byteKey, byteValue);
-			jedis.hmset(byteName, hash);
+			jedis.hset(name.getBytes(), key.getBytes(), byteValue);
 		} catch (Exception e) {
-			logger.warn("更新 Cache 缓存错误", e);
+			logger.warn("Cache Error : ", e);
 		} finally {
 			jedisPool.returnResource(jedis);
 		}
@@ -108,11 +85,9 @@ public class SpringCacheOperation implements CacheOperation {
 	public void put(String key, Object value) {
 		if (value == null || !isOpen)
 			return;
-		Jedis jedis = getResource(name);
+		Jedis jedis = getResource();
 		try {
 			Object cache = null;
-			byte[] byteName = genByteName();
-			byte[] byteKey = genByteKey(key);
 			
 			if(CacheConfig.isCacheObject) {
 				cache = new CacheObjectImpl(value, getExpiredTime());
@@ -121,14 +96,13 @@ public class SpringCacheOperation implements CacheOperation {
 				cache = value;
 			}
 			byte[] byteValue = SerializeUtility.serialize(cache);
+			byte[] byteKey = name.getBytes();
 			
-			Map<byte[], byte[]> hash = new HashMap<>();
-			hash.put(byteKey, byteValue);
-			jedis.hmset(byteName, hash);
+			jedis.hset(byteKey, key.getBytes(), byteValue);
 			if(expireTime > 0 && !CacheConfig.isCacheObject)
-				jedis.expire(byteName, expireTime);
+				jedis.expire(byteKey, expireTime);
 		} catch (Exception e) {
-			logger.warn("更新 Cache 缓存错误", e);
+			logger.warn("Cache Error : ", e);
 		} finally {
 			jedisPool.returnResource(jedis);
 		}
@@ -136,22 +110,22 @@ public class SpringCacheOperation implements CacheOperation {
 
 	@SuppressWarnings("deprecation")
 	public void clear() {
-		Jedis jedis = getResource(name);
+		Jedis jedis = getResource();
 		try {
-			jedis.del(genByteName());
+			jedis.del(name.getBytes());
 		} catch (Exception e) {
-			logger.warn("删除 Cache 缓存错误", e);
+			logger.warn("Cache Error : ", e);
 		} finally {
 			jedisPool.returnResource(jedis);
 		}
 	}
 
 	public void delete(String key) {
-		Jedis jedis = getResource(name);
+		Jedis jedis = getResource();
 		try {
-			jedis.hdel(genByteName(), genByteKey(key));
+			jedis.hdel(name.getBytes(), key.getBytes());
 		} catch (Exception e) {
-			logger.warn("删除 Cache 缓存错误", e);
+			logger.warn("Cache Error : ", e);
 		}
 	}
 

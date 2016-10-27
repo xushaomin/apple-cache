@@ -22,7 +22,7 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 
 	private static Logger logger = Logger.getLogger(J2RedissonMapCacheManager.class);
 
-	private String name = "J2_CACHE_MANAGER";
+	private String name = "J2CACHE_REDISSON_MANAGER";
 
 	private RedissonClient redisson;
 
@@ -46,7 +46,7 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 		this.ehcacheManager = ehcacheManager;
 	}
 
-	public <T> RMapCache<String, T> getRedisCache() {
+	public <T> RMapCache<String, T> getCache() {
 		return redisson.getMapCache(name);
 	}
 
@@ -62,7 +62,7 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 
 	public void clear() throws CacheException {
 		try {
-			getRedisCache().clear();
+			getCache().clear();
 			publish(null, CommandType.CLEAR, 0);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -74,7 +74,7 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 			Object value = null;
 			Element element = getEhCache().get(key);
 			if (null == element) {
-				value = getRedisCache().get(key);
+				value = getCache().get(key);
 				if (null != value)
 					getEhCache().put(new Element(key, value));
 			} else {
@@ -95,7 +95,7 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 			T value = null;
 			Element element = getEhCache().get(key);
 			if (null == element) {
-				value = (T) getRedisCache().get(key);
+				value = (T) getCache().get(key);
 				if (null != value)
 					getEhCache().put(new Element(key, value));
 			} else {
@@ -110,7 +110,7 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 
 	public boolean remove(String key) throws CacheException {
 		try {
-			getRedisCache().remove(key);
+			getCache().remove(key);
 			publish(key, CommandType.DELETE, 0);
 			return true;
 		} catch (Exception e) {
@@ -122,7 +122,7 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 	public void set(String key, Object value) throws CacheException {
 		if (null != value) {
 			try {
-				getRedisCache().put(key, value);
+				getCache().put(key, value);
 				publish(key, CommandType.PUT, 0);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
@@ -133,7 +133,7 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 	public void set(String key, Object value, int expireTime) throws CacheException {
 		if (null != value) {
 			try {
-				getRedisCache().put(key, value, expireTime, TimeUnit.SECONDS);
+				getCache().put(key, value, expireTime, TimeUnit.SECONDS);
 				publish(key, CommandType.PUT, expireTime);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
@@ -144,6 +144,7 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 	private void publish(Object key, CommandType commandType, Integer timeout) {
 		try {
 			Command command = new Command();
+			command.setName(name);
 			command.setKey(key);
 			command.setType(commandType);
 			command.setTimeout(timeout);

@@ -22,7 +22,7 @@
 
 		<dependency>
 			<groupId>com.appleframework.cache</groupId>
-			<artifactId>apple-cache-redis</artifactId>
+			<artifactId>apple-cache-jedis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

@@ -169,7 +169,6 @@ public class J2RedissonBucketCacheManager implements com.appleframework.cache.co
 	public List<Object> getList(List<String> keyList) throws CacheException {
 		try {
 			List<Object> returnList = new ArrayList<Object>();
-			//List<String> redisCacheKeyList = new ArrayList<String>();
 			Map<Object, Element> ehcacheMap = getEhCache().getAll(keyList);
 			for (int i = 0; i < keyList.size(); i++) {
 				String key = keyList.get(i);

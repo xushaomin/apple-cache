@@ -17,7 +17,7 @@
 	<import resource="apple-cache-echcache.xml"/>
 	
 	<bean id="springCacheManager"
-		class="com.appleframework.cache.ehcache.spring.SpringEhCacheManager">
+		class="com.appleframework.cache.ehcache.spring.SpringCacheManager">
 		<property name="ehcacheManager" ref="ehCacheManagerFactoryBean" />
 		<!-- 配置缓存时间 -->
 		<property name="expireConfig">

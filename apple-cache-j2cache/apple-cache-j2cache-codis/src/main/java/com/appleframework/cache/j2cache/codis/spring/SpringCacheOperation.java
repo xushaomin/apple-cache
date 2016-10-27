@@ -1,17 +1,15 @@
 package com.appleframework.cache.j2cache.codis.spring;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.jgroups.MessageListener;
 
 import com.appleframework.cache.codis.CodisResourcePool;
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.Command.CommandType;
 import com.appleframework.cache.core.replicator.CommandReplicator;
 import com.appleframework.cache.core.spring.CacheOperation;
-import com.appleframework.cache.j2cache.codis.utils.Contants;
+import com.appleframework.cache.core.utils.SerializeUtility;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -70,6 +68,23 @@ public class SpringCacheOperation implements CacheOperation {
 			return cache;
 		}
 	}
+	
+	public Object getFromRedis(String key) {
+		if(!isOpen)
+			return null;
+		Object object = null;
+		try {
+			try (Jedis jedis = codisResourcePool.getResource()) {
+				byte[] cacheValue = jedis.hget(name.getBytes(), key.getBytes());
+				if (null != cacheValue) {
+					object = SerializeUtility.unserialize(cacheValue);
+				}
+			}
+		} catch (Exception e) {
+			logger.warn("Cache Error : ", e);
+		}
+		return object;
+	}
 
 	public Object get(String key) {
 		if(!isOpen)
@@ -78,7 +93,7 @@ public class SpringCacheOperation implements CacheOperation {
 		try {
 			Element element = getEhCache().get(key);
 			if(null == element) {
-				value = getRedisCache().get(key);
+				value = getFromRedis(key);
 				if(null != value)
 					getEhCache().put(new Element(key, value));
 			}
@@ -95,7 +110,9 @@ public class SpringCacheOperation implements CacheOperation {
 		if (value == null || !isOpen)
 			return;
 		try {
-			getRedisCache().put(key, value);
+			try (Jedis jedis = codisResourcePool.getResource()) {
+				jedis.hset(name.getBytes(), key.getBytes(), SerializeUtility.serialize(value));
+			}
 			publish(key, CommandType.PUT);
 		} catch (Exception e) {
 			logger.warn("cache error", e);
