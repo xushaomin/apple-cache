@@ -16,17 +16,12 @@
         overflowToDisk：内存不足时，是否启用磁盘缓存。
         memoryStoreEvictionPolicy：缓存满了之后的淘汰算法。
     -->
-    <cache name="userCache" 
+    <cache name="testd" 
         maxElementsInMemory="10000" 
         eternal="false"
         overflowToDisk="false" 
         timeToIdleSeconds="900" 
         timeToLiveSeconds="1800"
-        memoryStoreEvictionPolicy="LFU" />
-        
-   	<cacheManagerPeerProviderFactory
-		class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
-		properties="peerDiscovery=automatic, multicastGroupAddress=230.0.0.1,multicastGroupPort=4446, timeToLive=32" />
-   	
+        memoryStoreEvictionPolicy="LFU" />   	
  
 </ehcache>

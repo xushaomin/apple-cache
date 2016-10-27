@@ -16,15 +16,24 @@
 	<!-- turn on declarative caching -->
 	<cache:annotation-driven cache-manager="springCacheManager" />  
 
-	<bean id="ehCacheManagerFactoryBean" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal" value="24" />
+		<property name="maxIdle" value="24" />
+		<property name="minIdle" value="0" />
+	</bean>
 	
-	<bean id="cacheManager" class="com.appleframework.cache.ehcache.EhCacheManager">
-		<property name="ehcacheManager" ref="ehCacheManagerFactoryBean" />
+	<bean id="jedisPool" class="redis.clients.jedis.JedisPool" >
+		<constructor-arg ref="jedisPoolConfig" />
+		<constructor-arg value="192.168.1.177" />
+		<constructor-arg value="6379" />
+		<constructor-arg value="500" />
+		<constructor-arg ><null/></constructor-arg>
+		<constructor-arg value="0" />
 	</bean>
 	
 	<bean id="springCacheManager"
-		class="com.appleframework.cache.ehcache.spring.SpringEhCacheManager">
-		<property name="ehcacheManager" ref="ehCacheManagerFactoryBean" />
+		class="com.appleframework.cache.redis.spring.SpringRedisCacheManager">
+		<property name="jedisPool" ref="jedisPool" />
 		<property name="cacheObject" value="true" />
 		<!-- 配置缓存时间 -->
 		<property name="expireConfig">
@@ -36,9 +45,9 @@
 	
 	<bean id="threadPoolTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<!-- 核心线程数，默认为1 -->
-		<property name="corePoolSize" value="1000" />
+		<property name="corePoolSize" value="100" />
 		<!-- 最大线程数，默认为Integer.MAX_VALUE -->
-		<property name="maxPoolSize" value="2000" />
+		<property name="maxPoolSize" value="200" />
 		<!-- 队列最大长度，一般需要设置值>=notifyScheduledMainExecutor.maxNum；默认为Integer.MAX_VALUE -->
 		<property name="queueCapacity" value="100000" />
 		<!-- 线程池维护线程所允许的空闲时间，默认为60s -->

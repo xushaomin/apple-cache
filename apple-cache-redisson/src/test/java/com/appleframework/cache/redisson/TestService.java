@@ -1,4 +1,4 @@
-package com.appleframework.cache.redis;
+package com.appleframework.cache.redisson;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;

@@ -6,6 +6,10 @@ import org.apache.log4j.Logger;
 import org.redisson.RedissonClient;
 import org.redisson.core.RMapCache;
 
+import com.appleframework.cache.core.CacheObject;
+import com.appleframework.cache.core.CacheObjectImpl;
+import com.appleframework.cache.core.config.CacheConfig;
+
 public class RedissonCacheOperation {
 
 	private static Logger logger = Logger.getLogger(RedissonCacheOperation.class);
@@ -32,23 +36,52 @@ public class RedissonCacheOperation {
 	}
 
 	public Object get(String key) {
-		Object value = null;
+		Object returnValue = null;
 		try {
-			value = getCacheMap().get(key);
+			Object cacheValue = getCacheMap().get(key);
+			if(CacheConfig.isCacheObject) {
+				CacheObject cache = (CacheObject) cacheValue;
+				if (null != cache) {
+					if (cache.isExpired()) {
+						this.resetCacheObject(key, cache);
+					} else {
+						returnValue = cache.getObject();
+					}
+				}
+			}
+			else {
+				return cacheValue;
+			}
 		} catch (Exception e) {
 			logger.warn("cache error", e);
 		}
-		return value;
+		return returnValue;
 	}
 
+	private void resetCacheObject(String key, CacheObject cache) {
+		try {
+			cache.setExpiredTime(getExpiredTime());
+			getCacheMap().put(key, cache);
+		} catch (Exception e) {
+			logger.warn("cache error", e);
+		} 
+	}
+	
 	public void put(String key, Object value) {
 		if (value == null)
 			return;
 		try {
-			if(expire > 0)
-				getCacheMap().put(key, value, expire, TimeUnit.SECONDS);
-			else
-				getCacheMap().put(key, value);
+			if(CacheConfig.isCacheObject) {
+				CacheObject cache = new CacheObjectImpl(value, getExpiredTime());
+				getCacheMap().put(key, cache);
+			}
+			else {
+				if(expire > 0)
+					getCacheMap().put(key, value, expire, TimeUnit.SECONDS);
+				else
+					getCacheMap().put(key, value);
+			}
+			
 		} catch (Exception e) {
 			logger.warn("cache error", e);
 		}
@@ -72,6 +105,14 @@ public class RedissonCacheOperation {
 
 	public int getExpire() {
 		return expire;
+	}
+	
+	private long getExpiredTime() {
+		long lastTime = 2592000000L;
+		if (expire > 0) {
+			lastTime = expire * 1000;
+		}
+		return System.currentTimeMillis() + lastTime;
 	}
 	
 }

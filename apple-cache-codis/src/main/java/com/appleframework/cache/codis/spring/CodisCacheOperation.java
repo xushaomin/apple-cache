@@ -80,7 +80,7 @@ public class CodisCacheOperation {
 			}
 			else {
 				cache = value;
-			}			
+			}
 			byte[] byteValue = SerializeUtility.serialize(cache);
 			
 			Map<byte[], byte[]> hash = new HashMap<>();

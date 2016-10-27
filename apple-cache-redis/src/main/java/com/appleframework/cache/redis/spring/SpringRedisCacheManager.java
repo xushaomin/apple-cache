@@ -9,6 +9,8 @@ import java.util.concurrent.ConcurrentMap;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.AbstractCacheManager;
 
+import com.appleframework.cache.core.config.CacheConfig;
+
 import redis.clients.jedis.JedisPool;
 
 public class SpringRedisCacheManager extends AbstractCacheManager {
@@ -65,6 +67,10 @@ public class SpringRedisCacheManager extends AbstractCacheManager {
 
 	public void setJedisPool(JedisPool jedisPool) {
 		this.jedisPool = jedisPool;
+	}
+	
+	public void setCacheObject(Boolean isCacheObject) {
+		CacheConfig.isCacheObject = isCacheObject;
 	}
 
 }

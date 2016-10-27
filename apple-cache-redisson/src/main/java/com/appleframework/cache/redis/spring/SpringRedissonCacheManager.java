@@ -11,6 +11,8 @@ import org.redisson.RedissonClient;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.AbstractCacheManager;
 
+import com.appleframework.cache.core.config.CacheConfig;
+
 public class SpringRedissonCacheManager extends AbstractCacheManager {
 
 	private ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>();
@@ -65,4 +67,7 @@ public class SpringRedissonCacheManager extends AbstractCacheManager {
 		this.openMap = openConfig;
 	}
 
+	public void setCacheObject(Boolean isCacheObject) {
+		CacheConfig.isCacheObject = isCacheObject;
+	}
 }
