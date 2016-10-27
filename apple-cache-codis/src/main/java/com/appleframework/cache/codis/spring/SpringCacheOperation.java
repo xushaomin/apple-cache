@@ -1,9 +1,5 @@
 package com.appleframework.cache.codis.spring;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.appleframework.cache.codis.CodisResourcePool;
 import com.appleframework.cache.core.CacheObject;
 import com.appleframework.cache.core.CacheObjectImpl;
@@ -31,37 +27,23 @@ public class SpringCacheOperation implements CacheOperation {
 		this.expireTime = expireTime;
 		this.codisResourcePool = codisResourcePool;
 	}
-	
-	private byte[] genByteKey(String key) {
-		return SerializeUtility.serialize(key);
-	}
-	
-	private byte[] genByteName() {
-		return SerializeUtility.serialize(name);
-	}
 
 	public Object get(String key) {
 		Object value = null;
 		try (Jedis jedis = codisResourcePool.getResource()) {
-			byte[] field = genByteKey(key);
-			
-			List<byte[]> list = jedis.hmget(genByteName(), field);
-			if(list.size() > 0) {
-				byte[] cacheValue = list.get(0);
-				if(null != cacheValue) {
-					if(CacheConfig.isCacheObject) {
-						CacheObject cache = (CacheObject) SerializeUtility.unserialize(cacheValue);
-						if (null != cache) {
-							if (cache.isExpired()) {
-								this.resetCacheObject(key, cache);
-							} else {
-								value = cache.getObject();
-							}
+			byte[] cacheValue = jedis.hget(name.getBytes(), key.getBytes());
+			if (null != cacheValue) {
+				if (CacheConfig.isCacheObject) {
+					CacheObject cache = (CacheObject) SerializeUtility.unserialize(cacheValue);
+					if (null != cache) {
+						if (cache.isExpired()) {
+							this.resetCacheObject(key, cache);
+						} else {
+							value = cache.getObject();
 						}
 					}
-					else {
-						value = SerializeUtility.unserialize(cacheValue);
-					}
+				} else {
+					value = SerializeUtility.unserialize(cacheValue);
 				}
 			}
 		}
@@ -73,8 +55,7 @@ public class SpringCacheOperation implements CacheOperation {
 			return;
 		Object cache = null;
 		try (Jedis jedis = codisResourcePool.getResource()) {
-			byte[] byteName = genByteName();
-			byte[] byteKey = genByteKey(key);
+			byte[] byteKey = name.getBytes();
 			
 			if(CacheConfig.isCacheObject) {
 				cache = new CacheObjectImpl(value, getExpiredTime());
@@ -82,26 +63,16 @@ public class SpringCacheOperation implements CacheOperation {
 			else {
 				cache = value;
 			}
-			byte[] byteValue = SerializeUtility.serialize(cache);
-			
-			Map<byte[], byte[]> hash = new HashMap<>();
-			hash.put(byteKey, byteValue);
-			jedis.hmset(byteName, hash);
+			jedis.hset(byteKey, key.getBytes(), SerializeUtility.serialize(cache));
 			if(expireTime > 0 && !CacheConfig.isCacheObject)
-				jedis.expire(byteName, expireTime);
+				jedis.expire(byteKey, expireTime);
 		}
 	}
 	
 	private void resetCacheObject(String key, CacheObject cache) {
 		cache.setExpiredTime(getExpiredTime());
 		try (Jedis jedis = codisResourcePool.getResource()) {
-			byte[] byteName = genByteName();
-			byte[] byteKey = genByteKey(key);
-			byte[] byteValue = SerializeUtility.serialize(cache);
-
-			Map<byte[], byte[]> hash = new HashMap<>();
-			hash.put(byteKey, byteValue);
-			jedis.hmset(byteName, hash);
+			jedis.hset(name.getBytes(), key.getBytes(), SerializeUtility.serialize(cache));
 		}
 
 	}
@@ -116,13 +87,13 @@ public class SpringCacheOperation implements CacheOperation {
 
 	public void clear() {
 		try (Jedis jedis = codisResourcePool.getResource()) {
-			jedis.del(genByteName());
+			jedis.del(name.getBytes());
 		}
 	}
 
 	public void delete(String key) {
 		try (Jedis jedis = codisResourcePool.getResource()) {
-			jedis.hdel(genByteName(), genByteKey(key));
+			jedis.hdel(name.getBytes(), key.getBytes());
 		}
 	}
 

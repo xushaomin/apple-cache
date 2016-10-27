@@ -23,7 +23,7 @@
 	</bean>
 	
 	<bean id="springCacheManager"
-		class="com.appleframework.cache.ehcache.spring.SpringEhCacheManager">
+		class="com.appleframework.cache.ehcache.spring.SpringCacheManager">
 		<property name="ehcacheManager" ref="ehCacheManagerFactoryBean" />
 		<property name="cacheObject" value="true" />
 		<!-- 配置缓存时间 -->
