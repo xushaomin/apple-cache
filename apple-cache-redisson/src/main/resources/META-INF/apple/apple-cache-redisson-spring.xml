@@ -17,7 +17,7 @@
 	<import resource="apple-cache-redisson-master.xml"/>
 	
 	<bean id="springCacheManager"
-		class="com.appleframework.cache.redis.spring.SpringRedissonCacheManager">
+		class="com.appleframework.cache.redisson.spring.SpringCacheManager">
 		<property name="redisson" ref="redisson" />
 		<!-- 配置缓存时间 -->
 		<property name="expireConfig">
