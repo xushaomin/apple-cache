@@ -19,7 +19,7 @@ public class RedisSpringTest8 {
 		try {
 			for (int i = 1; i < 100000; i++) {
 				try {
-					testService.getCache("xusm");
+					System.out.println(testService.getCache("xusm"));
 					Thread.sleep(1000);
 				} catch (RuntimeException e) {
 					e.printStackTrace();

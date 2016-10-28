@@ -70,7 +70,7 @@ public class SpringCacheOperation implements CacheOperation {
 	
 	public void put(String key, Object value) {
 		if (value == null)
-			return;
+			this.delete(key);
 		try {
 			if(CacheConfig.isCacheObject()) {
 				CacheObject cache = new CacheObjectImpl(value, getExpiredTime());
@@ -82,7 +82,6 @@ public class SpringCacheOperation implements CacheOperation {
 				else
 					getCacheMap().put(key, value);
 			}
-			
 		} catch (Exception e) {
 			logger.warn("cache error", e);
 		}

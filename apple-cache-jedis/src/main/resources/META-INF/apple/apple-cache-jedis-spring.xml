@@ -17,7 +17,7 @@
 	<import resource="apple-cache-redis.xml"/>
 	
 	<bean id="springCacheManager"
-		class="com.appleframework.cache.jedis.spring.SpringRedisCacheManager">
+		class="com.appleframework.cache.jedis.spring.SpringCacheManager">
 		<property name="jedisPool" ref="jedisPool" />
 		<!-- 配置缓存时间 -->
 		<property name="expireConfig">

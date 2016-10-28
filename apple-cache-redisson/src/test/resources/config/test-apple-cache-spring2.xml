@@ -39,6 +39,7 @@
 		class="com.appleframework.cache.redisson.spring.SpringCacheManager">
 		<property name="redisson" ref="redisson" />
 		<property name="cacheObject" value="true" />
+		<property name="cacheEnable" value="true" />
 		<!-- 配置缓存时间 -->
 		<property name="expireConfig">
 			<map>

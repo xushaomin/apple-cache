@@ -79,9 +79,9 @@ public class SpringCache implements Cache {
 
 	@Override
 	public ValueWrapper putIfAbsent(Object key, Object value) {
-		ValueWrapper wrapper = null;
 		if(!CacheConfig.isCacheEnable())
-			return wrapper;
+			return null;
+		ValueWrapper wrapper = null;
 		Object objValue = this.cacheOperation.get(key.toString());
 		if (objValue != null) {
 			wrapper = new SimpleValueWrapper(objValue);

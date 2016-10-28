@@ -5,7 +5,6 @@ import javax.annotation.Resource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.redisson.Redisson;
-import org.redisson.core.RSortedSet;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -18,11 +17,9 @@ public class RedisSpringTest {
 	    
 	@Test
 	public void testAddOpinion1() {
-		RSortedSet set = redisson.getSortedSet("dddd");
+		//RSortedSet set = redisson.getSortedSet("dddd");
 		
 	}
-	
-
 
 }
 

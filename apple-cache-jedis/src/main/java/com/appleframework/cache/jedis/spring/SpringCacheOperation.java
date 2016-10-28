@@ -11,6 +11,7 @@ import com.appleframework.cache.core.utils.SerializeUtility;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+@SuppressWarnings("deprecation")
 public class SpringCacheOperation implements CacheOperation {
 
 	private static Logger logger = Logger.getLogger(SpringCacheOperation.class);
@@ -35,10 +36,7 @@ public class SpringCacheOperation implements CacheOperation {
 		this.jedisPool = jedisPool;
 	}
 	
-	@SuppressWarnings("deprecation")
 	public Object get(String key) {
-		if(!CacheConfig.isCacheEnable())
-			return null;
 		Object object = null;
 		Jedis jedis = getResource();
 		try {
@@ -66,7 +64,6 @@ public class SpringCacheOperation implements CacheOperation {
 		return object;
 	}
 	
-	@SuppressWarnings({ "deprecation" })
 	private void resetCacheObject(String key, CacheObject cache) {
 		Jedis jedis = getResource();
 		try {
@@ -80,10 +77,9 @@ public class SpringCacheOperation implements CacheOperation {
 		}
 	}
 	
-	@SuppressWarnings({ "deprecation" })
 	public void put(String key, Object value) {
-		if (value == null || !CacheConfig.isCacheEnable())
-			return;
+		if (value == null)
+			this.delete(key);
 		Jedis jedis = getResource();
 		try {
 			Object cache = null;
@@ -107,7 +103,6 @@ public class SpringCacheOperation implements CacheOperation {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	public void clear() {
 		Jedis jedis = getResource();
 		try {

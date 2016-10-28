@@ -73,7 +73,7 @@ public class SpringCacheOperation implements CacheOperation {
 
 	public void put(String key, Object value) {
 		if (value == null)
-			return;
+			this.delete(key);
 		try {
 			key = this.getKey(key);
 			if(CacheConfig.isCacheObject()) {

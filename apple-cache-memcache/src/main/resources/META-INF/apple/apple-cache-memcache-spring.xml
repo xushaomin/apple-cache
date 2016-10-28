@@ -16,7 +16,7 @@
 	<import resource="apple-cache-memcache.xml"/>
 		
 	<bean id="springCacheManager"
-		class="com.appleframework.cache.memcache.spring.SpringMemcachedCacheManager">
+		class="com.appleframework.cache.memcache.spring.SpringCacheManager">
 		<property name="memcachedClient" ref="memcachedClient" />
 		<!-- 配置缓存时间 -->
 		<property name="expireConfig">

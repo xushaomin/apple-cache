@@ -25,6 +25,8 @@
 				<entry key="typeList" value="3600" />   <!-- key缓存对象名称 value缓存过期时间 -->
 			</map>
 		</property>
+		<property name="cacheObject" value="true" />
+		<property name="cacheEnable" value="true" />
 	</bean>
 
 </beans>
