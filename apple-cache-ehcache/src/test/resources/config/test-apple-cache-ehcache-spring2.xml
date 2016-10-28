@@ -26,6 +26,7 @@
 		class="com.appleframework.cache.ehcache.spring.SpringCacheManager">
 		<property name="ehcacheManager" ref="ehCacheManagerFactoryBean" />
 		<property name="cacheObject" value="true" />
+		<property name="cacheEnable" value="true" />
 		<!-- 配置缓存时间 -->
 		<property name="expireConfig">
 			<map>
