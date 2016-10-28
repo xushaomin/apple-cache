@@ -11,7 +11,6 @@ public class Command implements Serializable {
 	}
 
 	private CommandType type;
-	private String name;
 	private Object key;
 	private Integer timeout = 0;
 
@@ -42,14 +41,6 @@ public class Command implements Serializable {
 	public Command(CommandType commandType, Object key, Integer timeout) {
 		super();
 		this.type = commandType;
-		this.key = key;
-		this.timeout = timeout;
-	}
-	
-	public Command(CommandType commandType, String name, Object key, Integer timeout) {
-		super();
-		this.type = commandType;
-		this.name = name;
 		this.key = key;
 		this.timeout = timeout;
 	}
@@ -86,14 +77,6 @@ public class Command implements Serializable {
 
 	public Integer getTimeout() {
 		return timeout;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.appleframework.cache.j2cache.redisson;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -144,7 +145,6 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 	private void publish(Object key, CommandType commandType, Integer timeout) {
 		try {
 			Command command = new Command();
-			command.setName(name);
 			command.setKey(key);
 			command.setType(commandType);
 			command.setTimeout(timeout);
@@ -154,7 +154,6 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 		}
 	}
 	
-	// 批量获取
 	@Override
 	public List<Object> getList(List<String> keyList) throws CacheException {
 		List<Object> list = new ArrayList<Object>();
@@ -193,25 +192,29 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 
 	@Override
 	public Map<String, Object> getMap(List<String> keyList) throws CacheException {
-		// TODO Auto-generated method stub
-		return null;
+		return this.getMap(keyList.toArray(new String[keyList.size()]));
 	}
 
 	@Override
 	public Map<String, Object> getMap(String... keys) throws CacheException {
-		// TODO Auto-generated method stub
-		return null;
+		Map<String, Object> map = new HashMap<>();
+		for (String key : keys) {
+			map.put(key, this.get(key));
+		}
+		return map;
 	}
 
 	@Override
 	public <T> Map<String, T> getMap(Class<T> clazz, List<String> keyList) throws CacheException {
-		// TODO Auto-generated method stub
-		return null;
+		return this.getMap(clazz, keyList.toArray(new String[keyList.size()]));
 	}
 
 	@Override
 	public <T> Map<String, T> getMap(Class<T> clazz, String... keys) throws CacheException {
-		// TODO Auto-generated method stub
-		return null;
+		Map<String, T> map = new HashMap<>();
+		for (String key : keys) {
+			map.put(key, this.get(key, clazz));
+		}
+		return map;
 	}
 }

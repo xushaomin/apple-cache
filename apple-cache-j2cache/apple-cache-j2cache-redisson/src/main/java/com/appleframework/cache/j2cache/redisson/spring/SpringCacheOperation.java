@@ -7,7 +7,6 @@ import org.redisson.RedissonClient;
 import org.redisson.core.MessageListener;
 import org.redisson.core.RTopic;
 
-import com.appleframework.cache.core.config.CacheConfig;
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.Command.CommandType;
 import com.appleframework.cache.core.spring.CacheOperation;
@@ -60,14 +59,10 @@ public class SpringCacheOperation implements CacheOperation {
 	public void init() {
 		topic = redisson.getTopic(Contants.TOPIC_PREFIX_KEY + name);
 		topic.addListener(new MessageListener<Command>() {
-			
 		    public void onMessage(String channel, Command message) {
-		    	
 		    	Object key = message.getKey();
 		    	Cache cache = getEhCache();
-		    	
 		    	if(null != cache) {
-			    	
 			    	if(message.getType().equals(CommandType.PUT)) {
 			    		cache.remove(key);
 			    	}
@@ -83,19 +78,20 @@ public class SpringCacheOperation implements CacheOperation {
 		    	}
 		    }
 		});
-		
 	}
 
 	public Object get(String key) {
-		if(!CacheConfig.isCacheEnable())
-			return null;
 		Object value = null;
 		try {
 			Element element = getEhCache().get(key);
 			if(null == element) {
 				value = getRedisCache().get(key);
-				if(null != value)
-					getEhCache().put(new Element(key, value));
+				if(null != value) {
+					if(expire > 0)
+						getEhCache().put(new Element(key, value, expire, expire));
+					else
+						getEhCache().put(new Element(key, value));
+				}
 			}
 			else {
 				value = element.getObjectValue();
@@ -107,8 +103,8 @@ public class SpringCacheOperation implements CacheOperation {
 	}
 
 	public void put(String key, Object value) {
-		if (value == null || !CacheConfig.isCacheEnable())
-			return;
+		if (value == null)
+			this.delete(key);
 		try {
 			getRedisCache().put(key, value);
 			publish(key, CommandType.PUT);

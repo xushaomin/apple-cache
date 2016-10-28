@@ -25,7 +25,6 @@ public class CommandTopicReceiver implements CommandReceiver {
 	public void init() {
 		topic = redisson.getTopic(Contants.TOPIC_PREFIX_KEY + name);
 		topic.addListener(new MessageListener<Command>() {
-
 			public void onMessage(String channel, Command command) {
 				commandProcesser.onProcess(command);
 			}

@@ -164,7 +164,6 @@ public class J2RedissonBucketCacheManager implements com.appleframework.cache.co
 		}
 	}
 
-	// 批量获取
 	@Override
 	public List<Object> getList(List<String> keyList) throws CacheException {
 		try {

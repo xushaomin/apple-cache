@@ -38,9 +38,9 @@ public class SpringCache implements Cache {
 
 	@Override
 	public ValueWrapper get(Object key) {
-		ValueWrapper wrapper = null;
 		if(!CacheConfig.isCacheEnable())
-			return wrapper;
+			return null;
+		ValueWrapper wrapper = null;
 		Object value = cacheOperation.get(key.toString());
 		if (value != null) {
 			wrapper = new SimpleValueWrapper(value);
@@ -80,9 +80,9 @@ public class SpringCache implements Cache {
 
 	@Override
 	public ValueWrapper putIfAbsent(Object key, Object value) {
-		ValueWrapper wrapper = null;
 		if(!CacheConfig.isCacheEnable())
-			return wrapper;
+			return null;
+		ValueWrapper wrapper = null;
 		Object objValue = this.cacheOperation.get(key.toString());
 		if (objValue != null) {
 			wrapper = new SimpleValueWrapper(objValue);
