@@ -17,7 +17,7 @@
 	<import resource="apple-cache-codis.xml"/>
 	
 	<bean id="springCacheManager"
-		class="com.appleframework.cache.codis.spring.SpringCodisCacheManager">
+		class="com.appleframework.cache.codis.spring.SpringCacheManager">
 		<property name="codisResourcePool" ref="codisResourcePool" />
 		<!-- 配置缓存时间 -->
 		<property name="expireConfig">
@@ -26,11 +26,8 @@
 			</map>
 		</property>
 		<!-- 配置缓存开关 -->
-		<property name="openConfig">
-			<map>
-				<entry key="typeList" value="true" />   <!-- key缓存对象名称 value缓存是否启用 -->
-			</map>
-		</property>
+		<property name="cacheEnable" value="true" />
+		<property name="cacheObject" value="true" />
 	</bean>
 
 </beans>

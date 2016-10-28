@@ -13,7 +13,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.SortingParams;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"classpath*:config/apple-cache-codis.xml"})
+@ContextConfiguration(locations={"classpath*:config/test-apple-cache-codis.xml"})
 public class CodisSpringTest2 {
 
 	@Resource

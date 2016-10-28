@@ -52,7 +52,7 @@ public class SpringCacheOperation implements CacheOperation {
 
 	public void put(String key, Object value) {
 		if (value == null)
-			return;
+			this.delete(key);
 		Object cache = null;
 		try (Jedis jedis = codisResourcePool.getResource()) {
 			byte[] byteKey = name.getBytes();
