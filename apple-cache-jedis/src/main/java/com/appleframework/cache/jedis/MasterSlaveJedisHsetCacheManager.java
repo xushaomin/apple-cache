@@ -4,26 +4,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.Pipeline;
-import redis.clients.jedis.Response;
-
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager;
+import com.appleframework.cache.core.CacheObject;
+import com.appleframework.cache.core.CacheObjectImpl;
 import com.appleframework.cache.core.utils.SerializeUtility;
 import com.appleframework.cache.jedis.factory.PoolFactory;
 
-@SuppressWarnings({ "unchecked", "deprecation" })
-public class MasterSlaveRedisCacheManager implements CacheManager {
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
-	private static Logger logger = Logger.getLogger(MasterSlaveRedisCacheManager.class);
+@SuppressWarnings({ "unchecked", "deprecation" })
+public class MasterSlaveJedisHsetCacheManager implements CacheManager {
+
+	private static Logger logger = Logger.getLogger(MasterSlaveJedisHsetCacheManager.class);
 	
 	private PoolFactory poolFactory;
+	
+	private String name = "AC_";
 
 	public void setPoolFactory(PoolFactory poolFactory) {
 		this.poolFactory = poolFactory;
@@ -33,10 +34,7 @@ public class MasterSlaveRedisCacheManager implements CacheManager {
 		JedisPool jedisPool = poolFactory.getWritePool();
 		Jedis jedis = jedisPool.getResource();
 		try {
-			Set<byte[]> keys = jedis.keys("*".getBytes());
-			for (byte[] key : keys) {
-				jedis.del(key);
-			}
+			jedis.del(name.getBytes());
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		} finally {
@@ -48,8 +46,19 @@ public class MasterSlaveRedisCacheManager implements CacheManager {
 		JedisPool jedisPool = poolFactory.getReadPool();
 		Jedis jedis = jedisPool.getResource();
 		try {
-			byte[] value = jedis.get(key.getBytes());
-			return SerializeUtility.unserialize(value);
+			byte[] value = jedis.hget(name.getBytes(), key.getBytes());
+			if(null != value) {
+				CacheObject cache = (CacheObject)SerializeUtility.unserialize(value);
+				if(cache.isExpired()) {
+					this.remove(key);
+					return null;
+				}
+				else
+					return cache.getObject(); 
+			}
+			else {
+				return null;
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
@@ -63,8 +72,19 @@ public class MasterSlaveRedisCacheManager implements CacheManager {
 		JedisPool jedisPool = poolFactory.getReadPool();
 		Jedis jedis = jedisPool.getResource();
 		try {
-			byte[] value = jedis.get(key.getBytes());
-		    return (T)SerializeUtility.unserialize(value);
+			byte[] value = jedis.hget(name.getBytes(), key.getBytes());
+			if(null != value) {
+				CacheObject cache = (CacheObject)SerializeUtility.unserialize(value);
+				if(cache.isExpired()) {
+					this.remove(key);
+					return null;
+				}
+				else
+					return (T)cache.getObject(); 
+			}
+			else {
+				return null;
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
@@ -77,7 +97,7 @@ public class MasterSlaveRedisCacheManager implements CacheManager {
 		JedisPool jedisPool = poolFactory.getWritePool();
 		Jedis jedis = jedisPool.getResource();
 		try {
-			return jedis.del(key.getBytes())>0;
+			return jedis.hdel(name.getBytes(), key.getBytes())>0;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		} finally {
@@ -91,8 +111,8 @@ public class MasterSlaveRedisCacheManager implements CacheManager {
 		Jedis jedis = jedisPool.getResource();
 		if (null != obj) {
 			try {
-				String o = jedis.set(key.getBytes(), SerializeUtility.serialize(obj));
-				logger.info(o);
+				CacheObject cache = new CacheObjectImpl(obj, getExpiredTime(0));
+				jedis.hset(name.getBytes(), key.getBytes(), SerializeUtility.serialize(cache));
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			} finally {
@@ -106,8 +126,8 @@ public class MasterSlaveRedisCacheManager implements CacheManager {
 		Jedis jedis = jedisPool.getResource();
 		if (null != obj) {
 			try {
-				jedis.set(key.getBytes(), SerializeUtility.serialize(obj));
-				jedis.expire(key.getBytes(), expireTime);
+				CacheObject cache = new CacheObjectImpl(obj, getExpiredTime(expireTime));
+				jedis.hset(name.getBytes(), key.getBytes(), SerializeUtility.serialize(cache));
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			} finally {
@@ -116,7 +136,6 @@ public class MasterSlaveRedisCacheManager implements CacheManager {
 		}
 	}
 
-	//批量获取
 	@Override
 	public List<Object> getList(List<String> keyList) throws CacheException {
 		return this.getList(keyList.toArray(new String[keyList.size()]));
@@ -128,12 +147,29 @@ public class MasterSlaveRedisCacheManager implements CacheManager {
 		Jedis jedis = jedisPool.getResource();
 		try {
 			List<Object> list = new ArrayList<Object>();
-			for (String key : keys) {
-				byte[] value = jedis.get(key.getBytes());
-				Object object = SerializeUtility.unserialize(value);
-				list.add(object);
+		    
+			byte[][] fields = new byte[keys.length][];
+			for (int i = 0; i < keys.length; i++) {
+				fields[i] = keys[i].getBytes();
 			}
-		    return list;
+			List<byte[]> byteList = jedis.hmget(name.getBytes(), fields);
+			for (int i = 0; i < byteList.size(); i++) {
+				byte[] value = byteList.get(i);
+				if(null != value) {
+					CacheObject cache = (CacheObject)SerializeUtility.unserialize(value);
+					if(cache.isExpired()) {
+						list.add(null);
+						this.remove(keys[i]);
+					}
+					else {
+						list.add(cache.getObject());
+					}
+				}
+				else {
+					list.add(null);
+				}
+			}
+			return list;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
@@ -153,19 +189,23 @@ public class MasterSlaveRedisCacheManager implements CacheManager {
 		Jedis jedis = jedisPool.getResource();
 		try {
 			List<T> list = new ArrayList<T>();
-		    Map<String, Response<byte[]>> responses = new HashMap<String, Response<byte[]>>(keys.length);
-
-			Pipeline pipeline = jedis.pipelined();
-			for (String key : keys) {
-				responses.put(key, pipeline.get(key.getBytes()));
+		    
+			byte[][] fields = new byte[keys.length][];
+			for (int i = 0; i < keys.length; i++) {
+				fields[i] = keys[i].getBytes();
 			}
-			pipeline.sync();
-			
-			for(String key : responses.keySet()) {
-				Response<byte[]> response = responses.get(key);
-				byte[] value = response.get();
+			List<byte[]> byteList = jedis.hmget(name.getBytes(), fields);
+			for (int i = 0; i < byteList.size(); i++) {
+				byte[] value = byteList.get(i);
 				if(null != value) {
-					list.add((T)SerializeUtility.unserialize(value));
+					CacheObject cache = (CacheObject)SerializeUtility.unserialize(value);
+					if(cache.isExpired()) {
+						list.add(null);
+						this.remove(keys[i]);
+					}
+					else {
+						list.add((T)cache.getObject());
+					}
 				}
 				else {
 					list.add(null);
@@ -191,22 +231,22 @@ public class MasterSlaveRedisCacheManager implements CacheManager {
 		Jedis jedis = jedisPool.getResource();
 		try {
 			Map<String, Object> map = new HashMap<String, Object>();
-		    Map<String, Response<byte[]>> responses = new HashMap<String, Response<byte[]>>(keys.length);
-
-			Pipeline pipeline = jedis.pipelined();
-			for (String key : keys) {
-				responses.put(key, pipeline.get(key.getBytes()));
+		    
+			byte[][] fields = new byte[keys.length][];
+			for (int i = 0; i < keys.length; i++) {
+				fields[i] = keys[i].getBytes();
 			}
-			pipeline.sync();
-			
-			for(String key : responses.keySet()) {
-				Response<byte[]> response = responses.get(key);
-				byte[] value = response.get();
+			List<byte[]> byteList = jedis.hmget(name.getBytes(), fields);
+			for (int i = 0; i < byteList.size(); i++) {
+				byte[] value = byteList.get(i);
 				if(null != value) {
-					map.put(key, SerializeUtility.unserialize(value));
-				}
-				else {
-					map.put(key, null);
+					CacheObject cache = (CacheObject)SerializeUtility.unserialize(value);
+					if(cache.isExpired()) {
+						this.remove(keys[i]);
+					}
+					else {
+						map.put(keys[i], cache.getObject());
+					}
 				}
 			}
 			return map;
@@ -229,22 +269,22 @@ public class MasterSlaveRedisCacheManager implements CacheManager {
 		Jedis jedis = jedisPool.getResource();
 		try {
 			Map<String, T> map = new HashMap<String, T>();
-		    Map<String, Response<byte[]>> responses = new HashMap<String, Response<byte[]>>(keys.length);
-
-			Pipeline pipeline = jedis.pipelined();
-			for (String key : keys) {
-				responses.put(key, pipeline.get(key.getBytes()));
+		    
+			byte[][] fields = new byte[keys.length][];
+			for (int i = 0; i < keys.length; i++) {
+				fields[i] = keys[i].getBytes();
 			}
-			pipeline.sync();
-			
-			for(String key : responses.keySet()) {
-				Response<byte[]> response = responses.get(key);
-				byte[] value = response.get();
+			List<byte[]> byteList = jedis.hmget(name.getBytes(), fields);
+			for (int i = 0; i < byteList.size(); i++) {
+				byte[] value = byteList.get(i);
 				if(null != value) {
-					map.put(key, (T)SerializeUtility.unserialize(value));
-				}
-				else {
-					map.put(key, null);
+					CacheObject cache = (CacheObject)SerializeUtility.unserialize(value);
+					if(cache.isExpired()) {
+						this.remove(keys[i]);
+					}
+					else {
+						map.put(keys[i], (T)cache.getObject());
+					}
 				}
 			}
 			return map;
@@ -254,6 +294,22 @@ public class MasterSlaveRedisCacheManager implements CacheManager {
 		} finally {
 			jedisPool.returnResource(jedis);
 		}
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	private long getExpiredTime(int expireTime) {
+		long lastTime = 2592000000L;
+		if (expireTime > 0) {
+			lastTime = expireTime * 1000;
+		}
+		return System.currentTimeMillis() + lastTime;
 	}
 
 }
