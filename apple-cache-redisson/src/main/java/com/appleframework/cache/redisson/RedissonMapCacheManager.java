@@ -18,7 +18,7 @@ public class RedissonMapCacheManager implements CacheManager {
 
 	private static Logger logger = Logger.getLogger(RedissonMapCacheManager.class);
 	
-	private String name = "REDIS_CACHE_MANAGER";
+	private String name = "AC_";
 	
 	private RedissonClient redisson;
 
