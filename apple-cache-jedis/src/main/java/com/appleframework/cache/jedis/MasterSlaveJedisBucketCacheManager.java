@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -39,8 +38,8 @@ public class MasterSlaveJedisBucketCacheManager implements CacheManager {
 		JedisPool jedisPool = poolFactory.getWritePool();
 		Jedis jedis = jedisPool.getResource();
 		try {
-			Set<byte[]> keys = jedis.keys((name + "*").getBytes());
-			for (byte[] key : keys) {
+			byte[] pattern = (name + "*").getBytes();
+			for (byte[] key : jedis.keys(pattern)) {
 				jedis.del(key);
 			}
 		} catch (Exception e) {

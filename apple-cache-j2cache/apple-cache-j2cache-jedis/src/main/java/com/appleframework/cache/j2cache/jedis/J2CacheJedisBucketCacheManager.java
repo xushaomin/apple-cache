@@ -1,12 +1,14 @@
 package com.appleframework.cache.j2cache.jedis;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import com.appleframework.cache.core.CacheException;
+import com.appleframework.cache.core.CacheObject;
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.Command.CommandType;
 import com.appleframework.cache.core.replicator.CommandReplicator;
@@ -17,12 +19,14 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
+@SuppressWarnings("deprecation")
 public class J2CacheJedisBucketCacheManager implements com.appleframework.cache.core.CacheManager {
 
 	private static Logger logger = Logger.getLogger(J2CacheJedisBucketCacheManager.class);
 
-	private String name = "J2_CACHE_MANAGER";
+	private String name = "AC_";
 
 	private PoolFactory poolFactory;
 
@@ -45,6 +49,10 @@ public class J2CacheJedisBucketCacheManager implements com.appleframework.cache.
 	public void setCommandReplicator(CommandReplicator commandReplicator) {
 		this.commandReplicator = commandReplicator;
 	}
+	
+	private byte[] getKey(String key) {
+		return (name + key).getBytes();
+	}
 
 	public Cache getEhCache() {
 		Cache cache = ehcacheManager.getCache(name);
@@ -57,14 +65,44 @@ public class J2CacheJedisBucketCacheManager implements com.appleframework.cache.
 	}
 
 	public void clear() throws CacheException {
+		JedisPool jedisPool = poolFactory.getReadPool();
+		Jedis jedis = jedisPool.getResource();
 		try {
-			try (Jedis jedis = poolFactory.getWritePool().getResource()) {
-				jedis.del(name.getBytes());
+			byte[] pattern = getKey("*");
+			for (byte[] key : jedis.keys(pattern)) {
+				jedis.del(key);
 			}
 			getEhCache().removeAll();
 			this.replicate(Command.create(CommandType.CLEAR));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
+		} finally {
+			jedisPool.returnResource(jedis);
+		}
+	}
+	
+	private Object getFromCache(String key) throws CacheException {
+		JedisPool jedisPool = poolFactory.getReadPool();
+		Jedis jedis = jedisPool.getResource();
+		try {
+			byte[] value = jedis.get(getKey(key));
+			if(null != value) {
+				CacheObject cache = (CacheObject)SerializeUtility.unserialize(value);
+				if(cache.isExpired()) {
+					this.remove(key);
+					return null;
+				}
+				else
+					return cache.getObject(); 
+			}
+			else {
+				return null;
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
+		} finally {
+			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -73,10 +111,7 @@ public class J2CacheJedisBucketCacheManager implements com.appleframework.cache.
 			Object value = null;
 			Element element = getEhCache().get(key);
 			if (null == element) {
-				try (Jedis jedis = poolFactory.getReadPool().getResource()) {
-					byte[] rvalue = jedis.get(key.getBytes());
-					value = SerializeUtility.unserialize(rvalue);
-				}
+				value = this.getFromCache(key);
 				if (null != value)
 					getEhCache().put(new Element(key, value));
 			} else {
@@ -87,7 +122,6 @@ public class J2CacheJedisBucketCacheManager implements com.appleframework.cache.
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
 		}
-
 	}
 
 	@SuppressWarnings({ "unchecked" })
@@ -97,10 +131,7 @@ public class J2CacheJedisBucketCacheManager implements com.appleframework.cache.
 			T value = null;
 			Element element = getEhCache().get(key);
 			if (null == element) {
-				try (Jedis jedis = poolFactory.getReadPool().getResource()) {
-					byte[] rvalue = jedis.get(key.getBytes());
-					value = (T)SerializeUtility.unserialize(rvalue);
-				}
+				value = (T)this.getFromCache(key);
 				if (null != value)
 					getEhCache().put(new Element(key, value));
 			} else {
@@ -114,46 +145,51 @@ public class J2CacheJedisBucketCacheManager implements com.appleframework.cache.
 	}
 
 	public boolean remove(String key) throws CacheException {
+		JedisPool jedisPool = poolFactory.getReadPool();
+		Jedis jedis = jedisPool.getResource();
 		try {
-			try (Jedis jedis = poolFactory.getWritePool().getResource()) {
-				jedis.del(key.getBytes());
-			}
+			jedis.del(getKey(key));
 			getEhCache().remove(key);
 			this.replicate(Command.create(CommandType.DELETE, key));
 			return true;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
+		} finally {
+			jedisPool.returnResource(jedis);
 		}
 		return false;
 	}
 
 	public void set(String key, Object value) throws CacheException {
-		if (null != value) {
-			try {
-				try (Jedis jedis = poolFactory.getWritePool().getResource()) {
-					String o = jedis.set(key.getBytes(), SerializeUtility.serialize(value));
-					logger.info(o);
-				}
+		JedisPool jedisPool = poolFactory.getReadPool();
+		Jedis jedis = jedisPool.getResource();
+		try {
+			if (null != value) {
+				jedis.set(getKey(key), SerializeUtility.serialize(value));
 				getEhCache().put(new Element(key, value));
 				this.replicate(Command.create(CommandType.PUT, key));
-			} catch (Exception e) {
-				logger.error(e.getMessage());
 			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
+			jedisPool.returnResource(jedis);
 		}
 	}
 
 	public void set(String key, Object value, int expireTime) throws CacheException {
 		if (null != value) {
+			JedisPool jedisPool = poolFactory.getReadPool();
+			Jedis jedis = jedisPool.getResource();
 			try {
-				try (Jedis jedis = poolFactory.getWritePool().getResource()) {
-					String o = jedis.set(key.getBytes(), SerializeUtility.serialize(value));
-					jedis.expire(key.getBytes(), expireTime);
-					logger.info(o);
-				}
+				byte[] byteKey = getKey(key);
+				jedis.set(byteKey, SerializeUtility.serialize(value));
+				jedis.expire(byteKey, expireTime);
 				getEhCache().put(new Element(key, value, expireTime, expireTime));
 				this.replicate(Command.create(CommandType.PUT, key, expireTime));
 			} catch (Exception e) {
 				logger.error(e.getMessage());
+			} finally {
+				jedisPool.returnResource(jedis);
 			}
 		}
 	}
@@ -163,7 +199,6 @@ public class J2CacheJedisBucketCacheManager implements com.appleframework.cache.
 	public List<Object> getList(List<String> keyList) throws CacheException {
 		try {
 			List<Object> returnList = new ArrayList<Object>();
-			//List<String> redisCacheKeyList = new ArrayList<String>();
 			Map<Object, Element> ehcacheMap = getEhCache().getAll(keyList);
 			for (int i = 0; i < keyList.size(); i++) {
 				String key = keyList.get(i);
@@ -220,7 +255,11 @@ public class J2CacheJedisBucketCacheManager implements com.appleframework.cache.
 
 	@Override
 	public Map<String, Object> getMap(String... keys) throws CacheException {
-		return null;
+		Map<String, Object> map = new HashMap<>();
+		for (String key : keys) {
+			map.put(key, this.get(key));
+		}
+		return map;
 	}
 
 	@Override
@@ -230,7 +269,11 @@ public class J2CacheJedisBucketCacheManager implements com.appleframework.cache.
 
 	@Override
 	public <T> Map<String, T> getMap(Class<T> clazz, String... keys) throws CacheException {
-		return null;
+		Map<String, T> map = new HashMap<>();
+		for (String key : keys) {
+			map.put(key, this.get(key, clazz));
+		}
+		return map;
 	}
 	
 	private void replicate(Command command) {
