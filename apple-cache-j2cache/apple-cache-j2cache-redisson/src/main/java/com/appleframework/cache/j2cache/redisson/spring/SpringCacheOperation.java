@@ -7,6 +7,7 @@ import org.redisson.RedissonClient;
 import org.redisson.core.MessageListener;
 import org.redisson.core.RTopic;
 
+import com.appleframework.cache.core.config.CacheConfig;
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.Command.CommandType;
 import com.appleframework.cache.core.spring.CacheOperation;
@@ -22,7 +23,6 @@ public class SpringCacheOperation implements CacheOperation {
 
 	private String name;
 	private int expire = 0;
-	private boolean isOpen = true;
 	private RedissonClient redisson;
 	private CacheManager ehcacheManager;
 	private RTopic<Command> topic;
@@ -37,15 +37,6 @@ public class SpringCacheOperation implements CacheOperation {
 	public SpringCacheOperation(CacheManager ehcacheManager, RedissonClient redisson, String name, int expire) {
 		this.name = name;
 		this.expire = expire;
-		this.redisson = redisson;
-		this.ehcacheManager = ehcacheManager;
-		init();
-	}
-	
-	public SpringCacheOperation(CacheManager ehcacheManager, RedissonClient redisson, String name, int expire, boolean isOpen) {
-		this.name = name;
-		this.expire = expire;
-		this.isOpen = isOpen;
 		this.redisson = redisson;
 		this.ehcacheManager = ehcacheManager;
 		init();
@@ -96,7 +87,7 @@ public class SpringCacheOperation implements CacheOperation {
 	}
 
 	public Object get(String key) {
-		if(!isOpen)
+		if(!CacheConfig.isCacheEnable())
 			return null;
 		Object value = null;
 		try {
@@ -116,7 +107,7 @@ public class SpringCacheOperation implements CacheOperation {
 	}
 
 	public void put(String key, Object value) {
-		if (value == null || !isOpen)
+		if (value == null || !CacheConfig.isCacheEnable())
 			return;
 		try {
 			getRedisCache().put(key, value);

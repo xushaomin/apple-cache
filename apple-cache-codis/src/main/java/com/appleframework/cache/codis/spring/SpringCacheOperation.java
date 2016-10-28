@@ -33,7 +33,7 @@ public class SpringCacheOperation implements CacheOperation {
 		try (Jedis jedis = codisResourcePool.getResource()) {
 			byte[] cacheValue = jedis.hget(name.getBytes(), key.getBytes());
 			if (null != cacheValue) {
-				if (CacheConfig.isCacheObject) {
+				if (CacheConfig.isCacheObject()) {
 					CacheObject cache = (CacheObject) SerializeUtility.unserialize(cacheValue);
 					if (null != cache) {
 						if (cache.isExpired()) {
@@ -57,14 +57,14 @@ public class SpringCacheOperation implements CacheOperation {
 		try (Jedis jedis = codisResourcePool.getResource()) {
 			byte[] byteKey = name.getBytes();
 			
-			if(CacheConfig.isCacheObject) {
+			if(CacheConfig.isCacheObject()) {
 				cache = new CacheObjectImpl(value, getExpiredTime());
 			}
 			else {
 				cache = value;
 			}
 			jedis.hset(byteKey, key.getBytes(), SerializeUtility.serialize(cache));
-			if(expireTime > 0 && !CacheConfig.isCacheObject)
+			if(expireTime > 0 && !CacheConfig.isCacheObject())
 				jedis.expire(byteKey, expireTime);
 		}
 	}

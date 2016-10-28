@@ -5,6 +5,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.appleframework.cache.codis.CodisResourcePool;
+import com.appleframework.cache.core.config.CacheConfig;
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.Command.CommandType;
 import com.appleframework.cache.core.replicator.CommandReplicator;
@@ -22,7 +23,6 @@ public class SpringCacheOperation implements CacheOperation {
 
 	private String name;
 	private int expire = 0;
-	private boolean isOpen = true;
 	private CodisResourcePool codisResourcePool;
 	private CacheManager ehcacheManager;
 	private CommandReplicator commandReplicator;
@@ -40,19 +40,10 @@ public class SpringCacheOperation implements CacheOperation {
 		this.ehcacheManager = ehcacheManager;
 	}
 	
-	public SpringCacheOperation(CacheManager ehcacheManager, CodisResourcePool codisResourcePool, String name, int expire, boolean isOpen) {
-		this.name = name;
-		this.expire = expire;
-		this.isOpen = isOpen;
-		this.codisResourcePool = codisResourcePool;
-		this.ehcacheManager = ehcacheManager;
-	}
-	
-	public SpringCacheOperation(CacheManager ehcacheManager, CodisResourcePool codisResourcePool, String name, int expire, boolean isOpen,
+	public SpringCacheOperation(CacheManager ehcacheManager, CodisResourcePool codisResourcePool, String name, int expire,
 			CommandReplicator commandReplicator) {
 		this.name = name;
 		this.expire = expire;
-		this.isOpen = isOpen;
 		this.codisResourcePool = codisResourcePool;
 		this.ehcacheManager = ehcacheManager;
 		this.commandReplicator = commandReplicator;
@@ -70,7 +61,7 @@ public class SpringCacheOperation implements CacheOperation {
 	}
 	
 	public Object getFromRedis(String key) {
-		if(!isOpen)
+		if(!CacheConfig.isCacheEnable())
 			return null;
 		Object object = null;
 		try {
@@ -87,7 +78,7 @@ public class SpringCacheOperation implements CacheOperation {
 	}
 
 	public Object get(String key) {
-		if(!isOpen)
+		if(!CacheConfig.isCacheEnable())
 			return null;
 		Object value = null;
 		try {
@@ -107,7 +98,7 @@ public class SpringCacheOperation implements CacheOperation {
 	}
 
 	public void put(String key, Object value) {
-		if (value == null || !isOpen)
+		if (value == null || !CacheConfig.isCacheEnable())
 			return;
 		try {
 			try (Jedis jedis = codisResourcePool.getResource()) {
@@ -164,10 +155,6 @@ public class SpringCacheOperation implements CacheOperation {
 
 	public void setExpire(int expire) {
 		this.expire = expire;
-	}
-
-	public void setOpen(boolean isOpen) {
-		this.isOpen = isOpen;
 	}
 
 	public void setCodisResourcePool(CodisResourcePool codisResourcePool) {

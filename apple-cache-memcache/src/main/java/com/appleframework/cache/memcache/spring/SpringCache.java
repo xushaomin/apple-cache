@@ -5,13 +5,13 @@ import net.rubyeye.xmemcached.MemcachedClient;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
 
+import com.appleframework.cache.core.config.CacheConfig;
 import com.appleframework.cache.core.spring.CacheOperation;
 
 public class SpringCache implements Cache {
 
 	private String name;
 	private CacheOperation cacheOperation;
-	private boolean isOpen = true;
 	
 	public SpringCache(String name, MemcachedClient memcachedClient) {
 		this.name = name;
@@ -22,29 +22,23 @@ public class SpringCache implements Cache {
 		this.name = name;
 		this.cacheOperation = new SpringCacheOperation(memcachedClient, name, expire);
 	}
-	
-	public SpringCache(MemcachedClient memcachedClient, String name, int expire, boolean isOpen) {
-		this.name = name;
-		this.isOpen = isOpen;
-		this.cacheOperation = new SpringCacheOperation(memcachedClient, name, expire);
-	}
 
 	@Override
 	public void clear() {
-		if(isOpen)
+		if(CacheConfig.isCacheEnable())
 			cacheOperation.clear();
 	}
 
 	@Override
 	public void evict(Object key) {
-		if(isOpen)
+		if(CacheConfig.isCacheEnable())
 			cacheOperation.delete(key.toString());
 	}
 
 	@Override
 	public ValueWrapper get(Object key) {
 		ValueWrapper wrapper = null;
-		if(!isOpen)
+		if(!CacheConfig.isCacheEnable())
 			return wrapper;
 		Object value = cacheOperation.get(key.toString());
 		if (value != null) {
@@ -65,7 +59,7 @@ public class SpringCache implements Cache {
 
 	@Override
 	public void put(Object key, Object value) {
-		if(isOpen)
+		if(CacheConfig.isCacheEnable())
 			cacheOperation.put(key.toString(), value);
 	}
 
@@ -84,7 +78,7 @@ public class SpringCache implements Cache {
 	@Override
 	public ValueWrapper putIfAbsent(Object key, Object value) {
 		ValueWrapper wrapper = null;
-		if(!isOpen)
+		if(!CacheConfig.isCacheEnable())
 			return wrapper;
 		Object objValue = this.cacheOperation.get(key.toString());
 		if (objValue != null) {

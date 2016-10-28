@@ -47,7 +47,7 @@ public class SpringCacheOperation implements CacheOperation {
 		try {
 			Element element = getEhCache().get(key);
 			if(null != element) {
-				if(CacheConfig.isCacheObject) {
+				if(CacheConfig.isCacheObject()) {
 					CacheObject cache = (CacheObject) element.getObjectValue();
 					if (null != cache) {
 						if (cache.isExpired()) {
@@ -82,7 +82,7 @@ public class SpringCacheOperation implements CacheOperation {
 			return;
 		try {
 			Element element = null;
-			if(CacheConfig.isCacheObject) {
+			if(CacheConfig.isCacheObject()) {
 				CacheObject object = new CacheObjectImpl(value, getExpiredTime());
 				element = new Element(key, object);
 			}

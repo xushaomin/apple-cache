@@ -15,7 +15,6 @@ public class SpringCacheOperation implements CacheOperation {
 
 	private static Logger logger = Logger.getLogger(SpringCacheOperation.class);
 
-	private boolean isOpen = true;
 	private String name;
 	private int expireTime = 0;
 	private JedisPool jedisPool;
@@ -38,14 +37,14 @@ public class SpringCacheOperation implements CacheOperation {
 	
 	@SuppressWarnings("deprecation")
 	public Object get(String key) {
-		if(!isOpen)
+		if(!CacheConfig.isCacheEnable())
 			return null;
 		Object object = null;
 		Jedis jedis = getResource();
 		try {
 			byte[] cacheValue = jedis.hget(name.getBytes(), key.getBytes());
 			if (null != cacheValue) {
-				if (CacheConfig.isCacheObject) {
+				if (CacheConfig.isCacheObject()) {
 					CacheObject cache = (CacheObject) SerializeUtility.unserialize(cacheValue);
 					if (null != cache) {
 						if (cache.isExpired()) {
@@ -83,13 +82,13 @@ public class SpringCacheOperation implements CacheOperation {
 	
 	@SuppressWarnings({ "deprecation" })
 	public void put(String key, Object value) {
-		if (value == null || !isOpen)
+		if (value == null || !CacheConfig.isCacheEnable())
 			return;
 		Jedis jedis = getResource();
 		try {
 			Object cache = null;
 			
-			if(CacheConfig.isCacheObject) {
+			if(CacheConfig.isCacheObject()) {
 				cache = new CacheObjectImpl(value, getExpiredTime());
 			}
 			else {
@@ -99,7 +98,7 @@ public class SpringCacheOperation implements CacheOperation {
 			byte[] byteKey = name.getBytes();
 			
 			jedis.hset(byteKey, key.getBytes(), byteValue);
-			if(expireTime > 0 && !CacheConfig.isCacheObject)
+			if(expireTime > 0 && !CacheConfig.isCacheObject())
 				jedis.expire(byteKey, expireTime);
 		} catch (Exception e) {
 			logger.warn("Cache Error : ", e);

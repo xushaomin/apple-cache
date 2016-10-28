@@ -4,6 +4,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
 
 import com.appleframework.cache.codis.CodisResourcePool;
+import com.appleframework.cache.core.config.CacheConfig;
 import com.appleframework.cache.core.spring.CacheOperation;
 
 public class SpringCache implements Cache {
@@ -11,7 +12,6 @@ public class SpringCache implements Cache {
 	private CacheOperation cacheOperation;
 
 	private String name;
-	private boolean isOpen = true;
 	
 	public SpringCache(CodisResourcePool codisResourcePool, String name) {
 		this.name = name;
@@ -22,29 +22,23 @@ public class SpringCache implements Cache {
 		this.name = name;
 		this.cacheOperation = new SpringCacheOperation(codisResourcePool, name, expire);
 	}
-	
-	public SpringCache(CodisResourcePool codisResourcePool, String name, int expire, boolean isOpen) {
-		this.name = name;
-		this.isOpen = isOpen;
-		this.cacheOperation = new SpringCacheOperation(codisResourcePool, name, expire);
-	}
 
 	@Override
 	public void clear() {
-		if(isOpen)
+		if(CacheConfig.isCacheEnable())
 			cacheOperation.clear();
 	}
 
 	@Override
 	public void evict(Object key) {
-		if(isOpen)
+		if(CacheConfig.isCacheEnable())
 			cacheOperation.delete(key.toString());
 	}
 
 	@Override
 	public ValueWrapper get(Object key) {
 		ValueWrapper wrapper = null;
-		if(!isOpen)
+		if(!CacheConfig.isCacheEnable())
 			return wrapper;
 		Object value = cacheOperation.get(key.toString());
 		if (value != null) {
@@ -65,14 +59,14 @@ public class SpringCache implements Cache {
 
 	@Override
 	public void put(Object key, Object value) {
-		if(isOpen)
+		if(CacheConfig.isCacheEnable())
 			cacheOperation.put(key.toString(), value);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T get(Object key, Class<T> type) {
-		if(!isOpen)
+		if(!CacheConfig.isCacheEnable())
 			return null;
 		Object cacheValue = this.cacheOperation.get(key.toString());
 		Object value = (cacheValue != null ? cacheValue : null);
@@ -85,7 +79,7 @@ public class SpringCache implements Cache {
 
 	@Override
 	public ValueWrapper putIfAbsent(Object key, Object value) {
-		if(!isOpen)
+		if(!CacheConfig.isCacheEnable())
 			return null;
 		ValueWrapper wrapper = null;
 		Object objValue = this.cacheOperation.get(key.toString());

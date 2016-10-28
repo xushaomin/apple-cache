@@ -5,6 +5,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.appleframework.cache.core.CacheException;
+import com.appleframework.cache.core.config.CacheConfig;
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.Command.CommandType;
 import com.appleframework.cache.core.spring.CacheOperation;
@@ -25,7 +26,6 @@ public class SpringCacheOperation implements CacheOperation {
 
 	private String name;
 	private int expire = 0;
-	private boolean isOpen = true;
 	private PoolFactory poolFactory;
 	private CacheManager ehcacheManager;
 	
@@ -44,19 +44,10 @@ public class SpringCacheOperation implements CacheOperation {
 		this.ehcacheManager = ehcacheManager;
 	}
 	
-	public SpringCacheOperation(CacheManager ehcacheManager, PoolFactory poolFactory, String name, int expire, boolean isOpen) {
-		this.name = name;
-		this.expire = expire;
-		this.isOpen = isOpen;
-		this.poolFactory = poolFactory;
-		this.ehcacheManager = ehcacheManager;
-	}
-	
-	public SpringCacheOperation(CacheManager ehcacheManager, PoolFactory poolFactory, String name, int expire, boolean isOpen,
+	public SpringCacheOperation(CacheManager ehcacheManager, PoolFactory poolFactory, String name, int expire,
 			CommandReplicator commandReplicator) {
 		this.name = name;
 		this.expire = expire;
-		this.isOpen = isOpen;
 		this.poolFactory = poolFactory;
 		this.ehcacheManager = ehcacheManager;
 		this.commandReplicator = commandReplicator;
@@ -74,7 +65,7 @@ public class SpringCacheOperation implements CacheOperation {
 	}
 
 	public Object get(String key) {
-		if(!isOpen)
+		if(!CacheConfig.isCacheEnable())
 			return null;
 		Object value = null;
 		try {
@@ -109,7 +100,7 @@ public class SpringCacheOperation implements CacheOperation {
 	
 
 	public void put(String key, Object value) {
-		if (value == null || !isOpen)
+		if (value == null || !CacheConfig.isCacheEnable())
 			return;
 		JedisPool jedisPool = poolFactory.getWritePool();
 		Jedis jedis = jedisPool.getResource();

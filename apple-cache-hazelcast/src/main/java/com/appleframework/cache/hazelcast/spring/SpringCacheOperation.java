@@ -39,7 +39,7 @@ public class SpringCacheOperation implements CacheOperation {
 		Object returnValue = null;
 		try {
 			Object cacheValue = getCacheMap().get(key);
-			if(CacheConfig.isCacheObject) {
+			if(CacheConfig.isCacheObject()) {
 				CacheObject cache = (CacheObject) cacheValue;
 				if (null != cache) {
 					if (cache.isExpired()) {
@@ -71,7 +71,7 @@ public class SpringCacheOperation implements CacheOperation {
 		if (value == null)
 			return;
 		try {
-			if(CacheConfig.isCacheObject) {
+			if(CacheConfig.isCacheObject()) {
 				CacheObject cache = new CacheObjectImpl(value, getExpiredTime());
 				getCacheMap().put(key, cache);
 			}

@@ -17,7 +17,6 @@ public class SpringCacheManager extends AbstractCacheManager {
 
 	private ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>();
 	private Map<String, Integer> expireMap = new HashMap<String, Integer>();
-	private Map<String, Boolean> openMap = new HashMap<String, Boolean>();
 
 	private MemcachedClient memcachedClient;
 
@@ -39,17 +38,7 @@ public class SpringCacheManager extends AbstractCacheManager {
 				expire = 0;
 				expireMap.put(name, expire);
 			}
-			Boolean isOpen = openMap.get(name);
-			if (isOpen == null) {
-				isOpen = true;
-				openMap.put(name, isOpen);
-			}
-			if(!isOpen) {
-				cache = new SpringCache(memcachedClient, name, expire.intValue(), false);
-			}
-			else {
-				cache = new SpringCache(memcachedClient, name, expire.intValue());
-			}
+			cache = new SpringCache(memcachedClient, name, expire.intValue());
 			cacheMap.put(name, cache);
 		}
 		return cache;
@@ -62,13 +51,13 @@ public class SpringCacheManager extends AbstractCacheManager {
 	public void setExpireConfig(Map<String, Integer> expireConfig) {
 		this.expireMap = expireConfig;
 	}
-
-	public void setOpenConfig(Map<String, Boolean> openConfig) {
-		this.openMap = openConfig;
-	}
 	
 	public void setCacheObject(Boolean isCacheObject) {
-		CacheConfig.isCacheObject = isCacheObject;
+		CacheConfig.setCacheObject(isCacheObject);
+	}
+	
+	public void setCacheEnable(Boolean isCacheEnable) {
+		CacheConfig.setCacheEnable(isCacheEnable);
 	}
 
 }

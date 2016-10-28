@@ -39,7 +39,7 @@ public class SpringCacheOperation implements CacheOperation {
 		Object value = null;
 		try {
 			key = this.getKey(key);
-			if(CacheConfig.isCacheObject) {
+			if(CacheConfig.isCacheObject()) {
 				CacheObject cache = (CacheObject) memcachedClient.get(key);
 				if (null != cache) {
 					if (cache.isExpired()) {
@@ -76,7 +76,7 @@ public class SpringCacheOperation implements CacheOperation {
 			return;
 		try {
 			key = this.getKey(key);
-			if(CacheConfig.isCacheObject) {
+			if(CacheConfig.isCacheObject()) {
 				CacheObject object = new CacheObjectImpl(value, getExpiredTime());
 				memcachedClient.setWithNoReply(key, 0, object);
 			}
