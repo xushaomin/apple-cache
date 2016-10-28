@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:hz="http://www.hazelcast.com/schema/spring"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+       		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        	http://www.hazelcast.com/schema/spring http://www.hazelcast.com/schema/spring/hazelcast-spring-3.3.xsd
+        	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd">
+
+	<context:component-scan base-package="com.appleframework.cache.hazelcast" />  
+	
+	<!-- turn on declarative caching -->
+	<cache:annotation-driven cache-manager="springCacheManager" />  
+
+	<hz:hazelcast id="hazelcastInstance">
+		<hz:config>
+			<hz:group name="dev" password="password" />
+			<hz:properties>
+				<hz:property name="hazelcast.logging.type">log4j</hz:property>
+			</hz:properties>
+			<hz:network port="5701" port-auto-increment="true">
+				<hz:join>
+					<hz:multicast enabled="false" multicast-group="224.2.2.3" multicast-port="54327" />
+					<hz:tcp-ip enabled="true">
+						<hz:members>127.0.0.1</hz:members>
+					</hz:tcp-ip>
+				</hz:join>
+			</hz:network>
+		</hz:config>
+	</hz:hazelcast>
+	
+	<bean id="springCacheManager"
+		class="com.appleframework.cache.hazelcast.spring.SpringCacheManager">
+		<property name="hazelcastInstance" ref="hazelcastInstance" />
+		<property name="cacheObject" value="true" />
+		<property name="cacheEnable" value="true" />
+		<!-- 配置缓存时间 -->
+		<property name="expireConfig">
+			<map>
+				<entry key="testd" value="5" />   <!-- key缓存对象名称 value缓存过期时间 -->
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="threadPoolTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<!-- 核心线程数，默认为1 -->
+		<property name="corePoolSize" value="1000" />
+		<!-- 最大线程数，默认为Integer.MAX_VALUE -->
+		<property name="maxPoolSize" value="2000" />
+		<!-- 队列最大长度，一般需要设置值>=notifyScheduledMainExecutor.maxNum；默认为Integer.MAX_VALUE -->
+		<property name="queueCapacity" value="100000" />
+		<!-- 线程池维护线程所允许的空闲时间，默认为60s -->
+		<property name="keepAliveSeconds" value="300" />
+		<!-- 线程池对拒绝任务（无线程可用）的处理策略，目前只支持AbortPolicy、CallerRunsPolicy；默认为后者 -->
+		<property name="rejectedExecutionHandler">
+			<!-- AbortPolicy:直接抛出java.util.concurrent.RejectedExecutionException异常 -->
+			<!-- CallerRunsPolicy:主线程直接执行该任务，执行完之后尝试添加下一个任务到线程池中，可以有效降低向线程池内添加任务的速度 -->
+			<!-- DiscardOldestPolicy:抛弃旧的任务、暂不支持；会导致被丢弃的任务无法再次被执行 -->
+			<!-- DiscardPolicy:抛弃当前任务、暂不支持；会导致被丢弃的任务无法再次被执行 -->
+			<bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy" />
+		</property>
+
+	</bean>
+
+</beans>
