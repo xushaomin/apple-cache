@@ -19,7 +19,7 @@
 		<property name="minIdle" value="${codis.minIdle:0}" />
 	</bean>
 	
-	<bean id="cacheManager" class="com.appleframework.cache.codis.CodisCacheManager">
+	<bean id="cacheManager" class="com.appleframework.cache.codis.CodisHsetCacheManager">
 		<property name="codisResourcePool" ref="codisResourcePool" />
 	</bean>
 

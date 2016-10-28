@@ -11,9 +11,9 @@
         http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
      default-lazy-init="true">
      
-     <bean id="masterSlaveServersConfig" class="com.appleframework.cache.redis.config.MasterSlaveServersConfig">
+     <bean id="masterSlaveServersConfig" class="com.appleframework.cache.jedis.config.MasterSlaveServersConfig">
 		<property name="masterAddressUri" value="192.168.1.177:6379" />
-		<property name="slaveAddressUris" value="192.168.1.214:6379,192.168.1.241:6379" />
+		<property name="slaveAddressUris" value="192.168.1.177:6379" />
 		<property name="database" value="9" />
 	</bean>
 		
@@ -23,14 +23,18 @@
 		<property name="minIdle" value="0" />
 	</bean>
 		
-	<bean id="poolFactory" class="com.appleframework.cache.redis.factory.MasterSlavePoolFactory"
+	<bean id="poolFactory" class="com.appleframework.cache.jedis.factory.MasterSlavePoolFactory"
 		destroy-method="destroy" init-method="init">
 		<property name="serverConfig" ref="masterSlaveServersConfig" />
 		<property name="masterPoolConfig" ref="poolConfig" />
 		<property name="slavePoolConfig" ref="poolConfig" />
 	</bean>	
 	
-	<bean id="cacheManager" class="com.appleframework.cache.redis.MasterSlaveRedisCacheManager">
+	<bean id="cacheManager" class="com.appleframework.cache.jedis.MasterSlaveJedisBucketCacheManager">
+		<property name="poolFactory" ref="poolFactory" />
+	</bean>
+	
+	<bean id="hsetCacheManager" class="com.appleframework.cache.jedis.MasterSlaveJedisHsetCacheManager">
 		<property name="poolFactory" ref="poolFactory" />
 	</bean>
 	

@@ -97,8 +97,7 @@ public class MasterSlaveJedisBucketCacheManager implements CacheManager {
 		Jedis jedis = jedisPool.getResource();
 		if (null != obj) {
 			try {
-				String o = jedis.set(getKey(key).getBytes(), SerializeUtility.serialize(obj));
-				logger.info(o);
+				jedis.set(getKey(key).getBytes(), SerializeUtility.serialize(obj));
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			} finally {
