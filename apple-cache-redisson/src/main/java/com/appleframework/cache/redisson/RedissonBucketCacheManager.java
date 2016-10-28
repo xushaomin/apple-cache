@@ -90,7 +90,6 @@ public class RedissonBucketCacheManager implements CacheManager {
 		}
 	}
 	
-	//批量获取
 	@Override
 	public List<Object> getList(List<String> keyList) throws CacheException {
 		try {
