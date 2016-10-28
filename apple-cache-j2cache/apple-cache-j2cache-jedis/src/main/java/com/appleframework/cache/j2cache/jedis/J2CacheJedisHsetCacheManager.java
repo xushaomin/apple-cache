@@ -19,9 +19,9 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import redis.clients.jedis.Jedis;
 
-public class J2CacheCodisCacheManager implements com.appleframework.cache.core.CacheManager {
+public class J2CacheJedisHsetCacheManager implements com.appleframework.cache.core.CacheManager {
 
-	private static Logger logger = Logger.getLogger(J2CacheCodisCacheManager.class);
+	private static Logger logger = Logger.getLogger(J2CacheJedisHsetCacheManager.class);
 
 	private String name = "J2_CACHE_MANAGER";
 

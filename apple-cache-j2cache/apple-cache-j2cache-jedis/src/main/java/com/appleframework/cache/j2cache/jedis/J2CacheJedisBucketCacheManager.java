@@ -3,7 +3,6 @@ package com.appleframework.cache.j2cache.jedis;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -19,9 +18,9 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import redis.clients.jedis.Jedis;
 
-public class J2CacheJedisMapCacheManager implements com.appleframework.cache.core.CacheManager {
+public class J2CacheJedisBucketCacheManager implements com.appleframework.cache.core.CacheManager {
 
-	private static Logger logger = Logger.getLogger(J2CacheJedisMapCacheManager.class);
+	private static Logger logger = Logger.getLogger(J2CacheJedisBucketCacheManager.class);
 
 	private String name = "J2_CACHE_MANAGER";
 

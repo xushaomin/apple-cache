@@ -64,19 +64,15 @@ public class J2RedissonBucketCacheManager implements com.appleframework.cache.co
 
 	public void clear() throws CacheException {
 		try {
-			try {
-				RKeys keys = redisson.getKeys();
-				for (String key : keys.getKeys()) {
-					getRedisCache(key).delete();
-				}
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-				throw new CacheException(e.getMessage());
+			RKeys keys = redisson.getKeys();
+			for (String key : keys.getKeys()) {
+				getRedisCache(key).delete();
 			}
-			publish(Command.create(CommandType.CLEAR));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
 		}
+		publish(Command.create(CommandType.CLEAR));
 	}
 
 	public Object get(String key) throws CacheException {
@@ -98,7 +94,6 @@ public class J2RedissonBucketCacheManager implements com.appleframework.cache.co
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
 		}
-
 	}
 
 	@SuppressWarnings({ "unchecked" })

@@ -23,7 +23,7 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 
 	private static Logger logger = Logger.getLogger(J2RedissonMapCacheManager.class);
 
-	private String name = "J2CACHE_REDISSON_MANAGER";
+	private String name = "AC_";
 
 	private RedissonClient redisson;
 
