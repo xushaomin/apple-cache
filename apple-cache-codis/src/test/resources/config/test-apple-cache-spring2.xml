@@ -25,7 +25,7 @@
 	</bean>
 	
 	<bean id="springCacheManager"
-		class="com.appleframework.cache.codis.spring.SpringCodisCacheManager">
+		class="com.appleframework.cache.codis.spring.SpringCacheManager">
 		<property name="codisResourcePool" ref="codisResourcePool" />
 		<property name="cacheObject" value="true" />
 		<!-- 配置缓存时间 -->
