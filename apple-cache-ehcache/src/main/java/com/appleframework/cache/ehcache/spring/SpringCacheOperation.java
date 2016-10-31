@@ -21,16 +21,14 @@ public class SpringCacheOperation implements CacheOperation {
 	
 	private long timeToIdleSeconds = 0L;
 	private long timeToLiveSeconds = 0L;
-	
-	private CacheManager ehcacheManager;
-	
+		
 	private Cache cache;
 	
 	private Cache getEhCache() {
 		return cache;
 	}
 	
-	private void init(){
+	private void init(CacheManager ehcacheManager){
 		cache = ehcacheManager.getCache(name);
 		if(null == cache) {
 			ehcacheManager.addCache(name);
@@ -49,15 +47,13 @@ public class SpringCacheOperation implements CacheOperation {
 	
 	public SpringCacheOperation(CacheManager ehcacheManager, String name) {
 		this.name = name;
-		this.ehcacheManager = ehcacheManager;
-		this.init();
+		this.init(ehcacheManager);
 	}
 
 	public SpringCacheOperation(CacheManager ehcacheManager, String name, int expire) {
 		this.name = name;
 		this.expire = expire;
-		this.ehcacheManager = ehcacheManager;
-		this.init();
+		this.init(ehcacheManager);
 	}
 
 	public Object get(String key) {
