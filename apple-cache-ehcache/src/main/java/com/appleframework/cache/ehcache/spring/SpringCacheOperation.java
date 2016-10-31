@@ -136,14 +136,4 @@ public class SpringCacheOperation implements CacheOperation {
 		return expire;
 	}
 	
-	/*private int getEhCacheTime() {
-		if(expire > 0) {
-			return expire + delayedTime;
-		}
-		else {
-			return 
-		}
-		
-	}*/
-	
 }
