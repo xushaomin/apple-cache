@@ -10,6 +10,7 @@ import com.appleframework.cache.core.spring.CacheOperation;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.config.CacheConfiguration;
 
 public class SpringCacheOperation implements CacheOperation {
 
@@ -18,28 +19,45 @@ public class SpringCacheOperation implements CacheOperation {
 	private String name;
 	private int expire = 0;
 	
+	private long timeToIdleSeconds = 0L;
+	private long timeToLiveSeconds = 0L;
+	
 	private CacheManager ehcacheManager;
 	
-	public Cache getEhCache() {
-		Cache cache = ehcacheManager.getCache(name);
+	private Cache cache;
+	
+	private Cache getEhCache() {
+		return cache;
+	}
+	
+	private void init(){
+		cache = ehcacheManager.getCache(name);
 		if(null == cache) {
 			ehcacheManager.addCache(name);
-			return ehcacheManager.getCache(name);
+			cache = ehcacheManager.getCache(name);
 		}
-		else {
-			return cache;
+		CacheConfiguration config = cache.getCacheConfiguration();
+		timeToIdleSeconds = config.getTimeToIdleSeconds();
+		timeToLiveSeconds = config.getTimeToLiveSeconds();
+		if(timeToIdleSeconds < expire) {
+			timeToIdleSeconds = timeToIdleSeconds + expire;
+		}
+		if(timeToLiveSeconds < expire) {
+			timeToLiveSeconds = timeToLiveSeconds + expire;
 		}
 	}
 	
 	public SpringCacheOperation(CacheManager ehcacheManager, String name) {
 		this.name = name;
 		this.ehcacheManager = ehcacheManager;
+		this.init();
 	}
 
 	public SpringCacheOperation(CacheManager ehcacheManager, String name, int expire) {
 		this.name = name;
 		this.expire = expire;
 		this.ehcacheManager = ehcacheManager;
+		this.init();
 	}
 
 	public Object get(String key) {
@@ -69,8 +87,8 @@ public class SpringCacheOperation implements CacheOperation {
 
 	private void resetCacheObject(String key, CacheObject cache) {
 		try {
-			cache.setExpiredTime(getExpiredTime());
-			Element element = new Element(key, cache);
+			cache.setExpiredSecond(expire);
+			Element element = new Element(key, cache, (int)timeToIdleSeconds, (int)timeToLiveSeconds);
 			getEhCache().put(element);
 		} catch (Exception e) {
 			logger.warn("cache error", e);
@@ -83,8 +101,8 @@ public class SpringCacheOperation implements CacheOperation {
 		try {
 			Element element = null;
 			if(CacheConfig.isCacheObject()) {
-				CacheObject object = new CacheObjectImpl(value, getExpiredTime());
-				element = new Element(key, object);
+				CacheObject object = CacheObjectImpl.create(value, expire);
+				element = new Element(key, object, (int)timeToIdleSeconds, (int)timeToLiveSeconds);
 			}
 			else {
 				if(expire > 0)
@@ -118,12 +136,14 @@ public class SpringCacheOperation implements CacheOperation {
 		return expire;
 	}
 	
-	private long getExpiredTime() {
-		long lastTime = 2592000000L;
-		if (expire > 0) {
-			lastTime = expire * 1000;
+	/*private int getEhCacheTime() {
+		if(expire > 0) {
+			return expire + delayedTime;
 		}
-		return System.currentTimeMillis() + lastTime;
-	}
+		else {
+			return 
+		}
+		
+	}*/
 	
 }

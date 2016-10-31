@@ -9,5 +9,7 @@ public interface CacheObject {
 	boolean isExpired();
 	
 	void setExpiredTime(long expiredTime);
+	
+	void setExpiredSecond(int expiredSecond);
 
 }
