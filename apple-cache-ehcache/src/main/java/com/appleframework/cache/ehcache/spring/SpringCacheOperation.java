@@ -39,10 +39,10 @@ public class SpringCacheOperation implements CacheOperation {
 		CacheConfiguration config = cache.getCacheConfiguration();
 		timeToIdleSeconds = config.getTimeToIdleSeconds();
 		timeToLiveSeconds = config.getTimeToLiveSeconds();
-		if(timeToIdleSeconds < expire) {
+		if(timeToIdleSeconds <= expire) {
 			timeToIdleSeconds = timeToIdleSeconds + expire;
 		}
-		if(timeToLiveSeconds < expire) {
+		if(timeToLiveSeconds <= expire) {
 			timeToLiveSeconds = timeToLiveSeconds + expire;
 		}
 	}
