@@ -7,6 +7,7 @@ import com.appleframework.cache.core.spring.CacheOperation;
 import com.appleframework.cache.core.utils.SerializeUtility;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Pipeline;
 
 public class SpringCacheOperationBucket implements CacheOperation {
 	
@@ -65,9 +66,12 @@ public class SpringCacheOperationBucket implements CacheOperation {
 		try (Jedis jedis = codisResourcePool.getResource()) {
 			byte[] nameKey = getNameKey();
 			Set<byte[]> set = jedis.smembers(nameKey);
+			Pipeline pipeline = jedis.pipelined();
 			for (byte[] bs : set) {
-				jedis.del(bs);
+				pipeline.del(bs);
 			}
+			pipeline.del(nameKey);
+			pipeline.sync();
 		}
 	}
 
