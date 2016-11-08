@@ -3,6 +3,7 @@ package com.appleframework.cache.codis.spring;
 import java.util.Set;
 
 import com.appleframework.cache.codis.CodisResourcePool;
+import com.appleframework.cache.core.config.CacheConfig;
 import com.appleframework.cache.core.spring.CacheOperation;
 import com.appleframework.cache.core.utils.SerializeUtility;
 
@@ -10,9 +11,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Pipeline;
 
 public class SpringCacheOperationBucket implements CacheOperation {
-	
-	private static String PRE_KEY = "cache:spring:";
-	
+		
 	private CodisResourcePool codisResourcePool;
 
 	private String name;
@@ -32,11 +31,11 @@ public class SpringCacheOperationBucket implements CacheOperation {
 	}
 	
 	private byte[] getCacheKey(String key) {
-		return (PRE_KEY + name + ":value:" + key).getBytes();
+		return (CacheConfig.getCacheKeyPrefix() + name + ":value:" + key).getBytes();
 	}
 	
 	private byte[] getNameKey() {
-		return (PRE_KEY + name + ":keys").getBytes();
+		return (CacheConfig.getCacheKeyPrefix() + name + ":keys").getBytes();
 	}
 
 	public Object get(String key) {
@@ -55,10 +54,13 @@ public class SpringCacheOperationBucket implements CacheOperation {
 			this.delete(key);
 		try (Jedis jedis = codisResourcePool.getResource()) {
 			byte[] byteKey = getCacheKey(key);
+			byte[] byteName = getNameKey();
 			jedis.set(byteKey, SerializeUtility.serialize(value));
-			if (expireTime > 0)
-				jedis.expire(byteKey, expireTime);
-			jedis.sadd(getNameKey(), byteKey);
+			jedis.sadd(byteName, byteKey);
+			if (expireTime > 0) {
+				jedis.expire(byteKey, expireTime * 2);
+				jedis.expire(byteName, expireTime * 2);
+			}
 		}
 	}
 

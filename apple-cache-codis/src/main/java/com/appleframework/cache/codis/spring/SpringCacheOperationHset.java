@@ -3,15 +3,14 @@ package com.appleframework.cache.codis.spring;
 import com.appleframework.cache.codis.CodisResourcePool;
 import com.appleframework.cache.core.CacheObject;
 import com.appleframework.cache.core.CacheObjectImpl;
+import com.appleframework.cache.core.config.CacheConfig;
 import com.appleframework.cache.core.spring.CacheOperation;
 import com.appleframework.cache.core.utils.SerializeUtility;
 
 import redis.clients.jedis.Jedis;
 
 public class SpringCacheOperationHset implements CacheOperation {
-	
-	private static String PRE_KEY = "cache:spring:";
-	
+		
 	private CodisResourcePool codisResourcePool;
 
 	private String name;
@@ -30,7 +29,7 @@ public class SpringCacheOperationHset implements CacheOperation {
 	}
 	
 	private byte[] getNameKey() {
-		return (PRE_KEY + name).getBytes();
+		return (CacheConfig.getCacheKeyPrefix() + name).getBytes();
 	}
 	
 	public Object get(String key) {

@@ -5,6 +5,8 @@ public class CacheConfig {
 	private static boolean isCacheObject = false;
 
 	private static boolean isCacheEnable = true;
+	
+	private static String cacheKeyPrefix = "cache:spring";
 
 	public static boolean isCacheEnable() {
 		return isCacheEnable;
@@ -20,6 +22,14 @@ public class CacheConfig {
 
 	public static void setCacheObject(boolean isCacheObject) {
 		CacheConfig.isCacheObject = isCacheObject;
+	}
+
+	public static String getCacheKeyPrefix() {
+		return cacheKeyPrefix;
+	}
+
+	public static void setCacheKeyPrefix(String cacheKeyPrefix) {
+		CacheConfig.cacheKeyPrefix = cacheKeyPrefix;
 	}
 
 }

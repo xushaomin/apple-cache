@@ -57,5 +57,9 @@ public class SpringCacheManager extends AbstractCacheManager {
 	public void setCacheEnable(Boolean isCacheEnable) {
 		CacheConfig.setCacheEnable(isCacheEnable);
 	}
+	
+	public void setCacheKeyPrefix(String cacheKeyPrefix) {
+		CacheConfig.setCacheKeyPrefix(cacheKeyPrefix);
+	}
 
 }
