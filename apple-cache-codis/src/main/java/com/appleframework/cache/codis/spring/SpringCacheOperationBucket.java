@@ -35,7 +35,7 @@ public class SpringCacheOperationBucket implements CacheOperation {
 	}
 	
 	private byte[] getNameKey() {
-		return (PRE_KEY + name + ":key").getBytes();
+		return (PRE_KEY + name + ":keys").getBytes();
 	}
 
 	public Object get(String key) {
