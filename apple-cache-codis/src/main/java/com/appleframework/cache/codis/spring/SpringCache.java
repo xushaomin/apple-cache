@@ -71,8 +71,7 @@ public class SpringCache implements Cache {
 		Object cacheValue = this.cacheOperation.get(key.toString());
 		Object value = (cacheValue != null ? cacheValue : null);
 		if (type != null && !type.isInstance(value)) {
-			throw new IllegalStateException(
-					"Cached value is not of required type [" + type.getName() + "]: " + value);
+			throw new IllegalStateException("Cached value is not of required type [" + type.getName() + "]: " + value);
 		}
 		return (T) value;
 	}
