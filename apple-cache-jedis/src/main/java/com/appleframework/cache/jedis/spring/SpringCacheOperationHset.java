@@ -7,6 +7,7 @@ import com.appleframework.cache.core.CacheObjectImpl;
 import com.appleframework.cache.core.config.CacheConfig;
 import com.appleframework.cache.core.spring.CacheOperation;
 import com.appleframework.cache.core.utils.SerializeUtility;
+import com.appleframework.cache.jedis.factory.PoolFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -18,16 +19,12 @@ public class SpringCacheOperationHset implements CacheOperation {
 
 	private String name;
 	private int expireTime = 0;
-	private JedisPool jedisPool;
-	
-	private Jedis getResource() {
-		return jedisPool.getResource();
-	}
+	private PoolFactory poolFactory;
 
-	public SpringCacheOperationHset(String name, int expireTime, JedisPool jedisPool) {
+	public SpringCacheOperationHset(String name, int expireTime, PoolFactory poolFactory) {
 		this.name = name;
 		this.expireTime = expireTime;
-		this.jedisPool = jedisPool;
+		this.poolFactory = poolFactory;
 	}
 	
 	private byte[] getNameKey() {
@@ -36,7 +33,8 @@ public class SpringCacheOperationHset implements CacheOperation {
 	
 	public Object get(String key) {
 		Object object = null;
-		Jedis jedis = getResource();
+		JedisPool jedisPool = poolFactory.getReadPool();
+		Jedis jedis = jedisPool.getResource();
 		try {
 			byte[] cacheValue = jedis.hget(getNameKey(), key.getBytes());
 			if (null != cacheValue) {
@@ -58,7 +56,8 @@ public class SpringCacheOperationHset implements CacheOperation {
 	}
 	
 	private void resetCacheObject(String key, CacheObject cache) {
-		Jedis jedis = getResource();
+		JedisPool jedisPool = poolFactory.getWritePool();
+		Jedis jedis = jedisPool.getResource();
 		try {
 			cache.setExpiredTime(getExpiredTime());
 			byte[] byteKey = getNameKey();
@@ -76,7 +75,8 @@ public class SpringCacheOperationHset implements CacheOperation {
 	public void put(String key, Object value) {
 		if (value == null)
 			this.delete(key);
-		Jedis jedis = getResource();
+		JedisPool jedisPool = poolFactory.getWritePool();
+		Jedis jedis = jedisPool.getResource();
 		try {
 			Object cache = new CacheObjectImpl(value, getExpiredTime());
 			byte[] byteKey = getNameKey();
@@ -92,7 +92,8 @@ public class SpringCacheOperationHset implements CacheOperation {
 	}
 
 	public void clear() {
-		Jedis jedis = getResource();
+		JedisPool jedisPool = poolFactory.getWritePool();
+		Jedis jedis = jedisPool.getResource();
 		try {
 			jedis.del(getNameKey());
 		} catch (Exception e) {
@@ -103,7 +104,8 @@ public class SpringCacheOperationHset implements CacheOperation {
 	}
 
 	public void delete(String key) {
-		Jedis jedis = getResource();
+		JedisPool jedisPool = poolFactory.getWritePool();
+		Jedis jedis = jedisPool.getResource();
 		try {
 			jedis.hdel(getNameKey(), key.getBytes());
 		} catch (Exception e) {

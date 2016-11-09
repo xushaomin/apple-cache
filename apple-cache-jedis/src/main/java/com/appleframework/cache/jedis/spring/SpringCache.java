@@ -2,18 +2,17 @@ package com.appleframework.cache.jedis.spring;
 
 import com.appleframework.cache.core.config.CacheConfig;
 import com.appleframework.cache.core.spring.BaseSpringCache;
-
-import redis.clients.jedis.JedisPool;
+import com.appleframework.cache.jedis.factory.PoolFactory;
 
 public class SpringCache extends BaseSpringCache {
 
-	public SpringCache(JedisPool jedisPool, String name, int expire) {
+	public SpringCache(PoolFactory poolFactory, String name, int expire) {
 		this.name = name;
 		if(CacheConfig.isCacheObject()) {
-			this.cacheOperation = new SpringCacheOperationHset(name, expire, jedisPool);
+			this.cacheOperation = new SpringCacheOperationHset(name, expire, poolFactory);
 		}
 		else {
-			this.cacheOperation = new SpringCacheOperationBucket(name, expire, jedisPool);
+			this.cacheOperation = new SpringCacheOperationBucket(name, expire, poolFactory);
 		}
 	}
 

@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import com.appleframework.cache.core.config.CacheConfig;
 import com.appleframework.cache.core.spring.CacheOperation;
 import com.appleframework.cache.core.utils.SerializeUtility;
+import com.appleframework.cache.jedis.factory.PoolFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -19,16 +20,12 @@ public class SpringCacheOperationBucket implements CacheOperation {
 
 	private String name;
 	private int expireTime = 0;
-	private JedisPool jedisPool;
-	
-	private Jedis getResource() {
-		return jedisPool.getResource();
-	}
+	private PoolFactory poolFactory;
 
-	public SpringCacheOperationBucket(String name, int expireTime, JedisPool jedisPool) {
+	public SpringCacheOperationBucket(String name, int expireTime, PoolFactory poolFactory) {
 		this.name = name;
 		this.expireTime = expireTime;
-		this.jedisPool = jedisPool;
+		this.poolFactory = poolFactory;
 	}
 	
 	private byte[] getCacheKey(String key) {
@@ -37,7 +34,8 @@ public class SpringCacheOperationBucket implements CacheOperation {
 	
 	public Object get(String key) {
 		Object value = null;
-		Jedis jedis = getResource();
+		JedisPool jedisPool = poolFactory.getReadPool();
+		Jedis jedis = jedisPool.getResource();
 		try {
 			byte[] cacheValue = jedis.get(getCacheKey(key));
 			if (null != cacheValue) {
@@ -54,7 +52,8 @@ public class SpringCacheOperationBucket implements CacheOperation {
 	public void put(String key, Object value) {
 		if (value == null)
 			this.delete(key);
-		Jedis jedis = getResource();
+		JedisPool jedisPool = poolFactory.getWritePool();
+		Jedis jedis = jedisPool.getResource();
 		try {
 			byte[] byteKey = getCacheKey(key);
 			jedis.set(byteKey, SerializeUtility.serialize(value));
@@ -69,7 +68,8 @@ public class SpringCacheOperationBucket implements CacheOperation {
 	}
 
 	public void clear() {
-		Jedis jedis = getResource();
+		JedisPool jedisPool = poolFactory.getWritePool();
+		Jedis jedis = jedisPool.getResource();
 		try {
 			byte[] pattern = getCacheKey("*");
 			Set<byte[]> set = jedis.keys(pattern);
@@ -86,7 +86,8 @@ public class SpringCacheOperationBucket implements CacheOperation {
 	}
 
 	public void delete(String key) {
-		Jedis jedis = getResource();
+		JedisPool jedisPool = poolFactory.getWritePool();
+		Jedis jedis = jedisPool.getResource();
 		try {
 			byte[] cacheKey = this.getCacheKey(key);
 			jedis.del(cacheKey);

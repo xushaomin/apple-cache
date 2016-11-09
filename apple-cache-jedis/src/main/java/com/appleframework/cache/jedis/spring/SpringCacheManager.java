@@ -3,12 +3,11 @@ package com.appleframework.cache.jedis.spring;
 import org.springframework.cache.Cache;
 
 import com.appleframework.cache.core.spring.BaseSpringCacheManager;
-
-import redis.clients.jedis.JedisPool;
+import com.appleframework.cache.jedis.factory.PoolFactory;
 
 public class SpringCacheManager extends BaseSpringCacheManager {
 
-	private JedisPool jedisPool;
+	private PoolFactory poolFactory;
 
 	public SpringCacheManager() {
 	}
@@ -22,9 +21,14 @@ public class SpringCacheManager extends BaseSpringCacheManager {
 				expire = 0;
 				expireMap.put(name, expire);
 			}
-			cache = new SpringCache(jedisPool, name, expire.intValue());
+			cache = new SpringCache(poolFactory, name, expire.intValue());
 			cacheMap.put(name, cache);
 		}
 		return cache;
 	}
+
+	public void setPoolFactory(PoolFactory poolFactory) {
+		this.poolFactory = poolFactory;
+	}
+	
 }
