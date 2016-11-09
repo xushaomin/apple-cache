@@ -14,13 +14,7 @@ public class SpringCacheOperationHset implements CacheOperation {
 	private CodisResourcePool codisResourcePool;
 
 	private String name;
-	private int expireTime = 0;	
-	
-	public SpringCacheOperationHset(CodisResourcePool codisResourcePool, String name) {
-		this.name = name;
-		this.expireTime = 0;
-		this.codisResourcePool = codisResourcePool;
-	}
+	private int expireTime = 0;
 	
 	public SpringCacheOperationHset(CodisResourcePool codisResourcePool, String name, int expireTime) {
 		this.name = name;
@@ -58,14 +52,17 @@ public class SpringCacheOperationHset implements CacheOperation {
 			CacheObject cache = new CacheObjectImpl(value, getExpiredTime());
 			jedis.hset(byteKey, key.getBytes(), SerializeUtility.serialize(cache));
 			if(expireTime > 0)
-				jedis.expire(byteKey, expireTime);
+				jedis.expire(byteKey, expireTime * 2);
 		}
 	}
 	
 	private void resetCacheObject(String key, CacheObject cache) {
 		cache.setExpiredTime(getExpiredTime());
+		byte[] byteKey = getNameKey();
 		try (Jedis jedis = codisResourcePool.getResource()) {
-			jedis.hset(getNameKey(), key.getBytes(), SerializeUtility.serialize(cache));
+			jedis.hset(byteKey, key.getBytes(), SerializeUtility.serialize(cache));
+			if(expireTime > 0)
+				jedis.expire(byteKey, expireTime * 2);
 		}
 
 	}

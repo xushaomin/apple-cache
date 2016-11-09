@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>apple-cache</artifactId>
 		<groupId>com.appleframework.cache</groupId>
-		<version>0.3.0.RELEASE</version>
+		<version>0.3.1.RELEASE</version>
 	</parent>
 	<artifactId>apple-cache-core</artifactId>
 	<name>apple-cache-core</name>
@@ -16,6 +16,10 @@
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
 		</dependency>
 	</dependencies>
 </project>

@@ -28,12 +28,6 @@ public class SpringCacheOperation implements CacheOperation {
 		this.expire = expire;
 		this.instance = instance;
 	}
-	
-	public SpringCacheOperation(HazelcastInstance instance, String name) {
-		this.name = name;
-		this.expire = 0;
-		this.instance = instance;
-	}
 
 	public Object get(String key) {
 		Object returnValue = null;

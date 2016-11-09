@@ -17,13 +17,6 @@ public class SpringCacheOperationBucket implements CacheOperation {
 	private String name;
 	private int expireTime = 0;
 	
-	
-	public SpringCacheOperationBucket(CodisResourcePool codisResourcePool, String name) {
-		this.name = name;
-		this.expireTime = 0;
-		this.codisResourcePool = codisResourcePool;
-	}
-	
 	public SpringCacheOperationBucket(CodisResourcePool codisResourcePool, String name, int expireTime) {
 		this.name = name;
 		this.expireTime = expireTime;
@@ -58,7 +51,7 @@ public class SpringCacheOperationBucket implements CacheOperation {
 			jedis.set(byteKey, SerializeUtility.serialize(value));
 			jedis.sadd(byteName, byteKey);
 			if (expireTime > 0) {
-				jedis.expire(byteKey, expireTime * 2);
+				jedis.expire(byteKey, expireTime);
 				jedis.expire(byteName, expireTime * 2);
 			}
 		}

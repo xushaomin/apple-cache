@@ -1,31 +1,15 @@
 package com.appleframework.cache.hazelcast.spring;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import org.springframework.cache.Cache;
-import org.springframework.cache.support.AbstractCacheManager;
 
-import com.appleframework.cache.core.config.CacheConfig;
+import com.appleframework.cache.core.spring.BaseSpringCacheManager;
 import com.hazelcast.core.HazelcastInstance;
 
-public class SpringCacheManager extends AbstractCacheManager {
-
-	private ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>();
-	private Map<String, Integer> expireMap = new HashMap<String, Integer>();
+public class SpringCacheManager extends BaseSpringCacheManager {
 
 	private HazelcastInstance hazelcastInstance;
 
 	public SpringCacheManager() {
-	}
-
-	@Override
-	protected Collection<? extends Cache> loadCaches() {
-		Collection<Cache> values = cacheMap.values();
-		return values;
 	}
 
 	@Override
@@ -47,15 +31,4 @@ public class SpringCacheManager extends AbstractCacheManager {
 		this.hazelcastInstance = hazelcastInstance;
 	}
 
-	public void setExpireConfig(Map<String, Integer> expireConfig) {
-		this.expireMap = expireConfig;
-	}
-
-	public void setCacheObject(Boolean isCacheObject) {
-		CacheConfig.setCacheObject(isCacheObject);
-	}
-	
-	public void setCacheEnable(Boolean isCacheEnable) {
-		CacheConfig.setCacheEnable(isCacheEnable);
-	}
 }

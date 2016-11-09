@@ -27,11 +27,11 @@
 	<bean id="springCacheManager"
 		class="com.appleframework.cache.codis.spring.SpringCacheManager">
 		<property name="codisResourcePool" ref="codisResourcePool" />
-		<property name="cacheObject" value="true" />
+		<property name="cacheObject" value="false" />
 		<!-- 配置缓存时间 -->
 		<property name="expireConfig">
 			<map>
-				<entry key="testd" value="5" />   <!-- key缓存对象名称 value缓存过期时间 -->
+				<entry key="testd3" value="5" />   <!-- key缓存对象名称 value缓存过期时间 -->
 			</map>
 		</property>
 	</bean>

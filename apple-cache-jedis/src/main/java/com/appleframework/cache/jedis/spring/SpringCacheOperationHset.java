@@ -12,9 +12,9 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 @SuppressWarnings("deprecation")
-public class SpringCacheOperation implements CacheOperation {
+public class SpringCacheOperationHset implements CacheOperation {
 
-	private static Logger logger = Logger.getLogger(SpringCacheOperation.class);
+	private static Logger logger = Logger.getLogger(SpringCacheOperationHset.class);
 
 	private String name;
 	private int expireTime = 0;
@@ -24,38 +24,31 @@ public class SpringCacheOperation implements CacheOperation {
 		return jedisPool.getResource();
 	}
 
-	public SpringCacheOperation(String name, int expireTime, JedisPool jedisPool) {
+	public SpringCacheOperationHset(String name, int expireTime, JedisPool jedisPool) {
 		this.name = name;
 		this.expireTime = expireTime;
 		this.jedisPool = jedisPool;
 	}
 	
-	public SpringCacheOperation(String name, JedisPool jedisPool) {
-		this.name = name;
-		this.expireTime = 0;
-		this.jedisPool = jedisPool;
+	private byte[] getNameKey() {
+		return (CacheConfig.getCacheKeyPrefix() + name).getBytes();
 	}
 	
 	public Object get(String key) {
 		Object object = null;
 		Jedis jedis = getResource();
 		try {
-			byte[] cacheValue = jedis.hget(name.getBytes(), key.getBytes());
+			byte[] cacheValue = jedis.hget(getNameKey(), key.getBytes());
 			if (null != cacheValue) {
-				if (CacheConfig.isCacheObject()) {
-					CacheObject cache = (CacheObject) SerializeUtility.unserialize(cacheValue);
-					if (null != cache) {
-						if (cache.isExpired()) {
-							this.resetCacheObject(key, cache);
-						} else {
-							object = cache.getObject();
-						}
+				CacheObject cache = (CacheObject) SerializeUtility.unserialize(cacheValue);
+				if (null != cache) {
+					if (cache.isExpired()) {
+						this.resetCacheObject(key, cache);
+					} else {
+						object = cache.getObject();
 					}
-				} else {
-					object = SerializeUtility.unserialize(cacheValue);
 				}
 			}
-
 		} catch (Exception e) {
 			logger.warn("Cache Error : ", e);
 		} finally {
@@ -68,8 +61,11 @@ public class SpringCacheOperation implements CacheOperation {
 		Jedis jedis = getResource();
 		try {
 			cache.setExpiredTime(getExpiredTime());
+			byte[] byteKey = getNameKey();
 			byte[] byteValue = SerializeUtility.serialize(cache);
-			jedis.hset(name.getBytes(), key.getBytes(), byteValue);
+			jedis.hset(byteKey, key.getBytes(), byteValue);
+			if(expireTime > 0)
+				jedis.expire(byteKey, expireTime * 2);
 		} catch (Exception e) {
 			logger.warn("Cache Error : ", e);
 		} finally {
@@ -82,20 +78,12 @@ public class SpringCacheOperation implements CacheOperation {
 			this.delete(key);
 		Jedis jedis = getResource();
 		try {
-			Object cache = null;
-			
-			if(CacheConfig.isCacheObject()) {
-				cache = new CacheObjectImpl(value, getExpiredTime());
-			}
-			else {
-				cache = value;
-			}
+			Object cache = new CacheObjectImpl(value, getExpiredTime());
+			byte[] byteKey = getNameKey();
 			byte[] byteValue = SerializeUtility.serialize(cache);
-			byte[] byteKey = name.getBytes();
-			
 			jedis.hset(byteKey, key.getBytes(), byteValue);
-			if(expireTime > 0 && !CacheConfig.isCacheObject())
-				jedis.expire(byteKey, expireTime);
+			if(expireTime > 0)
+				jedis.expire(byteKey, expireTime * 2);
 		} catch (Exception e) {
 			logger.warn("Cache Error : ", e);
 		} finally {
@@ -106,7 +94,7 @@ public class SpringCacheOperation implements CacheOperation {
 	public void clear() {
 		Jedis jedis = getResource();
 		try {
-			jedis.del(name.getBytes());
+			jedis.del(getNameKey());
 		} catch (Exception e) {
 			logger.warn("Cache Error : ", e);
 		} finally {
@@ -117,7 +105,7 @@ public class SpringCacheOperation implements CacheOperation {
 	public void delete(String key) {
 		Jedis jedis = getResource();
 		try {
-			jedis.hdel(name.getBytes(), key.getBytes());
+			jedis.hdel(getNameKey(), key.getBytes());
 		} catch (Exception e) {
 			logger.warn("Cache Error : ", e);
 		}

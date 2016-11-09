@@ -8,7 +8,7 @@ public class TestService {
 	
 	private long time = System.currentTimeMillis();
 
-	@Cacheable(value = "testd", key = "#name")
+	@Cacheable(value = "testd3", key = "#name")
 	public String getCache(String name) {
 		System.out.println("-----service in------" + (System.currentTimeMillis() - time));
 		time = System.currentTimeMillis();

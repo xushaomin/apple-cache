@@ -10,21 +10,21 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.appleframework.cache.jedis.factory.PoolFactory;
+
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath*:config/apple-cache-redis-manager3.xml" })
-public class RedisSpringTest6 {
+public class RedisSpringTest9 {
 
 	@Resource
-	private JedisPool jedisPool;
+	private PoolFactory poolFactory;
 
 	@SuppressWarnings("deprecation")
 	@Test
 	public void testAddOpinion1() {
-
-		Jedis jedis = jedisPool.getResource();
+		Jedis jedis = poolFactory.getWritePool().getResource();
 		try {
 			String key = "testddddddd";
 			jedis.zadd(key, 100, "Java");
@@ -35,11 +35,12 @@ public class RedisSpringTest6 {
 			jedis.zadd(key, scoreMembers);
 			System.out.println("Number of Java users:" + jedis.zscore(key, "Java"));
 			System.out.println("Number of elements:" + jedis.zcard(key));
-			
-			System.out.println("555555555:" + jedis.zrevrange(key, 0, 2));} catch (Exception e) {
+
+			System.out.println("555555555:" + jedis.zrevrange(key, 0, 2));
+		} catch (Exception e) {
 		} finally {
 			if (null != jedis) {
-				jedisPool.returnResource(jedis);
+				poolFactory.getWritePool().returnResource(jedis);
 			}
 		}
 	}
