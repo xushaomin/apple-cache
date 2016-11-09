@@ -13,23 +13,13 @@ public class SpringCache implements Cache {
 
 	private String name;
 	
-	public SpringCache(CodisResourcePool codisResourcePool, String name) {
-		this.name = name;
-		if(CacheConfig.isCacheObject()) {
-			this.cacheOperation = new SpringCacheOperationHset(codisResourcePool, name);
-		}
-		else {
-			this.cacheOperation = new SpringCacheOperationBucket(codisResourcePool, name);
-		}
-	}
-	
 	public SpringCache(CodisResourcePool codisResourcePool, String name, int expire) {
 		this.name = name;
 		if(CacheConfig.isCacheObject()) {
-			this.cacheOperation = new SpringCacheOperationHset(codisResourcePool, name);
+			this.cacheOperation = new SpringCacheOperationHset(codisResourcePool, name, expire);
 		}
 		else {
-			this.cacheOperation = new SpringCacheOperationBucket(codisResourcePool, name);
+			this.cacheOperation = new SpringCacheOperationBucket(codisResourcePool, name, expire);
 		}
 	}
 
