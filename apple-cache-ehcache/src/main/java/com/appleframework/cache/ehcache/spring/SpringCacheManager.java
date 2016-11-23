@@ -28,4 +28,8 @@ public class SpringCacheManager extends BaseSpringCacheManager {
 		return cache;
 	}
 
+	public void setEhcacheManager(CacheManager ehcacheManager) {
+		this.ehcacheManager = ehcacheManager;
+	}
+
 }
