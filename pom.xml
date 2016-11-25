@@ -122,6 +122,7 @@
     	<module>apple-cache-redisson</module>
 		<module>apple-cache-ehcache</module>
     	<module>apple-cache-j2cache</module>
+    <module>apple-cache-config</module>
   </modules>
 	
 	<build>
