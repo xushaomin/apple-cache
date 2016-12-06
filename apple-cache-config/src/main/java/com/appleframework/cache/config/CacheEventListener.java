@@ -20,11 +20,11 @@ public class CacheEventListener implements ConfigListener {
 			SpringCacheConfig.setCacheEnable(Boolean.valueOf(cacheEnable.toString()));
 		}
 		Object cacheObject = props.get(KEY_CACHE_OBJECT);
-		if (null != cacheEnable) {
+		if (null != cacheObject) {
 			SpringCacheConfig.setCacheObject(Boolean.valueOf(cacheObject.toString()));
 		}
 		Object cachePrefix = props.get(KEY_CACHE_PREFIX);
-		if (null != cacheEnable) {
+		if (null != cachePrefix) {
 			SpringCacheConfig.setCacheKeyPrefix(cachePrefix.toString());
 		}
 	}
