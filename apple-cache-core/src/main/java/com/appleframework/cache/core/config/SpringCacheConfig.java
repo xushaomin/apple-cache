@@ -6,7 +6,7 @@ public class SpringCacheConfig {
 
 	private static boolean isCacheEnable = true;
 	
-	private static String cacheKeyPrefix = "cache:spring";
+	private static String cacheKeyPrefix = "cache:spring:";
 
 	public static boolean isCacheEnable() {
 		return isCacheEnable;
