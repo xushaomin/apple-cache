@@ -4,7 +4,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import com.appleframework.cache.core.config.CacheConfig;
+import com.appleframework.cache.core.config.SpringCacheConfig;
 import com.appleframework.cache.core.spring.CacheOperation;
 import com.appleframework.cache.core.utils.SerializeUtility;
 import com.appleframework.cache.jedis.factory.PoolFactory;
@@ -29,7 +29,7 @@ public class SpringCacheOperationBucket implements CacheOperation {
 	}
 	
 	private byte[] getCacheKey(String key) {
-		return (CacheConfig.getCacheKeyPrefix() + name + ":" + key).getBytes();
+		return (SpringCacheConfig.getCacheKeyPrefix() + name + ":" + key).getBytes();
 	}
 	
 	public Object get(String key) {

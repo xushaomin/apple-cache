@@ -3,7 +3,7 @@ package com.appleframework.cache.codis.spring;
 import com.appleframework.cache.codis.CodisResourcePool;
 import com.appleframework.cache.core.CacheObject;
 import com.appleframework.cache.core.CacheObjectImpl;
-import com.appleframework.cache.core.config.CacheConfig;
+import com.appleframework.cache.core.config.SpringCacheConfig;
 import com.appleframework.cache.core.spring.CacheOperation;
 import com.appleframework.cache.core.utils.SerializeUtility;
 
@@ -23,7 +23,7 @@ public class SpringCacheOperationHset implements CacheOperation {
 	}
 	
 	private byte[] getNameKey() {
-		return (CacheConfig.getCacheKeyPrefix() + name).getBytes();
+		return (SpringCacheConfig.getCacheKeyPrefix() + name).getBytes();
 	}
 	
 	public Object get(String key) {

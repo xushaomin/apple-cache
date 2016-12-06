@@ -2,7 +2,7 @@ package com.appleframework.cache.config;
 
 import java.util.Properties;
 
-import com.appleframework.cache.core.config.CacheConfig;
+import com.appleframework.cache.core.config.SpringCacheConfig;
 import com.appleframework.config.core.event.ConfigListener;
 
 public class CacheEventListener implements ConfigListener {
@@ -15,11 +15,11 @@ public class CacheEventListener implements ConfigListener {
 	public void receiveConfigInfo(Properties props) {
 		Object cacheEnable = props.get(KEY_CACHE_ENABLE);
 		if (null != cacheEnable) {
-			CacheConfig.setCacheEnable(Boolean.valueOf(cacheEnable.toString()));
+			SpringCacheConfig.setCacheEnable(Boolean.valueOf(cacheEnable.toString()));
 		}
 		Object cacheObject = props.get(KEY_CACHE_OBJECT);
 		if (null != cacheEnable) {
-			CacheConfig.setCacheObject(Boolean.valueOf(cacheObject.toString()));
+			SpringCacheConfig.setCacheObject(Boolean.valueOf(cacheObject.toString()));
 		}
 	}
 

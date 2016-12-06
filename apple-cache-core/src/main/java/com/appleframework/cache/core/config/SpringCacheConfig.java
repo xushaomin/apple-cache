@@ -1,6 +1,6 @@
 package com.appleframework.cache.core.config;
 
-public class CacheConfig {
+public class SpringCacheConfig {
 	
 	private static boolean isCacheObject = false;
 
@@ -13,7 +13,7 @@ public class CacheConfig {
 	}
 
 	public static void setCacheEnable(boolean isCacheEnable) {
-		CacheConfig.isCacheEnable = isCacheEnable;
+		SpringCacheConfig.isCacheEnable = isCacheEnable;
 	}
 
 	public static boolean isCacheObject() {
@@ -21,7 +21,7 @@ public class CacheConfig {
 	}
 
 	public static void setCacheObject(boolean isCacheObject) {
-		CacheConfig.isCacheObject = isCacheObject;
+		SpringCacheConfig.isCacheObject = isCacheObject;
 	}
 
 	public static String getCacheKeyPrefix() {
@@ -29,7 +29,7 @@ public class CacheConfig {
 	}
 
 	public static void setCacheKeyPrefix(String cacheKeyPrefix) {
-		CacheConfig.cacheKeyPrefix = cacheKeyPrefix;
+		SpringCacheConfig.cacheKeyPrefix = cacheKeyPrefix;
 	}
 
 }

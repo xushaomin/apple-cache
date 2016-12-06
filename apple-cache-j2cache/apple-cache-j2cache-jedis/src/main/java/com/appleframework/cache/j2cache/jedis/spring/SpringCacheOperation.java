@@ -5,7 +5,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.appleframework.cache.core.CacheException;
-import com.appleframework.cache.core.config.CacheConfig;
+import com.appleframework.cache.core.config.SpringCacheConfig;
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.Command.CommandType;
 import com.appleframework.cache.core.spring.CacheOperation;
@@ -65,7 +65,7 @@ public class SpringCacheOperation implements CacheOperation {
 	}
 
 	public Object get(String key) {
-		if(!CacheConfig.isCacheEnable())
+		if(!SpringCacheConfig.isCacheEnable())
 			return null;
 		Object value = null;
 		try {
@@ -100,7 +100,7 @@ public class SpringCacheOperation implements CacheOperation {
 	
 
 	public void put(String key, Object value) {
-		if (value == null || !CacheConfig.isCacheEnable())
+		if (value == null || !SpringCacheConfig.isCacheEnable())
 			return;
 		JedisPool jedisPool = poolFactory.getWritePool();
 		Jedis jedis = jedisPool.getResource();

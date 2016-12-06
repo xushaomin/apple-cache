@@ -8,7 +8,7 @@ import org.redisson.core.RMapCache;
 
 import com.appleframework.cache.core.CacheObject;
 import com.appleframework.cache.core.CacheObjectImpl;
-import com.appleframework.cache.core.config.CacheConfig;
+import com.appleframework.cache.core.config.SpringCacheConfig;
 import com.appleframework.cache.core.spring.CacheOperation;
 
 public class SpringCacheOperation implements CacheOperation {
@@ -40,7 +40,7 @@ public class SpringCacheOperation implements CacheOperation {
 		Object returnValue = null;
 		try {
 			Object cacheValue = getCacheMap().get(key);
-			if(CacheConfig.isCacheObject()) {
+			if(SpringCacheConfig.isCacheObject()) {
 				CacheObject cache = (CacheObject) cacheValue;
 				if (null != cache) {
 					if (cache.isExpired()) {
@@ -72,7 +72,7 @@ public class SpringCacheOperation implements CacheOperation {
 		if (value == null)
 			this.delete(key);
 		try {
-			if(CacheConfig.isCacheObject()) {
+			if(SpringCacheConfig.isCacheObject()) {
 				CacheObject cache = new CacheObjectImpl(value, getExpiredTime());
 				getCacheMap().put(key, cache);
 			}

@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 
 import com.appleframework.cache.core.CacheObject;
 import com.appleframework.cache.core.CacheObjectImpl;
-import com.appleframework.cache.core.config.CacheConfig;
+import com.appleframework.cache.core.config.SpringCacheConfig;
 import com.appleframework.cache.core.spring.CacheOperation;
 
 import net.sf.ehcache.Cache;
@@ -61,7 +61,7 @@ public class SpringCacheOperation implements CacheOperation {
 		try {
 			Element element = getEhCache().get(key);
 			if(null != element) {
-				if(CacheConfig.isCacheObject()) {
+				if(SpringCacheConfig.isCacheObject()) {
 					CacheObject cache = (CacheObject) element.getObjectValue();
 					if (null != cache) {
 						if (cache.isExpired()) {
@@ -96,7 +96,7 @@ public class SpringCacheOperation implements CacheOperation {
 			this.delete(key);
 		try {
 			Element element = null;
-			if(CacheConfig.isCacheObject()) {
+			if(SpringCacheConfig.isCacheObject()) {
 				CacheObject object = CacheObjectImpl.create(value, expire);
 				element = new Element(key, object, (int)timeToIdleSeconds, (int)timeToLiveSeconds);
 			}

@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentMap;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.AbstractCacheManager;
 
-import com.appleframework.cache.core.config.CacheConfig;
+import com.appleframework.cache.core.config.SpringCacheConfig;
 
 public abstract class BaseSpringCacheManager extends AbstractCacheManager {
 
@@ -27,15 +27,15 @@ public abstract class BaseSpringCacheManager extends AbstractCacheManager {
 	}
 	
 	public void setCacheObject(Boolean isCacheObject) {
-		CacheConfig.setCacheObject(isCacheObject);
+		SpringCacheConfig.setCacheObject(isCacheObject);
 	}
 	
 	public void setCacheEnable(Boolean isCacheEnable) {
-		CacheConfig.setCacheEnable(isCacheEnable);
+		SpringCacheConfig.setCacheEnable(isCacheEnable);
 	}
 	
 	public void setCacheKeyPrefix(String cacheKeyPrefix) {
-		CacheConfig.setCacheKeyPrefix(cacheKeyPrefix);
+		SpringCacheConfig.setCacheKeyPrefix(cacheKeyPrefix);
 	}
 
 }

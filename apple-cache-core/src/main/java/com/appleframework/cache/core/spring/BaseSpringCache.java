@@ -3,7 +3,7 @@ package com.appleframework.cache.core.spring;
 import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
 
-import com.appleframework.cache.core.config.CacheConfig;
+import com.appleframework.cache.core.config.SpringCacheConfig;
 import com.appleframework.cache.core.spring.CacheOperation;
 
 public abstract class BaseSpringCache implements Cache {
@@ -14,19 +14,19 @@ public abstract class BaseSpringCache implements Cache {
 
 	@Override
 	public void clear() {
-		if(CacheConfig.isCacheEnable())
+		if(SpringCacheConfig.isCacheEnable())
 			cacheOperation.clear();
 	}
 
 	@Override
 	public void evict(Object key) {
-		if(CacheConfig.isCacheEnable())
+		if(SpringCacheConfig.isCacheEnable())
 			cacheOperation.delete(key.toString());
 	}
 
 	@Override
 	public ValueWrapper get(Object key) {
-		if(!CacheConfig.isCacheEnable())
+		if(!SpringCacheConfig.isCacheEnable())
 			return null;
 		ValueWrapper wrapper = null;
 		Object value = cacheOperation.get(key.toString());
@@ -48,14 +48,14 @@ public abstract class BaseSpringCache implements Cache {
 
 	@Override
 	public void put(Object key, Object value) {
-		if(CacheConfig.isCacheEnable())
+		if(SpringCacheConfig.isCacheEnable())
 			cacheOperation.put(key.toString(), value);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T get(Object key, Class<T> type) {
-		if(!CacheConfig.isCacheEnable())
+		if(!SpringCacheConfig.isCacheEnable())
 			return null;
 		Object cacheValue = this.cacheOperation.get(key.toString());
 		Object value = (cacheValue != null ? cacheValue : null);
@@ -67,7 +67,7 @@ public abstract class BaseSpringCache implements Cache {
 
 	@Override
 	public ValueWrapper putIfAbsent(Object key, Object value) {
-		if(!CacheConfig.isCacheEnable())
+		if(!SpringCacheConfig.isCacheEnable())
 			return null;
 		ValueWrapper wrapper = null;
 		Object objValue = this.cacheOperation.get(key.toString());

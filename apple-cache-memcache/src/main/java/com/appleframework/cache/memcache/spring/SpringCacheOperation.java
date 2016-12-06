@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 import com.appleframework.cache.core.CacheObject;
 import com.appleframework.cache.core.CacheObjectImpl;
-import com.appleframework.cache.core.config.CacheConfig;
+import com.appleframework.cache.core.config.SpringCacheConfig;
 import com.appleframework.cache.core.spring.CacheOperation;
 
 import net.rubyeye.xmemcached.MemcachedClient;
@@ -39,7 +39,7 @@ public class SpringCacheOperation implements CacheOperation {
 		Object value = null;
 		try {
 			key = this.getKey(key);
-			if(CacheConfig.isCacheObject()) {
+			if(SpringCacheConfig.isCacheObject()) {
 				CacheObject cache = (CacheObject) memcachedClient.get(key);
 				if (null != cache) {
 					if (cache.isExpired()) {
@@ -76,7 +76,7 @@ public class SpringCacheOperation implements CacheOperation {
 			this.delete(key);
 		try {
 			key = this.getKey(key);
-			if(CacheConfig.isCacheObject()) {
+			if(SpringCacheConfig.isCacheObject()) {
 				CacheObject object = new CacheObjectImpl(value, getExpiredTime());
 				memcachedClient.setWithNoReply(key, 0, object);
 			}
