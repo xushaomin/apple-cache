@@ -31,5 +31,18 @@ public class SpringCacheConfig {
 	public static void setCacheKeyPrefix(String cacheKeyPrefix) {
 		SpringCacheConfig.cacheKeyPrefix = cacheKeyPrefix;
 	}
+	
+	//add set method for spring
+	public void setSpringCacheEnable(boolean isCacheEnable) {
+		SpringCacheConfig.isCacheEnable = isCacheEnable;
+	}
+
+	public void setSpringCacheObject(boolean isCacheObject) {
+		SpringCacheConfig.isCacheObject = isCacheObject;
+	}
+
+	public void setSpringCacheKeyPrefix(String cacheKeyPrefix) {
+		SpringCacheConfig.cacheKeyPrefix = cacheKeyPrefix;
+	}
 
 }
