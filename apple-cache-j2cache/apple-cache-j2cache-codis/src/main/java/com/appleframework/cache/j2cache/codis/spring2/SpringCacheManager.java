@@ -50,7 +50,7 @@ public class SpringCacheManager extends BaseSpringCacheManager {
 		this.codisResourcePool = codisResourcePool;
 	}
 
-	public void setCacheTypeMap(Map<String, String> cacheTypeMap) {
+	public void setCacheTypeConfig(Map<String, String> cacheTypeMap) {
 		this.cacheTypeMap = cacheTypeMap;
 	}
 	
