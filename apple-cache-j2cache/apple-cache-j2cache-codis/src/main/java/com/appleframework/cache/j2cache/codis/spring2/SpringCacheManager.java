@@ -7,8 +7,6 @@ import org.springframework.cache.Cache;
 
 import com.appleframework.cache.codis.CodisResourcePool;
 import com.appleframework.cache.core.spring.BaseSpringCacheManager;
-import com.appleframework.cache.j2cache.codis.spring2.codis.CodisSpringCache;
-import com.appleframework.cache.j2cache.codis.spring2.ehcache.EhcacheSpringCache;
 
 import net.sf.ehcache.CacheManager;
 
@@ -33,11 +31,11 @@ public class SpringCacheManager extends BaseSpringCacheManager {
 			}
 			String cacheType = cacheTypeMap.get(name);
 			if(cacheType.equals("codis")) {
-				cache = new CodisSpringCache(codisResourcePool, name, expire.intValue());
+				cache = new com.appleframework.cache.codis.spring.SpringCache(codisResourcePool, name, expire.intValue());
 				cacheMap.put(name, cache);
 			}
 			else {
-				cache = new EhcacheSpringCache(ehcacheManager, name, expire.intValue());
+				cache = new com.appleframework.cache.ehcache.spring.SpringCache(ehcacheManager, name, expire.intValue());
 				cacheMap.put(name, cache);
 			}
 		}
