@@ -30,7 +30,7 @@ public class SpringCacheManager extends BaseSpringCacheManager {
 				expireMap.put(name, expire);
 			}
 			String cacheType = cacheTypeMap.get(name);
-			if(cacheType.equals("codis")) {
+			if(null != cacheType && cacheType.equals("codis")) {
 				cache = new com.appleframework.cache.codis.spring.SpringCache(codisResourcePool, name, expire.intValue());
 				cacheMap.put(name, cache);
 			}
