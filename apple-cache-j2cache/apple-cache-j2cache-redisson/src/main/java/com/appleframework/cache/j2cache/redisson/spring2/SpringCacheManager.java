@@ -1,11 +1,11 @@
-package com.appleframework.cache.j2cache.codis.spring2;
+package com.appleframework.cache.j2cache.redisson.spring2;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.redisson.RedissonClient;
 import org.springframework.cache.Cache;
 
-import com.appleframework.cache.codis.CodisResourcePool;
 import com.appleframework.cache.core.spring.BaseSpringCacheManager;
 
 import net.sf.ehcache.CacheManager;
@@ -14,7 +14,7 @@ public class SpringCacheManager extends BaseSpringCacheManager {
 	
 	private Map<String, String> cacheTypeMap = new HashMap<String, String>();
 
-	private CodisResourcePool codisResourcePool;
+	private RedissonClient redisson;
 	private CacheManager ehcacheManager;
 
 	public SpringCacheManager() {
@@ -35,7 +35,7 @@ public class SpringCacheManager extends BaseSpringCacheManager {
 				cacheMap.put(name, cache);
 			}
 			else {
-				cache = new com.appleframework.cache.codis.spring.SpringCache(codisResourcePool, name, expire.intValue());
+				cache = new com.appleframework.cache.redisson.spring.SpringCache(redisson, name, expire.intValue());
 				cacheMap.put(name, cache);
 			}
 		}
@@ -46,8 +46,8 @@ public class SpringCacheManager extends BaseSpringCacheManager {
 		this.ehcacheManager = ehcacheManager;
 	}
 
-	public void setCodisResourcePool(CodisResourcePool codisResourcePool) {
-		this.codisResourcePool = codisResourcePool;
+	public void setRedisson(RedissonClient redisson) {
+		this.redisson = redisson;
 	}
 
 	public void setCacheTypeConfig(Map<String, String> cacheTypeMap) {
