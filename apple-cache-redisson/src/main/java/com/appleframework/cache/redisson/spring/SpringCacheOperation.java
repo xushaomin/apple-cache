@@ -3,8 +3,8 @@ package com.appleframework.cache.redisson.spring;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.redisson.RedissonClient;
-import org.redisson.core.RMapCache;
+import org.redisson.api.RMapCache;
+import org.redisson.api.RedissonClient;
 
 import com.appleframework.cache.core.CacheObject;
 import com.appleframework.cache.core.CacheObjectImpl;

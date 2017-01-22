@@ -1,14 +1,15 @@
 package com.appleframework.cache.redisson;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.redisson.RedissonClient;
-import org.redisson.core.RMapCache;
+import org.redisson.api.RMapCache;
+import org.redisson.api.RedissonClient;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager;
@@ -151,15 +152,19 @@ public class RedissonMapCacheManager implements CacheManager {
 	public Map<String, Object> getMap(List<String> keyList) throws CacheException {
 		return this.getMap(keyList.toArray(new String[keyList.size()]));
 	}
+	
+	private Set<String> getKeySet(String... keys) {
+		Set<String> keySet = new HashSet<String>(keys.length);  
+		for (String key : keySet) {
+			keySet.add(key);
+		}
+		return keySet;
+	}
 
 	@Override
 	public Map<String, Object> getMap(String... keys) throws CacheException {
-		Map<String, Object> returnMap = new HashMap<String, Object>();
-		RMapCache<String, Object> cacheMap = this.getCacheMap();
-		for (String key : keys) {
-			returnMap.put(key, cacheMap.get(key));
-		}
-		return returnMap;
+		Set<String> keySet = this.getKeySet(keys);
+		return this.getCacheMap().getAll(keySet);
 	}
 
 	@Override
@@ -169,12 +174,9 @@ public class RedissonMapCacheManager implements CacheManager {
 
 	@Override
 	public <T> Map<String, T> getMap(Class<T> clazz, String... keys) throws CacheException {
-		Map<String, T> returnMap = new HashMap<String, T>();
-		RMapCache<String, T> cacheMap = this.getCacheMapT();
-		for (String key : keys) {
-			returnMap.put(key, cacheMap.get(key));
-		}
-		return returnMap;
+		Set<String> keySet = this.getKeySet(keys);
+		Map<String, T> cacheMap = (Map<String, T>) this.getCacheMapT().getAll(keySet);
+		return cacheMap;
 	}
 		
 }

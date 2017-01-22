@@ -10,21 +10,34 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
      default-lazy-init="true">
-		
-	<bean id="masterSlaveServersConfig" class="org.redisson.MasterSlaveServersConfig">
-		<property name="masterAddressUri" value="${redis.masterAddress:192.168.1.177:6379}" />
-		<property name="slaveAddressUris" value="${redis.slaveAddresses:192.168.1.177:6379}" />
-		<property name="masterConnectionPoolSize" value="${redis.masterConnectionPoolSize:1000}" />
-		<property name="slaveConnectionPoolSize" value="${redis.slaveConnectionPoolSize:1000}" />	
-		<property name="database" value="${redis.database:1}" />
+
+	 	<bean id="config" class="com.appleframework.cache.redisson.factory.config.MasterSlaveServersConfigFactoryBean">
+	 		<property name="masterAddress" value="192.168.1.177:6379" />
+	 		<property name="slaveAddresses" value="192.168.1.177:6379" />
+	 		<property name="masterConnectionPoolSize" value="1000" />
+			<property name="slaveConnectionPoolSize" value="1000" />	
+			<property name="database" value="1" />
+			<property name="codec" ref="redissonCodec" />
+	 	</bean>
+	 	
+	 		 
+	<!-- 
+	<bean id="masterSlaveServersConfig" class="org.redisson.config.MasterSlaveServersConfig">
+		<property name="masterAddress" value="127.0.0.1:6379" />
+		<property name="slaveAddresses" ref="slaveAddresses" />
+		<property name="masterConnectionPoolSize" value="1000" />
+		<property name="slaveConnectionPoolSize" value="1000" />	
+		<property name="database" value="1" />
 	</bean>
-	
-	<bean id="redissonCodec" class="org.redisson.codec.SerializationCodec" />
-	
-	<bean id="config" class="org.redisson.Config">
+	<bean id="config" class="org.redisson.config.Config">
 		<property name="masterSlaveServersConfig" ref="masterSlaveServersConfig" />
 		<property name="codec" ref="redissonCodec" />
 	</bean>
+	 -->
+	 
+	<bean id="redissonCodec" class="org.redisson.codec.SerializationCodec" />
+	
+	
 	
 	<bean id="redisson" class="org.redisson.Redisson" destroy-method="shutdown">
 		<constructor-arg ref="config" />

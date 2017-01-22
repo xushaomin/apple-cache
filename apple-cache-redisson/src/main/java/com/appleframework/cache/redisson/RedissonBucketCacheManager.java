@@ -1,19 +1,22 @@
 package com.appleframework.cache.redisson;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.redisson.RedissonClient;
-import org.redisson.core.RBucket;
-import org.redisson.core.RKeys;
+import org.redisson.api.RBatch;
+import org.redisson.api.RBucket;
+import org.redisson.api.RBucketAsync;
+import org.redisson.api.RFuture;
+import org.redisson.api.RKeys;
+import org.redisson.api.RedissonClient;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager;
 
-@SuppressWarnings("deprecation")
 public class RedissonBucketCacheManager implements CacheManager {
 
 	private static Logger logger = Logger.getLogger(RedissonBucketCacheManager.class);
@@ -103,10 +106,10 @@ public class RedissonBucketCacheManager implements CacheManager {
 	@Override
 	public List<Object> getList(String... keys) throws CacheException {
 		try {
-			Map<String, Object> map = redisson.loadBucketValues(keys);
+			List<?> response = getBatchResponseList(keys);
 			List<Object> list = new ArrayList<Object>();
-			for (String key : keys) {
-				list.add(map.get(key));
+			for (Object object : response) {
+				list.add(object);
 			}
 			return list;
 		} catch (Exception e) {
@@ -125,13 +128,14 @@ public class RedissonBucketCacheManager implements CacheManager {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> List<T> getList(Class<T> clazz, String... keys) throws CacheException {
 		try {
-			Map<String, T> map = redisson.loadBucketValues(keys);
+			List<?> response = getBatchResponseList(keys);
 			List<T> list = new ArrayList<T>();
-			for (String key : keys) {
-				list.add(map.get(key));
+			for (Object object : response) {
+				list.add((T)object);
 			}
 			return list;
 		} catch (Exception e) {
@@ -142,22 +146,77 @@ public class RedissonBucketCacheManager implements CacheManager {
 
 	@Override
 	public Map<String, Object> getMap(List<String> keyList) throws CacheException {
-		return redisson.loadBucketValues(keyList);
+		return this.getBatchResponseMap(keyList.toArray(new String[keyList.size()]));
 	}
 
 	@Override
 	public Map<String, Object> getMap(String... keys) throws CacheException {
-		return redisson.loadBucketValues(keys);
+		return this.getBatchResponseMap(keys);
 	}
 
 	@Override
 	public <T> Map<String, T> getMap(Class<T> clazz, List<String> keyList) throws CacheException {
-		return redisson.loadBucketValues(keyList);
+		return this.getBatchResponseMapT(clazz, keyList.toArray(new String[keyList.size()]));
 	}
 
 	@Override
 	public <T> Map<String, T> getMap(Class<T> clazz, String... keys) throws CacheException {
-		return redisson.loadBucketValues(keys);
+		return this.getMap(clazz, keys);
 	}
-		
+	
+	private List<?> getBatchResponseList(String... keys) {
+		RBatch batch = redisson.createBatch();
+		for (String key : keys) {
+			batch.getBucket(key).getAsync();
+		}
+		return batch.execute();
+	}
+	
+	private Map<String, RFuture<Object>> getBatchRFutureMap(String... keys) {
+		Map<String, RFuture<Object>> futureMap = new HashMap<String, RFuture<Object>>(keys.length);
+		RBatch batch = redisson.createBatch();
+		try {
+			for (String key : keys) {
+				RBucketAsync<Object> bucket = batch.getBucket(key);
+				futureMap.put(key, bucket.getAsync());
+			}
+		} catch (Exception e) {
+			logger.error(e);
+		}
+		batch.execute();
+		return futureMap;
+	}
+	
+	private Map<String, Object> getBatchResponseMap(String... keys) {
+		Map<String, Object> returnMap = new HashMap<String, Object>(keys.length);
+		for (Map.Entry<String, RFuture<Object>> entry : getBatchRFutureMap(keys).entrySet()) {
+			String key = entry.getKey();
+			RFuture<Object> value = entry.getValue();
+			Object object = null;
+			try {
+				object = value.get();
+			} catch (Exception e) {
+				logger.error(e);
+			}
+			returnMap.put(key, object);
+		}
+		return returnMap;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T> Map<String, T> getBatchResponseMapT(Class<T> clazz, String... keys) {
+		Map<String, T> returnMap = new HashMap<String, T>(keys.length);
+		for (Map.Entry<String, RFuture<Object>> entry : getBatchRFutureMap(keys).entrySet()) {
+			String key = entry.getKey();
+			RFuture<Object> value = entry.getValue();
+			Object object = null;
+			try {
+				object = value.get();
+			} catch (Exception e) {
+				logger.error(e);
+			}
+			returnMap.put(key, (T)object);
+		}
+		return returnMap;
+	}
 }
