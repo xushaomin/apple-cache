@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.redisson.RedissonClient;
-import org.redisson.core.RBucket;
-import org.redisson.core.RKeys;
+import org.redisson.api.RBucket;
+import org.redisson.api.RKeys;
+import org.redisson.api.RedissonClient;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.replicator.Command;
@@ -219,7 +219,8 @@ public class J2RedissonBucketCacheManager implements com.appleframework.cache.co
 
 	@Override
 	public Map<String, Object> getMap(String... keys) throws CacheException {
-		return redisson.loadBucketValues(keys);
+		//return redisson.loadBucketValues(keys);
+		return null;
 	}
 
 	@Override
@@ -229,7 +230,8 @@ public class J2RedissonBucketCacheManager implements com.appleframework.cache.co
 
 	@Override
 	public <T> Map<String, T> getMap(Class<T> clazz, String... keys) throws CacheException {
-		return redisson.loadBucketValues(keys);
+		//return redisson.loadBucketValues(keys);
+		return null;
 	}
 	
 }

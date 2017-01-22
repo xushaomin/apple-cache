@@ -1,6 +1,6 @@
 package com.appleframework.cache.j2cache.redisson.spring;
 
-import org.redisson.RedissonClient;
+import org.redisson.api.RedissonClient;
 import org.springframework.cache.Cache;
 
 import com.appleframework.cache.core.spring.BaseSpringCacheManager;

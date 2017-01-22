@@ -1,9 +1,9 @@
 package com.appleframework.cache.j2cache.redisson.replicator;
 
 import org.apache.log4j.Logger;
-import org.redisson.RedissonClient;
-import org.redisson.core.RBucket;
-import org.redisson.core.RMapCache;
+import org.redisson.api.RBucket;
+import org.redisson.api.RMapCache;
+import org.redisson.api.RedissonClient;
 
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.Command.CommandType;

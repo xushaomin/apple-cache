@@ -3,9 +3,9 @@ package com.appleframework.cache.j2cache.redisson.spring;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.redisson.RedissonClient;
-import org.redisson.core.MessageListener;
-import org.redisson.core.RTopic;
+import org.redisson.api.RTopic;
+import org.redisson.api.RedissonClient;
+import org.redisson.api.listener.MessageListener;
 
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.Command.CommandType;
