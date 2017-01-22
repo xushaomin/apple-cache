@@ -19,7 +19,6 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
-@SuppressWarnings("deprecation")
 public class J2RedissonBucketCacheManager implements com.appleframework.cache.core.CacheManager {
 
 	private static Logger logger = Logger.getLogger(J2RedissonBucketCacheManager.class);
