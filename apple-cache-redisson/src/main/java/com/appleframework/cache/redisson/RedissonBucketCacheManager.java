@@ -1,6 +1,5 @@
 package com.appleframework.cache.redisson;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,14 +103,10 @@ public class RedissonBucketCacheManager implements CacheManager {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<Object> getList(String... keys) throws CacheException {
 		try {
-			List<?> response = getBatchResponseList(keys);
-			List<Object> list = new ArrayList<Object>();
-			for (Object object : response) {
-				list.add(object);
-			}
-			return list;
+			return (List<Object>) getBatchResponseList(keys);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
@@ -128,16 +123,10 @@ public class RedissonBucketCacheManager implements CacheManager {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public <T> List<T> getList(Class<T> clazz, String... keys) throws CacheException {
 		try {
-			List<?> response = getBatchResponseList(keys);
-			List<T> list = new ArrayList<T>();
-			for (Object object : response) {
-				list.add((T)object);
-			}
-			return list;
+			return getBatchResponseListT(clazz, keys);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
@@ -172,12 +161,21 @@ public class RedissonBucketCacheManager implements CacheManager {
 		return batch.execute();
 	}
 	
-	private Map<String, RFuture<Object>> getBatchRFutureMap(String... keys) {
-		Map<String, RFuture<Object>> futureMap = new HashMap<String, RFuture<Object>>(keys.length);
+	@SuppressWarnings("unchecked")
+	private <T> List<T> getBatchResponseListT(Class<T> clazz, String... keys) {
+		RBatch batch = redisson.createBatch();
+		for (String key : keys) {
+			batch.getBucket(key).getAsync();
+		}
+		return (List<T>) batch.execute();
+	}
+	
+	private <T> Map<String, RFuture<T>> getBatchRFutureMap(String... keys) {
+		Map<String, RFuture<T>> futureMap = new HashMap<String, RFuture<T>>(keys.length);
 		RBatch batch = redisson.createBatch();
 		try {
 			for (String key : keys) {
-				RBucketAsync<Object> bucket = batch.getBucket(key);
+				RBucketAsync<T> bucket = batch.getBucket(key);
 				futureMap.put(key, bucket.getAsync());
 			}
 		} catch (Exception e) {
@@ -203,19 +201,19 @@ public class RedissonBucketCacheManager implements CacheManager {
 		return returnMap;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private <T> Map<String, T> getBatchResponseMapT(Class<T> clazz, String... keys) {
 		Map<String, T> returnMap = new HashMap<String, T>(keys.length);
-		for (Map.Entry<String, RFuture<Object>> entry : getBatchRFutureMap(keys).entrySet()) {
+		Map<String, RFuture<T>> map = this.getBatchRFutureMap(keys);
+		for (Map.Entry<String, RFuture<T>> entry : map.entrySet()) {
 			String key = entry.getKey();
-			RFuture<Object> value = entry.getValue();
-			Object object = null;
+			RFuture<T> value = entry.getValue();
+			T object = null;
 			try {
 				object = value.get();
 			} catch (Exception e) {
 				logger.error(e);
 			}
-			returnMap.put(key, (T)object);
+			returnMap.put(key, object);
 		}
 		return returnMap;
 	}
