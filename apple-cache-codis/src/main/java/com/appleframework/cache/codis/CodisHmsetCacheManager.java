@@ -156,7 +156,7 @@ public class CodisHmsetCacheManager implements CacheManager {
 						try {
 							ReflectionUtility.invokeSetterMethod(object, boKey, boValue);
 						} catch (Exception e) {
-							logger.error(e.getMessage());
+							logger.info(e.getMessage());
 						}
 					}
 				}
@@ -288,7 +288,7 @@ public class CodisHmsetCacheManager implements CacheManager {
 							try {
 								ReflectionUtility.invokeSetterMethod(object, boKey, boValue);
 							} catch (Exception e) {
-								logger.error(e.getMessage());
+								logger.info(e.getMessage());
 							}
 						}
 					}
@@ -372,7 +372,11 @@ public class CodisHmsetCacheManager implements CacheManager {
 						String boKey = stringFields[i];
 						Object boValue = (Object) SerializeUtility.unserialize(value.get(i));
 						if (null != boValue) {
-							ReflectionUtility.invokeSetterMethod(object, boKey, boValue);
+							try {
+								ReflectionUtility.invokeSetterMethod(object, boKey, boValue);
+							} catch (Exception e) {
+								logger.info(e.getMessage());
+							}
 						}
 					}
 					map.put(key, object);
