@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>apple-cache</artifactId>
 		<groupId>com.appleframework.cache</groupId>
-		<version>0.3.2.RELEASE</version>
+		<version>0.3.3.RELEASE</version>
 	</parent>
 	<artifactId>apple-cache-jedis</artifactId>
 	<name>apple-cache-jedis</name>
@@ -62,6 +62,18 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
-				
+		
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+  			<artifactId>commons-beanutils</artifactId>
+  			<version>1.9.2</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>commons-lang</groupId>
+  			<artifactId>commons-lang</artifactId>
+  			<version>2.6</version>
+		</dependency>
+		
 	</dependencies>
 </project>
