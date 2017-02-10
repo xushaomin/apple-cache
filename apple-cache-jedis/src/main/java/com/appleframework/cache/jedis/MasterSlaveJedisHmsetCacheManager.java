@@ -137,6 +137,17 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 			jedisPool.returnResource(jedis);
 		}
 	}
+	
+	private boolean isListNull(List<?> list) {
+		if(null == list || list.size() == 0)
+			return true;
+		boolean isNull = true;
+		for (Object object : list) {
+			if(null != object)
+				isNull = false;
+		}
+		return isNull;
+	}
 
 	@Override
 	public <T> T get(String key, Class<T> clazz) throws CacheException {
@@ -145,7 +156,7 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 		try {
 			List<byte[]> list = jedis.hmget(getKey(key), this.getByteProperties(clazz));
 			T object = clazz.newInstance();
-			if (null != list) {
+			if (!isListNull(list)) {
 				String[] stringFields = this.getStrProperties(clazz);
 				for (int i = 0; i < stringFields.length; i++) {
 					String boKey = stringFields[i];
@@ -299,7 +310,7 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 			for (String key : responses.keySet()) {
 				Response<List<byte[]>> response = responses.get(key);
 				List<byte[]> value = response.get();
-				if (null != value) {
+				if (!isListNull(value)) {
 					T object = clazz.newInstance();
 					for (int i = 0; i < stringFields.length; i++) {
 						String boKey = stringFields[i];

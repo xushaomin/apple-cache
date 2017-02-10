@@ -103,6 +103,17 @@ public class CodisHmsetCacheManager implements CacheManager {
 		return descriptors;
 	}
 	
+	private boolean isListNull(List<?> list) {
+		if(null == list || list.size() == 0)
+			return true;
+		boolean isNull = true;
+		for (Object object : list) {
+			if(null != object)
+				isNull = false;
+		}
+		return isNull;
+	}
+	
 	public void clear() throws CacheException {
 		try (Jedis jedis = codisResourcePool.getResource()) {
 			jedis.del(getKey("*"));
@@ -136,7 +147,7 @@ public class CodisHmsetCacheManager implements CacheManager {
 				object = clazz.newInstance();
 			} catch (Exception e) {
 			}
-			if (null != list && null != object) {
+			if (!isListNull(list) && null != object) {
 				String[] stringFields = this.getStrProperties(clazz);
 				for (int i = 0; i < stringFields.length; i++) {
 					String boKey = stringFields[i];
@@ -268,7 +279,7 @@ public class CodisHmsetCacheManager implements CacheManager {
 			for (String key : responses.keySet()) {
 				Response<List<byte[]>> response = responses.get(key);
 				List<byte[]> value = response.get();
-				if (null != value) {
+				if (!isListNull(value)) {
 					T object = clazz.newInstance();
 					for (int i = 0; i < stringFields.length; i++) {
 						String boKey = stringFields[i];
