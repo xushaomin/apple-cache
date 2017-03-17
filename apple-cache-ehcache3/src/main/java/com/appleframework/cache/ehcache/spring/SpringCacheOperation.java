@@ -103,7 +103,7 @@ public class SpringCacheOperation implements CacheOperation {
 			this.delete(key);
 		try {
 			if (SpringCacheConfig.isCacheObject()) {
-				CacheObject object = CacheObjectImpl.create(value, expire);
+				CacheObjectImpl object = CacheObjectImpl.create(value, expire);
 				getEhCache().put(key, object);
 			} else {
 				/*
