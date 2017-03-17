@@ -127,14 +127,15 @@
 	
 	<modules>
 		<module>apple-cache-core</module>
+		<module>apple-cache-config</module>
 		<module>apple-cache-jedis</module>
 		<module>apple-cache-memcache</module>
     	<module>apple-cache-hazelcast</module>
     	<module>apple-cache-codis</module>
     	<module>apple-cache-redisson</module>
 		<module>apple-cache-ehcache</module>
+		<module>apple-cache-ehcache3</module>
     	<module>apple-cache-j2cache</module>
-    <module>apple-cache-config</module>
   </modules>
 	
 	<build>
