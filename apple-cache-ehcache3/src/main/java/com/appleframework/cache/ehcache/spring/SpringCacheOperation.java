@@ -9,7 +9,6 @@ import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.MemoryUnit;
 
-import com.appleframework.cache.core.CacheObject;
 import com.appleframework.cache.core.CacheObjectImpl;
 import com.appleframework.cache.core.config.SpringCacheConfig;
 import com.appleframework.cache.core.spring.CacheOperation;
@@ -71,7 +70,7 @@ public class SpringCacheOperation implements CacheOperation {
 			Object element = getEhCache().get(key);
 			if (null != element) {
 				if (SpringCacheConfig.isCacheObject()) {
-					CacheObject cache = (CacheObject) element;
+					CacheObjectImpl cache = (CacheObjectImpl) element;
 					if (null != cache) {
 						if (cache.isExpired()) {
 							this.resetCacheObject(key, cache);
@@ -89,7 +88,7 @@ public class SpringCacheOperation implements CacheOperation {
 		return value;
 	}
 
-	private void resetCacheObject(String key, CacheObject cache) {
+	private void resetCacheObject(String key, CacheObjectImpl cache) {
 		try {
 			cache.setExpiredSecond(expire);
 			getEhCache().put(key, cache);
