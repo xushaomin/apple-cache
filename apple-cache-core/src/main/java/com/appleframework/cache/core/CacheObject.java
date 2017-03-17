@@ -1,6 +1,8 @@
 package com.appleframework.cache.core;
 
-public interface CacheObject {
+import java.io.Serializable;
+
+public interface CacheObject extends Serializable {
 
 	Object getObject();
 	

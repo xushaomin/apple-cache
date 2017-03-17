@@ -6,10 +6,8 @@ public class ConfigurationFactoryBean {
 	private static int offheap = 100;
 	private static int sizeOfMaxObjectGraph;
 	private static int sizeOfMaxObjectSize;
-	private static int defaultSizeOfMaxObjectSize;// 分级机制可以配置在两个轴:第一个指定的最大数量
-													// 的对象遍历走对象图的时候,
-	private static int defaultSizeOfMaxObjectGraph; // 可以提供一个默认的配置缓存管理器级别使用的缓存,除非定义
-													// 明确
+	private static int defaultSizeOfMaxObjectSize;
+	private static int defaultSizeOfMaxObjectGraph;
 
 	public static int getHeap() {
 		return heap;
