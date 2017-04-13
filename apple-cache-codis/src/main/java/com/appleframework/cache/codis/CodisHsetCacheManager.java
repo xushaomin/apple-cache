@@ -39,6 +39,8 @@ public class CodisHsetCacheManager implements CacheManager {
 			byte[] value = jedis.hget(name.getBytes(), key.getBytes());
 			if(null != value) {
 				CacheObject cache = (CacheObject)SerializeUtility.unserialize(value);
+				if(null == cache)
+					return null;
 				if(cache.isExpired()) {
 					this.remove(key);
 					return null;
@@ -58,6 +60,8 @@ public class CodisHsetCacheManager implements CacheManager {
 			byte[] value = jedis.hget(name.getBytes(), key.getBytes());
 			if(null != value) {
 				CacheObject cache = (CacheObject)SerializeUtility.unserialize(value);
+				if(null == cache)
+					return null;
 				if(cache.isExpired()) {
 					this.remove(key);
 					return null;
@@ -112,6 +116,8 @@ public class CodisHsetCacheManager implements CacheManager {
 				byte[] value = byteList.get(i);
 				if(null != value) {
 					CacheObject cache = (CacheObject)SerializeUtility.unserialize(value);
+					if(null == cache)
+						list.add(null);
 					if(cache.isExpired()) {
 						list.add(null);
 						this.remove(keys[i]);
@@ -147,6 +153,8 @@ public class CodisHsetCacheManager implements CacheManager {
 				byte[] value = byteList.get(i);
 				if(null != value) {
 					CacheObject cache = (CacheObject)SerializeUtility.unserialize(value);
+					if(null == cache)
+						list.add(null);
 					if(cache.isExpired()) {
 						list.add(null);
 						this.remove(keys[i]);
@@ -182,6 +190,8 @@ public class CodisHsetCacheManager implements CacheManager {
 				byte[] value = byteList.get(i);
 				if(null != value) {
 					CacheObject cache = (CacheObject)SerializeUtility.unserialize(value);
+					if(null == cache)
+						this.remove(keys[i]);
 					if(cache.isExpired()) {
 						this.remove(keys[i]);
 					}
@@ -213,6 +223,8 @@ public class CodisHsetCacheManager implements CacheManager {
 				byte[] value = byteList.get(i);
 				if(null != value) {
 					CacheObject cache = (CacheObject)SerializeUtility.unserialize(value);
+					if(null == cache)
+						this.remove(keys[i]);
 					if(cache.isExpired()) {
 						this.remove(keys[i]);
 					}
