@@ -122,6 +122,7 @@ public class MasterSlaveServersConfigFactoryBean implements FactoryBean<Config> 
 		this.slaveAddresses = slaveAddresses.split(",");
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public Config getObject() throws Exception {
 		Config config = new Config();
