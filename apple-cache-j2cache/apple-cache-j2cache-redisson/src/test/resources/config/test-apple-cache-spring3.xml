@@ -33,12 +33,24 @@
 	
 	<bean id="ehCacheManagerFactoryBean" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
 	
-	
+	<!-- 
 	<bean id="springCacheManager"
 		class="com.appleframework.cache.j2cache.redisson.spring2.SpringCacheManager">
 		<property name="ehcacheManager" ref="ehCacheManagerFactoryBean" />
 		<property name="redisson" ref="redisson" />
 		<property name="cacheObject" value="true" />
+		<property name="expireConfig">
+			<map>
+				<entry key="testd" value="5" />
+			</map>
+		</property>
+	</bean>
+	 -->
+	<bean id="springEhCacheManager"
+		class="com.appleframework.cache.ehcache.spring.SpringCacheManager">
+		<property name="ehcacheManager" ref="ehCacheManagerFactoryBean" />
+		<property name="cacheObject" value="true" />
+		<property name="cacheEnable" value="true" />
 		<!-- 配置缓存时间 -->
 		<property name="expireConfig">
 			<map>
@@ -46,6 +58,31 @@
 			</map>
 		</property>
 	</bean>
+	
+	<bean id="springRedissonCacheManager"
+		class="com.appleframework.cache.redisson.spring.SpringCacheManager">
+		<property name="redisson" ref="redisson" />
+		<property name="cacheObject" value="true" />
+		<property name="cacheEnable" value="true" />
+		<!-- 配置缓存时间 -->
+		<property name="expireConfig">
+			<map>
+				<entry key="testd" value="5" />   <!-- key缓存对象名称 value缓存过期时间 -->
+			</map>
+		</property>
+	</bean>
+	
+	
+	<bean id="springCacheManager" class="org.springframework.cache.support.CompositeCacheManager">
+	    <property name="cacheManagers">
+	        <list>
+	            <ref bean="springEhCacheManager"/>
+	            <ref bean="springRedissonCacheManager"/>
+	        </list>
+	    </property>
+	    <property name="fallbackToNoOpCache" value="true"/>
+	</bean>
+
 	
 	<bean id="threadPoolTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<!-- 核心线程数，默认为1 -->
