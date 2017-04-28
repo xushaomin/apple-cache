@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.redisson.api.RedissonClient;
 import org.springframework.cache.Cache;
+import org.springframework.util.StringUtils;
 
 import com.appleframework.cache.core.spring.BaseSpringCacheManager;
 
@@ -30,7 +31,7 @@ public class SpringCacheManager extends BaseSpringCacheManager {
 				expireMap.put(name, expire);
 			}
 			String cacheType = cacheTypeMap.get(name);
-			if(null != cacheType && cacheType.equals("ehcache")) {
+			if(StringUtils.isEmpty(cacheType) || cacheType.equals("ehcache")) {
 				cache = new com.appleframework.cache.ehcache.spring.SpringCache(ehcacheManager, name, expire.intValue());
 				cacheMap.put(name, cache);
 			}
