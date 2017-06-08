@@ -9,7 +9,7 @@ import redis.clients.jedis.Jedis;
  *
  * @author zhengcanrui
  */
-public class RedisLock {
+public class CodisLock {
 
 	private CodisResourcePool codisResourcePool;
 
@@ -39,7 +39,7 @@ public class RedisLock {
 	 * @param lockKey
 	 *            lock key (ex. account:1, ...)
 	 */
-	public RedisLock(CodisResourcePool codisResourcePool, String lockKey) {
+	public CodisLock(CodisResourcePool codisResourcePool, String lockKey) {
 		this.codisResourcePool = codisResourcePool;
 		this.lockKey = lockKey + "_lock";
 	}
@@ -48,7 +48,7 @@ public class RedisLock {
 	 * Detailed constructor with default lock expiration of 60000 msecs.
 	 *
 	 */
-	public RedisLock(CodisResourcePool codisResourcePool, String lockKey, int timeoutMsecs) {
+	public CodisLock(CodisResourcePool codisResourcePool, String lockKey, int timeoutMsecs) {
 		this(codisResourcePool, lockKey);
 		this.timeoutMsecs = timeoutMsecs;
 	}
@@ -57,7 +57,7 @@ public class RedisLock {
 	 * Detailed constructor.
 	 *
 	 */
-	public RedisLock(CodisResourcePool codisResourcePool, String lockKey, int timeoutMsecs, int expireMsecs) {
+	public CodisLock(CodisResourcePool codisResourcePool, String lockKey, int timeoutMsecs, int expireMsecs) {
 		this(codisResourcePool, lockKey, timeoutMsecs);
 		this.expireMsecs = expireMsecs;
 	}
