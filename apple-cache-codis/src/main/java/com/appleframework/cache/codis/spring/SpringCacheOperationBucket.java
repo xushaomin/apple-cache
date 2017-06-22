@@ -34,9 +34,13 @@ public class SpringCacheOperationBucket implements CacheOperation {
 	public Object get(String key) {
 		Object value = null;
 		try (Jedis jedis = codisResourcePool.getResource()) {
-			byte[] cacheValue = jedis.get(getCacheKey(key));
+			byte[] cacheKey = getCacheKey(key);
+			byte[] cacheValue = jedis.get(cacheKey);
 			if (null != cacheValue) {
 				value = SerializeUtility.unserialize(cacheValue);
+			}
+			else {
+				jedis.srem(getNameKey(), cacheKey);
 			}
 		}
 		return value;
@@ -52,7 +56,6 @@ public class SpringCacheOperationBucket implements CacheOperation {
 			jedis.sadd(byteName, byteKey);
 			if (expireTime > 0) {
 				jedis.expire(byteKey, expireTime);
-				jedis.expire(byteName, expireTime * 2);
 			}
 		}
 	}
@@ -74,7 +77,7 @@ public class SpringCacheOperationBucket implements CacheOperation {
 		try (Jedis jedis = codisResourcePool.getResource()) {
 			byte[] cacheKey = this.getCacheKey(key);
 			jedis.del(cacheKey);
-			jedis.srem(getNameKey(), cacheKey); 
+			jedis.srem(getNameKey(), cacheKey);
 		}
 	}
 
