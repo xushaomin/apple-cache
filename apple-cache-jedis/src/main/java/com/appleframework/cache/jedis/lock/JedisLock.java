@@ -25,12 +25,12 @@ public class JedisLock implements Lock {
 	private PoolFactory poolFactory;
 
 	/**
-	 * Ëø³¬Ê±Ê±¼ä£¬·ÀÖ¹Ïß³ÌÔÚÈëËøÒÔºó£¬ÎŞÏŞµÄÖ´ĞĞµÈ´ı
+	 * é”è¶…æ—¶æ—¶é—´ï¼Œé˜²æ­¢çº¿ç¨‹åœ¨å…¥é”ä»¥åï¼Œæ— é™çš„æ‰§è¡Œç­‰å¾…
 	 */
 	private long acquireTimeout = 60000;
 
 	/**
-	 * ËøµÈ´ıÊ±¼ä£¬·ÀÖ¹Ïß³Ì¼¢¶ö
+	 * é”ç­‰å¾…æ—¶é—´ï¼Œé˜²æ­¢çº¿ç¨‹é¥¥é¥¿
 	 */
 	private long timeout = 10000;
 	
@@ -74,36 +74,36 @@ public class JedisLock implements Lock {
 	}
 	
 	/**
-	 * ¼ÓËø
+	 * åŠ é”
 	 * 
 	 * @param lockKey
-	 *            ËøµÄkey
+	 *            é”çš„key
 	 * @param acquireTimeout
-	 *            »ñÈ¡³¬Ê±Ê±¼ä
+	 *            è·å–è¶…æ—¶æ—¶é—´
 	 * @param timeout
-	 *            ËøµÄ³¬Ê±Ê±¼ä
-	 * @return Ëø±êÊ¶
+	 *            é”çš„è¶…æ—¶æ—¶é—´
+	 * @return é”æ ‡è¯†
 	 */
 	public void lock(String lockKey, long acquireTimeout, long timeout) {
 		JedisPool jedisPool = poolFactory.getWritePool();
 		Jedis jedis = jedisPool.getResource();
 		try {
-			// Ëæ»úÉú³ÉÒ»¸övalue
+			// éšæœºç”Ÿæˆä¸€ä¸ªvalue
 			String identifier = this.genIdentifier();
 			
-			// ËøÃû£¬¼´keyÖµ
+			// é”åï¼Œå³keyå€¼
 			lockKey = keyPrefix + lockKey;
-			// ³¬Ê±Ê±¼ä£¬ÉÏËøºó³¬¹ı´ËÊ±¼äÔò×Ô¶¯ÊÍ·ÅËø
+			// è¶…æ—¶æ—¶é—´ï¼Œä¸Šé”åè¶…è¿‡æ­¤æ—¶é—´åˆ™è‡ªåŠ¨é‡Šæ”¾é”
 			int lockExpire = (int) (timeout / 1000);
 
-			// »ñÈ¡ËøµÄ³¬Ê±Ê±¼ä£¬³¬¹ıÕâ¸öÊ±¼äÔò·ÅÆú»ñÈ¡Ëø
+			// è·å–é”çš„è¶…æ—¶æ—¶é—´ï¼Œè¶…è¿‡è¿™ä¸ªæ—¶é—´åˆ™æ”¾å¼ƒè·å–é”
 			long end = System.currentTimeMillis() + acquireTimeout;
 			while (System.currentTimeMillis() < end) {
 				if (jedis.setnx(lockKey, identifier) == 1) {
 					jedis.expire(lockKey, lockExpire);
 					break;
 				}
-				// ·µ»Ø-1´ú±íkeyÃ»ÓĞÉèÖÃ³¬Ê±Ê±¼ä£¬ÎªkeyÉèÖÃÒ»¸ö³¬Ê±Ê±¼ä
+				// è¿”å›-1ä»£è¡¨keyæ²¡æœ‰è®¾ç½®è¶…æ—¶æ—¶é—´ï¼Œä¸ºkeyè®¾ç½®ä¸€ä¸ªè¶…æ—¶æ—¶é—´
 				if (jedis.ttl(lockKey) == -1) {
 					jedis.expire(lockKey, lockExpire);
 				}
@@ -121,10 +121,10 @@ public class JedisLock implements Lock {
 	}
 
 	/**
-	 * »ñµÃ lock. ÊµÏÖË¼Â·: Ö÷ÒªÊÇÊ¹ÓÃÁËredis µÄsetnxÃüÁî,»º´æÁËËø. reids»º´æµÄkeyÊÇËøµÄkey,ËùÓĞµÄ¹²Ïí,
-	 * valueÊÇËøµÄµ½ÆÚÊ±¼ä(×¢Òâ:ÕâÀï°Ñ¹ıÆÚÊ±¼ä·ÅÔÚvalueÁË,Ã»ÓĞÊ±¼äÉÏÉèÖÃÆä³¬Ê±Ê±¼ä) Ö´ĞĞ¹ı³Ì:
-	 * 1.Í¨¹ısetnx³¢ÊÔÉèÖÃÄ³¸ökeyµÄÖµ,³É¹¦(µ±Ç°Ã»ÓĞÕâ¸öËø)Ôò·µ»Ø,³É¹¦»ñµÃËø
-	 * 2.ËøÒÑ¾­´æÔÚÔò»ñÈ¡ËøµÄµ½ÆÚÊ±¼ä,ºÍµ±Ç°Ê±¼ä±È½Ï,³¬Ê±µÄ»°,ÔòÉèÖÃĞÂµÄÖµ
+	 * è·å¾— lock. å®ç°æ€è·¯: ä¸»è¦æ˜¯ä½¿ç”¨äº†redis çš„setnxå‘½ä»¤,ç¼“å­˜äº†é”. reidsç¼“å­˜çš„keyæ˜¯é”çš„key,æ‰€æœ‰çš„å…±äº«,
+	 * valueæ˜¯é”çš„åˆ°æœŸæ—¶é—´(æ³¨æ„:è¿™é‡ŒæŠŠè¿‡æœŸæ—¶é—´æ”¾åœ¨valueäº†,æ²¡æœ‰æ—¶é—´ä¸Šè®¾ç½®å…¶è¶…æ—¶æ—¶é—´) æ‰§è¡Œè¿‡ç¨‹:
+	 * 1.é€šè¿‡setnxå°è¯•è®¾ç½®æŸä¸ªkeyçš„å€¼,æˆåŠŸ(å½“å‰æ²¡æœ‰è¿™ä¸ªé”)åˆ™è¿”å›,æˆåŠŸè·å¾—é”
+	 * 2.é”å·²ç»å­˜åœ¨åˆ™è·å–é”çš„åˆ°æœŸæ—¶é—´,å’Œå½“å‰æ—¶é—´æ¯”è¾ƒ,è¶…æ—¶çš„è¯,åˆ™è®¾ç½®æ–°çš„å€¼
 	 *
 	 * @return true if lock is acquired, false acquire timeouted
 	 * @throws InterruptedException
@@ -140,11 +140,11 @@ public class JedisLock implements Lock {
 		JedisPool jedisPool = poolFactory.getWritePool();
 		Jedis jedis = jedisPool.getResource();
 		try {
-			// Ëæ»úÉú³ÉÒ»¸övalue
+			// éšæœºç”Ÿæˆä¸€ä¸ªvalue
 			String identifier = this.genIdentifier();
-			// ËøÃû£¬¼´keyÖµ
+			// é”åï¼Œå³keyå€¼
 			lockKey = keyPrefix + lockKey;
-			// ³¬Ê±Ê±¼ä£¬ÉÏËøºó³¬¹ı´ËÊ±¼äÔò×Ô¶¯ÊÍ·ÅËø
+			// è¶…æ—¶æ—¶é—´ï¼Œä¸Šé”åè¶…è¿‡æ­¤æ—¶é—´åˆ™è‡ªåŠ¨é‡Šæ”¾é”
 			int lockExpire = (int) (timeout / 1000);
 			if (jedis.setnx(lockKey, identifier) == 1) {
 				jedis.expire(lockKey, lockExpire);
@@ -159,12 +159,12 @@ public class JedisLock implements Lock {
 	}
 	
 	/**
-     * »ñµÃ lock.
-     * ÊµÏÖË¼Â·: Ö÷ÒªÊÇÊ¹ÓÃÁËredis µÄsetnxÃüÁî,»º´æÁËËø.
-     * reids»º´æµÄkeyÊÇËøµÄkey,ËùÓĞµÄ¹²Ïí, valueÊÇËøµÄµ½ÆÚÊ±¼ä(×¢Òâ:ÕâÀï°Ñ¹ıÆÚÊ±¼ä·ÅÔÚvalueÁË,Ã»ÓĞÊ±¼äÉÏÉèÖÃÆä³¬Ê±Ê±¼ä)
-     * Ö´ĞĞ¹ı³Ì:
-     * 1.Í¨¹ısetnx³¢ÊÔÉèÖÃÄ³¸ökeyµÄÖµ,³É¹¦(µ±Ç°Ã»ÓĞÕâ¸öËø)Ôò·µ»Ø,³É¹¦»ñµÃËø
-     * 2.ËøÒÑ¾­´æÔÚÔò»ñÈ¡ËøµÄµ½ÆÚÊ±¼ä,ºÍµ±Ç°Ê±¼ä±È½Ï,³¬Ê±µÄ»°,ÔòÉèÖÃĞÂµÄÖµ
+     * è·å¾— lock.
+     * å®ç°æ€è·¯: ä¸»è¦æ˜¯ä½¿ç”¨äº†redis çš„setnxå‘½ä»¤,ç¼“å­˜äº†é”.
+     * reidsç¼“å­˜çš„keyæ˜¯é”çš„key,æ‰€æœ‰çš„å…±äº«, valueæ˜¯é”çš„åˆ°æœŸæ—¶é—´(æ³¨æ„:è¿™é‡ŒæŠŠè¿‡æœŸæ—¶é—´æ”¾åœ¨valueäº†,æ²¡æœ‰æ—¶é—´ä¸Šè®¾ç½®å…¶è¶…æ—¶æ—¶é—´)
+     * æ‰§è¡Œè¿‡ç¨‹:
+     * 1.é€šè¿‡setnxå°è¯•è®¾ç½®æŸä¸ªkeyçš„å€¼,æˆåŠŸ(å½“å‰æ²¡æœ‰è¿™ä¸ªé”)åˆ™è¿”å›,æˆåŠŸè·å¾—é”
+     * 2.é”å·²ç»å­˜åœ¨åˆ™è·å–é”çš„åˆ°æœŸæ—¶é—´,å’Œå½“å‰æ—¶é—´æ¯”è¾ƒ,è¶…æ—¶çš„è¯,åˆ™è®¾ç½®æ–°çš„å€¼
      *
      * @return true if lock is acquired, false acquire timeouted
      * @throws InterruptedException in case of thread interruption
@@ -180,9 +180,9 @@ public class JedisLock implements Lock {
 		JedisPool jedisPool = poolFactory.getWritePool();
 		Jedis jedis = jedisPool.getResource();
 		try {
-			// Ëæ»úÉú³ÉÒ»¸övalue
+			// éšæœºç”Ÿæˆä¸€ä¸ªvalue
 			String identifier = this.genIdentifier();
-			// ËøÃû£¬¼´keyÖµ
+			// é”åï¼Œå³keyå€¼
 			lockKey = keyPrefix + lockKey;
 			String value = jedis.get(lockKey);
 			if (null != value && value.equals(identifier)) {
@@ -197,12 +197,12 @@ public class JedisLock implements Lock {
 	}
 
 	/**
-	 * ÊÍ·ÅËø
+	 * é‡Šæ”¾é”
 	 * 
 	 * @param lockName
-	 *            ËøµÄkey
+	 *            é”çš„key
 	 * @param identifier
-	 *            ÊÍ·ÅËøµÄ±êÊ¶
+	 *            é‡Šæ”¾é”çš„æ ‡è¯†
 	 * @return
 	 */
 	public void unlock(String lockKey) {
@@ -212,9 +212,9 @@ public class JedisLock implements Lock {
 		Jedis jedis = jedisPool.getResource();
 		try {
 			while (true) {
-				// ¼àÊÓlock£¬×¼±¸¿ªÊ¼ÊÂÎñ
+				// ç›‘è§†lockï¼Œå‡†å¤‡å¼€å§‹äº‹åŠ¡
 				jedis.watch(lockKey);
-				// Í¨¹ıÇ°Ãæ·µ»ØµÄvalueÖµÅĞ¶ÏÊÇ²»ÊÇ¸ÃËø£¬ÈôÊÇ¸ÃËø£¬ÔòÉ¾³ı£¬ÊÍ·ÅËø
+				// é€šè¿‡å‰é¢è¿”å›çš„valueå€¼åˆ¤æ–­æ˜¯ä¸æ˜¯è¯¥é”ï¼Œè‹¥æ˜¯è¯¥é”ï¼Œåˆ™åˆ é™¤ï¼Œé‡Šæ”¾é”
 				String value = jedis.get(lockKey);
 				if (identifier.equals(value)) {
 					Transaction transaction = jedis.multi();
