@@ -9,11 +9,11 @@ public class JedisLockFactoryBean implements FactoryBean<Lock> {
 
 	private PoolFactory poolFactory;
 
-	private int timeoutMsecs = 10000, expireMsecs = 20000;
+	private long acquireTimeout = 60000, timeout = 10000;
 
 	@Override
 	public Lock getObject() throws Exception {
-		Lock lock = new JedisLock(poolFactory, timeoutMsecs, expireMsecs);
+		Lock lock = new JedisLock(poolFactory, acquireTimeout, timeout);
 		return lock;
 	}
 
@@ -31,12 +31,16 @@ public class JedisLockFactoryBean implements FactoryBean<Lock> {
 		this.poolFactory = poolFactory;
 	}
 
-	public void setTimeoutMsecs(int timeoutMsecs) {
-		this.timeoutMsecs = timeoutMsecs;
+	public PoolFactory getPoolFactory() {
+		return poolFactory;
 	}
 
-	public void setExpireMsecs(int expireMsecs) {
-		this.expireMsecs = expireMsecs;
+	public long getAcquireTimeout() {
+		return acquireTimeout;
+	}
+
+	public long getTimeout() {
+		return timeout;
 	}
 
 }

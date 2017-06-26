@@ -8,12 +8,12 @@ import com.appleframework.cache.core.lock.Lock;
 public class CodisLockFactoryBean implements FactoryBean<Lock> {
 
 	private CodisResourcePool codisResourcePool;
-
-	private int timeoutMsecs = 10000, expireMsecs = 20000;
+	
+	private long acquireTimeout = 60000, timeout = 10000;
 
 	@Override
 	public Lock getObject() throws Exception {
-		Lock lock = new CodisLock(codisResourcePool, timeoutMsecs, expireMsecs);
+		Lock lock = new CodisLock(codisResourcePool, 60000, 10000);
 		return lock;
 	}
 
@@ -31,12 +31,16 @@ public class CodisLockFactoryBean implements FactoryBean<Lock> {
 		this.codisResourcePool = codisResourcePool;
 	}
 
-	public void setTimeoutMsecs(int timeoutMsecs) {
-		this.timeoutMsecs = timeoutMsecs;
+	public CodisResourcePool getCodisResourcePool() {
+		return codisResourcePool;
 	}
 
-	public void setExpireMsecs(int expireMsecs) {
-		this.expireMsecs = expireMsecs;
+	public long getAcquireTimeout() {
+		return acquireTimeout;
+	}
+
+	public long getTimeout() {
+		return timeout;
 	}
 
 }

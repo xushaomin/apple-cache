@@ -1,12 +1,15 @@
 package com.appleframework.cache.codis.lock;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+
+import org.apache.log4j.Logger;
 
 import com.appleframework.cache.codis.CodisResourcePool;
 import com.appleframework.cache.core.lock.Lock;
+import com.appleframework.cache.core.utils.SequenceUtility;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Transaction;
 
 /**
  * Redis distributed lock implementation.
@@ -15,23 +18,29 @@ import redis.clients.jedis.Jedis;
  */
 public class CodisLock implements Lock {
 
+	private static Logger logger = Logger.getLogger(CodisLock.class);
+
 	private CodisResourcePool codisResourcePool;
 
-	private static final int DEFAULT_ACQUIRY_RESOLUTION_MILLIS = 100;
+	/**
+	 * é”è¶…æ—¶æ—¶é—´ï¼Œé˜²æ­¢çº¿ç¨‹åœ¨å…¥é”ä»¥åï¼Œæ— é™çš„æ‰§è¡Œç­‰å¾…
+	 */
+	private long acquireTimeout = 60000;
 
 	/**
-	 * Ëø³¬Ê±Ê±¼ä£¬·ÀÖ¹Ïß³ÌÔÚÈëËøÒÔºó£¬ÎŞÏŞµÄÖ´ĞĞµÈ´ı
+	 * é”ç­‰å¾…æ—¶é—´ï¼Œé˜²æ­¢çº¿ç¨‹é¥¥é¥¿
 	 */
-	private int expireMsecs = 60 * 1000;
-
-	/**
-	 * ËøµÈ´ıÊ±¼ä£¬·ÀÖ¹Ïß³Ì¼¢¶ö
-	 */
-	private int timeoutMsecs = 10 * 1000;
-
-	//private volatile boolean locked = false;
+	private long timeout = 10000;
 	
-	private Map<String, Boolean> lockedMap = new ConcurrentHashMap<String, Boolean>();
+	
+	private static String sequence = SequenceUtility.getSequence();
+	
+	
+	private String keyPrefix = "lock:";
+	
+	public void setKeyPrefix(String keyPrefix) {
+		this.keyPrefix = keyPrefix;
+	}
 
 	/**
 	 * Detailed constructor with default acquire timeout 10000 msecs and lock
@@ -48,103 +57,166 @@ public class CodisLock implements Lock {
 	 * Detailed constructor with default lock expiration of 60000 msecs.
 	 *
 	 */
-	public CodisLock(CodisResourcePool codisResourcePool, int timeoutMsecs) {
+	public CodisLock(CodisResourcePool codisResourcePool, long timeout) {
 		this(codisResourcePool);
-		this.timeoutMsecs = timeoutMsecs;
+		this.timeout = timeout;
 	}
 
 	/**
 	 * Detailed constructor.
 	 *
 	 */
-	public CodisLock(CodisResourcePool codisResourcePool, int timeoutMsecs, int expireMsecs) {
-		this(codisResourcePool, timeoutMsecs);
-		this.expireMsecs = expireMsecs;
+	public CodisLock(CodisResourcePool codisResourcePool, long acquireTimeout, long timeout) {
+		this(codisResourcePool, timeout);
+		this.acquireTimeout = acquireTimeout;
 	}
-
-	private String get(final String key) {
-		try (Jedis jedis = codisResourcePool.getResource()) {
-			return jedis.get(key);
-		} 
+	
+	private String genIdentifier() {
+		return sequence + "-" + Thread.currentThread().getId();
 	}
-
-	private boolean setNX(final String key, final String value) {
+	
+	/**
+	 * åŠ é”
+	 * 
+	 * @param lockKey
+	 *            é”çš„key
+	 * @param acquireTimeout
+	 *            è·å–è¶…æ—¶æ—¶é—´
+	 * @param timeout
+	 *            é”çš„è¶…æ—¶æ—¶é—´
+	 * @return é”æ ‡è¯†
+	 */
+	public void lock(String lockKey, long acquireTimeout, long timeout) {
 		try (Jedis jedis = codisResourcePool.getResource()) {
-			Long result = jedis.setnx(key, value);
-			return result == 0 ? false : true;
-		}
-	}
+			// éšæœºç”Ÿæˆä¸€ä¸ªvalue
+			String identifier = this.genIdentifier();
+			
+			// é”åï¼Œå³keyå€¼
+			lockKey = keyPrefix + lockKey;
+			// è¶…æ—¶æ—¶é—´ï¼Œä¸Šé”åè¶…è¿‡æ­¤æ—¶é—´åˆ™è‡ªåŠ¨é‡Šæ”¾é”
+			int lockExpire = (int) (timeout / 1000);
 
-	private String getSet(final String key, final String value) {
-		try (Jedis jedis = codisResourcePool.getResource()) {
-			Object obj = jedis.getSet(key, value);
-			return obj != null ? (String) obj : null;
+			// è·å–é”çš„è¶…æ—¶æ—¶é—´ï¼Œè¶…è¿‡è¿™ä¸ªæ—¶é—´åˆ™æ”¾å¼ƒè·å–é”
+			long end = System.currentTimeMillis() + acquireTimeout;
+			while (System.currentTimeMillis() < end) {
+				if (jedis.setnx(lockKey, identifier) == 1) {
+					jedis.expire(lockKey, lockExpire);
+					break;
+				}
+				// è¿”å›-1ä»£è¡¨keyæ²¡æœ‰è®¾ç½®è¶…æ—¶æ—¶é—´ï¼Œä¸ºkeyè®¾ç½®ä¸€ä¸ªè¶…æ—¶æ—¶é—´
+				if (jedis.ttl(lockKey) == -1) {
+					jedis.expire(lockKey, lockExpire);
+				}
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
+			}
+		} catch (Exception e) {
+			logger.error(e);
 		}
 	}
 
 	/**
-	 * »ñµÃ lock. ÊµÏÖË¼Â·: Ö÷ÒªÊÇÊ¹ÓÃÁËredis µÄsetnxÃüÁî,»º´æÁËËø. reids»º´æµÄkeyÊÇËøµÄkey,ËùÓĞµÄ¹²Ïí,
-	 * valueÊÇËøµÄµ½ÆÚÊ±¼ä(×¢Òâ:ÕâÀï°Ñ¹ıÆÚÊ±¼ä·ÅÔÚvalueÁË,Ã»ÓĞÊ±¼äÉÏÉèÖÃÆä³¬Ê±Ê±¼ä) Ö´ĞĞ¹ı³Ì:
-	 * 1.Í¨¹ısetnx³¢ÊÔÉèÖÃÄ³¸ökeyµÄÖµ,³É¹¦(µ±Ç°Ã»ÓĞÕâ¸öËø)Ôò·µ»Ø,³É¹¦»ñµÃËø
-	 * 2.ËøÒÑ¾­´æÔÚÔò»ñÈ¡ËøµÄµ½ÆÚÊ±¼ä,ºÍµ±Ç°Ê±¼ä±È½Ï,³¬Ê±µÄ»°,ÔòÉèÖÃĞÂµÄÖµ
+	 * è·å¾— lock. å®ç°æ€è·¯: ä¸»è¦æ˜¯ä½¿ç”¨äº†redis çš„setnxå‘½ä»¤,ç¼“å­˜äº†é”. reidsç¼“å­˜çš„keyæ˜¯é”çš„key,æ‰€æœ‰çš„å…±äº«,
+	 * valueæ˜¯é”çš„åˆ°æœŸæ—¶é—´(æ³¨æ„:è¿™é‡ŒæŠŠè¿‡æœŸæ—¶é—´æ”¾åœ¨valueäº†,æ²¡æœ‰æ—¶é—´ä¸Šè®¾ç½®å…¶è¶…æ—¶æ—¶é—´) æ‰§è¡Œè¿‡ç¨‹:
+	 * 1.é€šè¿‡setnxå°è¯•è®¾ç½®æŸä¸ªkeyçš„å€¼,æˆåŠŸ(å½“å‰æ²¡æœ‰è¿™ä¸ªé”)åˆ™è¿”å›,æˆåŠŸè·å¾—é”
+	 * 2.é”å·²ç»å­˜åœ¨åˆ™è·å–é”çš„åˆ°æœŸæ—¶é—´,å’Œå½“å‰æ—¶é—´æ¯”è¾ƒ,è¶…æ—¶çš„è¯,åˆ™è®¾ç½®æ–°çš„å€¼
 	 *
 	 * @return true if lock is acquired, false acquire timeouted
 	 * @throws InterruptedException
 	 *             in case of thread interruption
 	 */
-	public synchronized boolean lock(String lockKey) throws InterruptedException {
-		int timeout = timeoutMsecs;
-		while (timeout >= 0) {
-			long expires = System.currentTimeMillis() + expireMsecs + 1;
-			String expiresStr = String.valueOf(expires); // Ëøµ½ÆÚÊ±¼ä
-			if (this.setNX(lockKey, expiresStr)) {
-				// lock acquired
-				//locked = true;
-				lockedMap.put(lockKey, true);
-				return true;
+	public void lock(String lockKey) {
+		this.lock(lockKey, acquireTimeout, timeout);
+	}
+	
+	@Override
+	public boolean tryLock(String lockKey, long timeout) {
+		boolean lockedSuccess = false;
+		try (Jedis jedis = codisResourcePool.getResource()) {
+			// éšæœºç”Ÿæˆä¸€ä¸ªvalue
+			String identifier = this.genIdentifier();
+			// é”åï¼Œå³keyå€¼
+			lockKey = keyPrefix + lockKey;
+			// è¶…æ—¶æ—¶é—´ï¼Œä¸Šé”åè¶…è¿‡æ­¤æ—¶é—´åˆ™è‡ªåŠ¨é‡Šæ”¾é”
+			int lockExpire = (int) (timeout / 1000);
+			if (jedis.setnx(lockKey, identifier) == 1) {
+				jedis.expire(lockKey, lockExpire);
+				lockedSuccess = true;
 			}
-
-			String currentValueStr = this.get(lockKey); // redisÀïµÄÊ±¼ä
-			if (currentValueStr != null && Long.parseLong(currentValueStr) < System.currentTimeMillis()) {
-				// ÅĞ¶ÏÊÇ·ñÎª¿Õ£¬²»Îª¿ÕµÄÇé¿öÏÂ£¬Èç¹û±»ÆäËûÏß³ÌÉèÖÃÁËÖµ£¬ÔòµÚ¶ş¸öÌõ¼şÅĞ¶ÏÊÇ¹ı²»È¥µÄ
-				// lock is expired
-
-				String oldValueStr = this.getSet(lockKey, expiresStr);
-				// »ñÈ¡ÉÏÒ»¸öËøµ½ÆÚÊ±¼ä£¬²¢ÉèÖÃÏÖÔÚµÄËøµ½ÆÚÊ±¼ä£¬
-				// Ö»ÓĞÒ»¸öÏß³Ì²ÅÄÜ»ñÈ¡ÉÏÒ»¸öÏßÉÏµÄÉèÖÃÊ±¼ä£¬ÒòÎªjedis.getSetÊÇÍ¬²½µÄ
-				if (oldValueStr != null && oldValueStr.equals(currentValueStr)) {
-					// ·ÀÖ¹ÎóÉ¾£¨¸²¸Ç£¬ÒòÎªkeyÊÇÏàÍ¬µÄ£©ÁËËûÈËµÄËø¡ª¡ªÕâÀï´ï²»µ½Ğ§¹û£¬ÕâÀïÖµ»á±»¸²¸Ç£¬µ«ÊÇÒòÎªÊ²Ã´Ïà²îÁËºÜÉÙµÄÊ±¼ä£¬ËùÒÔ¿ÉÒÔ½ÓÊÜ
-
-					// [·Ö²¼Ê½µÄÇé¿öÏÂ]:Èç¹ıÕâ¸öÊ±ºò£¬¶à¸öÏß³ÌÇ¡ºÃ¶¼µ½ÁËÕâÀï£¬µ«ÊÇÖ»ÓĞÒ»¸öÏß³ÌµÄÉèÖÃÖµºÍµ±Ç°ÖµÏàÍ¬£¬Ëû²ÅÓĞÈ¨Àû»ñÈ¡Ëø
-					// lock acquired
-					//locked = true;
-					lockedMap.put(lockKey, true);
-					return true;
-				}
-			}
-			timeout -= DEFAULT_ACQUIRY_RESOLUTION_MILLIS;
-
-			/*
-			 * ÑÓ³Ù100 ºÁÃë, ÕâÀïÊ¹ÓÃËæ»úÊ±¼ä¿ÉÄÜ»áºÃÒ»µã,¿ÉÒÔ·ÀÖ¹¼¢¶ö½ø³ÌµÄ³öÏÖ,¼´,µ±Í¬Ê±µ½´ï¶à¸ö½ø³Ì,
-			 * Ö»»áÓĞÒ»¸ö½ø³Ì»ñµÃËø,ÆäËûµÄ¶¼ÓÃÍ¬ÑùµÄÆµÂÊ½øĞĞ³¢ÊÔ,ºóÃæÓĞÀ´ÁËÒ»Ğ©½øĞĞ,Ò²ÒÔÍ¬ÑùµÄÆµÂÊÉêÇëËø,Õâ½«¿ÉÄÜµ¼ÖÂÇ°ÃæÀ´µÄËøµÃ²»µ½Âú×ã.
-			 * Ê¹ÓÃËæ»úµÄµÈ´ıÊ±¼ä¿ÉÒÔÒ»¶¨³Ì¶ÈÉÏ±£Ö¤¹«Æ½ĞÔ
-			 */
-			Thread.sleep(DEFAULT_ACQUIRY_RESOLUTION_MILLIS);
-
+		} catch (Exception e) {
+			logger.error(e);
 		}
-		return false;
+		return lockedSuccess;
+	}
+	
+	/**
+     * è·å¾— lock.
+     * å®ç°æ€è·¯: ä¸»è¦æ˜¯ä½¿ç”¨äº†redis çš„setnxå‘½ä»¤,ç¼“å­˜äº†é”.
+     * reidsç¼“å­˜çš„keyæ˜¯é”çš„key,æ‰€æœ‰çš„å…±äº«, valueæ˜¯é”çš„åˆ°æœŸæ—¶é—´(æ³¨æ„:è¿™é‡ŒæŠŠè¿‡æœŸæ—¶é—´æ”¾åœ¨valueäº†,æ²¡æœ‰æ—¶é—´ä¸Šè®¾ç½®å…¶è¶…æ—¶æ—¶é—´)
+     * æ‰§è¡Œè¿‡ç¨‹:
+     * 1.é€šè¿‡setnxå°è¯•è®¾ç½®æŸä¸ªkeyçš„å€¼,æˆåŠŸ(å½“å‰æ²¡æœ‰è¿™ä¸ªé”)åˆ™è¿”å›,æˆåŠŸè·å¾—é”
+     * 2.é”å·²ç»å­˜åœ¨åˆ™è·å–é”çš„åˆ°æœŸæ—¶é—´,å’Œå½“å‰æ—¶é—´æ¯”è¾ƒ,è¶…æ—¶çš„è¯,åˆ™è®¾ç½®æ–°çš„å€¼
+     *
+     * @return true if lock is acquired, false acquire timeouted
+     * @throws InterruptedException in case of thread interruption
+     */
+	@Override
+	public boolean tryLock(String lockKey) {
+		return this.tryLock(lockKey, timeout);
+	}
+
+	@Override
+	public boolean isLocked(String lockKey) {
+		boolean isLocked = false;
+		try (Jedis jedis = codisResourcePool.getResource()) {
+			// éšæœºç”Ÿæˆä¸€ä¸ªvalue
+			String identifier = this.genIdentifier();
+			// é”åï¼Œå³keyå€¼
+			lockKey = keyPrefix + lockKey;
+			String value = jedis.get(lockKey);
+			if (null != value && value.equals(identifier)) {
+				isLocked = true;
+			}
+		} catch (Exception e) {
+			logger.error(e);
+		}
+		return isLocked;
 	}
 
 	/**
-	 * Acqurired lock release.
+	 * é‡Šæ”¾é”
+	 * 
+	 * @param lockName
+	 *            é”çš„key
+	 * @param identifier
+	 *            é‡Šæ”¾é”çš„æ ‡è¯†
+	 * @return
 	 */
-	public synchronized void unlock(String lockKey) {
-		boolean locked = lockedMap.get(lockKey);
-		if (locked) {
-			try (Jedis jedis = codisResourcePool.getResource()) {
-				jedis.del(lockKey);
+	public void unlock(String lockKey) {
+		String identifier = this.genIdentifier();
+		lockKey = keyPrefix + lockKey;
+		try (Jedis jedis = codisResourcePool.getResource()) {
+			while (true) {
+				// ç›‘è§†lockï¼Œå‡†å¤‡å¼€å§‹äº‹åŠ¡
+				jedis.watch(lockKey);
+				// é€šè¿‡å‰é¢è¿”å›çš„valueå€¼åˆ¤æ–­æ˜¯ä¸æ˜¯è¯¥é”ï¼Œè‹¥æ˜¯è¯¥é”ï¼Œåˆ™åˆ é™¤ï¼Œé‡Šæ”¾é”
+				String value = jedis.get(lockKey);
+				if (identifier.equals(value)) {
+					Transaction transaction = jedis.multi();
+					transaction.del(lockKey);
+					List<Object> results = transaction.exec();
+					if (results == null) {
+						continue;
+					}
+				}
+				jedis.unwatch();
+				break;
 			}
-			locked = false;
+		} catch (Exception e) {
+			logger.error(e);
 		}
 	}
 

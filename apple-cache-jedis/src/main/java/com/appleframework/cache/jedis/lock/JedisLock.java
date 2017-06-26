@@ -1,21 +1,21 @@
 package com.appleframework.cache.jedis.lock;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.lock.Lock;
+import com.appleframework.cache.core.utils.SequenceUtility;
 import com.appleframework.cache.jedis.factory.PoolFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Transaction;
 
 /**
  * Redis distributed lock implementation.
  *
- * @author zhengcanrui
+ * @author cruise.xu
  */
 @SuppressWarnings("deprecation")
 public class JedisLock implements Lock {
@@ -24,22 +24,22 @@ public class JedisLock implements Lock {
 
 	private PoolFactory poolFactory;
 
-	private static final int DEFAULT_ACQUIRY_RESOLUTION_MILLIS = 100;
-
 	/**
 	 * 锁超时时间，防止线程在入锁以后，无限的执行等待
 	 */
-	private int expireMsecs = 60 * 1000;
+	private long acquireTimeout = 60000;
 
 	/**
 	 * 锁等待时间，防止线程饥饿
 	 */
-	private int timeoutMsecs = 10 * 1000;
+	private long timeout = 10000;
 	
-	private Map<String, Boolean> lockedMap = new ConcurrentHashMap<String, Boolean>();
-
-	//private volatile boolean locked = false;
-
+	
+	private static String sequence = SequenceUtility.getSequence();
+	
+	
+	private String keyPrefix = "lock:";
+	
 	/**
 	 * Detailed constructor with default acquire timeout 10000 msecs and lock
 	 * expiration of 60000 msecs.
@@ -55,66 +55,69 @@ public class JedisLock implements Lock {
 	 * Detailed constructor with default lock expiration of 60000 msecs.
 	 *
 	 */
-	public JedisLock(PoolFactory poolFactory, int timeoutMsecs) {
+	public JedisLock(PoolFactory poolFactory, long timeout) {
 		this(poolFactory);
-		this.timeoutMsecs = timeoutMsecs;
+		this.timeout = timeout;
 	}
 
 	/**
 	 * Detailed constructor.
 	 *
 	 */
-	public JedisLock(PoolFactory poolFactory, int timeoutMsecs, int expireMsecs) {
-		this(poolFactory, timeoutMsecs);
-		this.expireMsecs = expireMsecs;
+	public JedisLock(PoolFactory poolFactory, long acquireTimeout, long timeout) {
+		this(poolFactory, timeout);
+		this.acquireTimeout = acquireTimeout;
 	}
-
-	private String get(final String key) {
+	
+	private String genIdentifier() {
+		return sequence + "-" + Thread.currentThread().getId();
+	}
+	
+	/**
+	 * 加锁
+	 * 
+	 * @param lockKey
+	 *            锁的key
+	 * @param acquireTimeout
+	 *            获取超时时间
+	 * @param timeout
+	 *            锁的超时时间
+	 * @return 锁标识
+	 */
+	public void lock(String lockKey, long acquireTimeout, long timeout) {
 		JedisPool jedisPool = poolFactory.getWritePool();
 		Jedis jedis = jedisPool.getResource();
-		String value = null;
 		try {
-			value = jedis.get(key);
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
-		}
-		return value;
-	}
+			// 随机生成一个value
+			String identifier = this.genIdentifier();
+			
+			// 锁名，即key值
+			lockKey = keyPrefix + lockKey;
+			// 超时时间，上锁后超过此时间则自动释放锁
+			int lockExpire = (int) (timeout / 1000);
 
-	private boolean setNX(final String key, final String value) {
-		JedisPool jedisPool = poolFactory.getWritePool();
-		Jedis jedis = jedisPool.getResource();
-		Long result = 0L;
-		try {
-			result = jedis.setnx(key, value);
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
-		}
-		return result == 0 ? false : true;
-	}
-
-	private String getSet(final String key, final String value) {
-		Object obj = null;
-		try {
-			JedisPool jedisPool = poolFactory.getWritePool();
-			Jedis jedis = jedisPool.getResource();
-			try {
-				obj = jedis.getSet(key, value);
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-			} finally {
-				jedisPool.returnResource(jedis);
+			// 获取锁的超时时间，超过这个时间则放弃获取锁
+			long end = System.currentTimeMillis() + acquireTimeout;
+			while (System.currentTimeMillis() < end) {
+				if (jedis.setnx(lockKey, identifier) == 1) {
+					jedis.expire(lockKey, lockExpire);
+					break;
+				}
+				// 返回-1代表key没有设置超时时间，为key设置一个超时时间
+				if (jedis.ttl(lockKey) == -1) {
+					jedis.expire(lockKey, lockExpire);
+				}
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
 			}
 		} catch (Exception e) {
-			logger.error("setNX redis error, key : " + key);
+			logger.error(e);
+		} finally {
+			jedisPool.returnResource(jedis);
 		}
-		return obj != null ? (String) obj : null;
-
 	}
 
 	/**
@@ -127,65 +130,107 @@ public class JedisLock implements Lock {
 	 * @throws InterruptedException
 	 *             in case of thread interruption
 	 */
-	public synchronized boolean lock(String lockKey) throws InterruptedException {
-		int timeout = timeoutMsecs;
-		while (timeout >= 0) {
-			long expires = System.currentTimeMillis() + expireMsecs + 1;
-			String expiresStr = String.valueOf(expires); // 锁到期时间
-			if (this.setNX(lockKey, expiresStr)) {
-				// lock acquired
-				lockedMap.put(lockKey, true);
-				//locked = true;
-				return true;
+	public void lock(String lockKey) {
+		this.lock(lockKey, acquireTimeout, timeout);
+	}
+	
+	@Override
+	public boolean tryLock(String lockKey, long timeout) {
+		boolean lockedSuccess = false;
+		JedisPool jedisPool = poolFactory.getWritePool();
+		Jedis jedis = jedisPool.getResource();
+		try {
+			// 随机生成一个value
+			String identifier = this.genIdentifier();
+			// 锁名，即key值
+			lockKey = keyPrefix + lockKey;
+			// 超时时间，上锁后超过此时间则自动释放锁
+			int lockExpire = (int) (timeout / 1000);
+			if (jedis.setnx(lockKey, identifier) == 1) {
+				jedis.expire(lockKey, lockExpire);
+				lockedSuccess = true;
 			}
-
-			String currentValueStr = this.get(lockKey); // redis里的时间
-			if (currentValueStr != null && Long.parseLong(currentValueStr) < System.currentTimeMillis()) {
-				// 判断是否为空，不为空的情况下，如果被其他线程设置了值，则第二个条件判断是过不去的
-				// lock is expired
-
-				String oldValueStr = this.getSet(lockKey, expiresStr);
-				// 获取上一个锁到期时间，并设置现在的锁到期时间，
-				// 只有一个线程才能获取上一个线上的设置时间，因为jedis.getSet是同步的
-				if (oldValueStr != null && oldValueStr.equals(currentValueStr)) {
-					// 防止误删（覆盖，因为key是相同的）了他人的锁——这里达不到效果，这里值会被覆盖，但是因为什么相差了很少的时间，所以可以接受
-
-					// [分布式的情况下]:如过这个时候，多个线程恰好都到了这里，但是只有一个线程的设置值和当前值相同，他才有权利获取锁
-					// lock acquired
-					//locked = true;
-					lockedMap.put(lockKey, true);
-					return true;
-				}
-			}
-			timeout -= DEFAULT_ACQUIRY_RESOLUTION_MILLIS;
-
-			/*
-			 * 延迟100 毫秒, 这里使用随机时间可能会好一点,可以防止饥饿进程的出现,即,当同时到达多个进程,
-			 * 只会有一个进程获得锁,其他的都用同样的频率进行尝试,后面有来了一些进行,也以同样的频率申请锁,这将可能导致前面来的锁得不到满足.
-			 * 使用随机的等待时间可以一定程度上保证公平性
-			 */
-			Thread.sleep(DEFAULT_ACQUIRY_RESOLUTION_MILLIS);
-
+		} catch (Exception e) {
+			logger.error(e);
+		} finally {
+			jedisPool.returnResource(jedis);
 		}
-		return false;
+		return lockedSuccess;
+	}
+	
+	/**
+     * 获得 lock.
+     * 实现思路: 主要是使用了redis 的setnx命令,缓存了锁.
+     * reids缓存的key是锁的key,所有的共享, value是锁的到期时间(注意:这里把过期时间放在value了,没有时间上设置其超时时间)
+     * 执行过程:
+     * 1.通过setnx尝试设置某个key的值,成功(当前没有这个锁)则返回,成功获得锁
+     * 2.锁已经存在则获取锁的到期时间,和当前时间比较,超时的话,则设置新的值
+     *
+     * @return true if lock is acquired, false acquire timeouted
+     * @throws InterruptedException in case of thread interruption
+     */
+	@Override
+	public boolean tryLock(String lockKey) {
+		return this.tryLock(lockKey, timeout);
+	}
+
+	@Override
+	public boolean isLocked(String lockKey) {
+		boolean isLocked = false;
+		JedisPool jedisPool = poolFactory.getWritePool();
+		Jedis jedis = jedisPool.getResource();
+		try {
+			// 随机生成一个value
+			String identifier = this.genIdentifier();
+			// 锁名，即key值
+			lockKey = keyPrefix + lockKey;
+			String value = jedis.get(lockKey);
+			if (null != value && value.equals(identifier)) {
+				isLocked = true;
+			}
+		} catch (Exception e) {
+			logger.error(e);
+		} finally {
+			jedisPool.returnResource(jedis);
+		}
+		return isLocked;
 	}
 
 	/**
-	 * Acqurired lock release.
+	 * 释放锁
+	 * 
+	 * @param lockName
+	 *            锁的key
+	 * @param identifier
+	 *            释放锁的标识
+	 * @return
 	 */
-	public synchronized void unlock(String lockKey) {
-		boolean locked = lockedMap.get(lockKey);
-		if (locked) {
-			JedisPool jedisPool = poolFactory.getWritePool();
-			Jedis jedis = jedisPool.getResource();
-			try {
-				jedis.del(lockKey);
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-			} finally {
-				jedisPool.returnResource(jedis);
+	public void unlock(String lockKey) {
+		String identifier = this.genIdentifier();
+		lockKey = keyPrefix + lockKey;
+		JedisPool jedisPool = poolFactory.getWritePool();
+		Jedis jedis = jedisPool.getResource();
+		try {
+			while (true) {
+				// 监视lock，准备开始事务
+				jedis.watch(lockKey);
+				// 通过前面返回的value值判断是不是该锁，若是该锁，则删除，释放锁
+				String value = jedis.get(lockKey);
+				if (identifier.equals(value)) {
+					Transaction transaction = jedis.multi();
+					transaction.del(lockKey);
+					List<Object> results = transaction.exec();
+					if (results == null) {
+						continue;
+					}
+				}
+				jedis.unwatch();
+				break;
 			}
-			locked = false;
+		} catch (Exception e) {
+			logger.error(e);
+		} finally {
+			jedisPool.returnResource(jedis);
 		}
 	}
 
