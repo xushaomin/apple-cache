@@ -3,6 +3,7 @@ package com.appleframework.cache.jedis.lock;
 import org.apache.log4j.Logger;
 
 import com.appleframework.cache.core.CacheException;
+import com.appleframework.cache.core.lock.Lock;
 import com.appleframework.cache.jedis.factory.PoolFactory;
 
 import redis.clients.jedis.Jedis;
@@ -14,9 +15,9 @@ import redis.clients.jedis.JedisPool;
  * @author zhengcanrui
  */
 @SuppressWarnings("deprecation")
-public class RedisLock {
+public class JedisLock implements Lock {
 
-	private static Logger logger = Logger.getLogger(RedisLock.class);
+	private static Logger logger = Logger.getLogger(JedisLock.class);
 
 	private PoolFactory poolFactory;
 
@@ -46,7 +47,7 @@ public class RedisLock {
 	 * @param lockKey
 	 *            lock key (ex. account:1, ...)
 	 */
-	public RedisLock(PoolFactory poolFactory, String lockKey) {
+	public JedisLock(PoolFactory poolFactory, String lockKey) {
 		this.poolFactory = poolFactory;
 		this.lockKey = lockKey + "_lock";
 	}
@@ -55,7 +56,7 @@ public class RedisLock {
 	 * Detailed constructor with default lock expiration of 60000 msecs.
 	 *
 	 */
-	public RedisLock(PoolFactory poolFactory, String lockKey, int timeoutMsecs) {
+	public JedisLock(PoolFactory poolFactory, String lockKey, int timeoutMsecs) {
 		this(poolFactory, lockKey);
 		this.timeoutMsecs = timeoutMsecs;
 	}
@@ -64,7 +65,7 @@ public class RedisLock {
 	 * Detailed constructor.
 	 *
 	 */
-	public RedisLock(PoolFactory poolFactory, String lockKey, int timeoutMsecs, int expireMsecs) {
+	public JedisLock(PoolFactory poolFactory, String lockKey, int timeoutMsecs, int expireMsecs) {
 		this(poolFactory, lockKey, timeoutMsecs);
 		this.expireMsecs = expireMsecs;
 	}

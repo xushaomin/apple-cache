@@ -1,15 +1,16 @@
 package com.appleframework.cache.codis.lock;
 
 import com.appleframework.cache.codis.CodisResourcePool;
+import com.appleframework.cache.core.lock.Lock;
 
 import redis.clients.jedis.Jedis;
 
 /**
  * Redis distributed lock implementation.
  *
- * @author zhengcanrui
+ * @author cruise.xu
  */
-public class CodisLock {
+public class CodisLock implements Lock {
 
 	private CodisResourcePool codisResourcePool;
 
