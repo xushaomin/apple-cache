@@ -31,7 +31,7 @@ public class MasterSlavePoolManager {
 	}
 
 	private void init() {
-		// 启动一个线程每1秒钟slave连接池是否有问题
+		// 鍚姩涓�涓嚎绋嬫瘡1绉掗挓slave杩炴帴姹犳槸鍚︽湁闂
 		exec.scheduleWithFixedDelay(new Runnable() {
 			@SuppressWarnings("deprecation")
 			public void run() {

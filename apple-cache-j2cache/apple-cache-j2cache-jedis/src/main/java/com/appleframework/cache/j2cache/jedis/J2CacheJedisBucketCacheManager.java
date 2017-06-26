@@ -194,7 +194,6 @@ public class J2CacheJedisBucketCacheManager implements com.appleframework.cache.
 		}
 	}
 	
-	// 批量获取
 	@Override
 	public List<Object> getList(List<String> keyList) throws CacheException {
 		try {
