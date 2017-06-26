@@ -1,5 +1,8 @@
 package com.appleframework.cache.jedis.lock;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.log4j.Logger;
 
 import com.appleframework.cache.core.CacheException;
@@ -24,11 +27,6 @@ public class JedisLock implements Lock {
 	private static final int DEFAULT_ACQUIRY_RESOLUTION_MILLIS = 100;
 
 	/**
-	 * Lock key path.
-	 */
-	private String lockKey;
-
-	/**
 	 * 锁超时时间，防止线程在入锁以后，无限的执行等待
 	 */
 	private int expireMsecs = 60 * 1000;
@@ -37,8 +35,10 @@ public class JedisLock implements Lock {
 	 * 锁等待时间，防止线程饥饿
 	 */
 	private int timeoutMsecs = 10 * 1000;
+	
+	private Map<String, Boolean> lockedMap = new ConcurrentHashMap<String, Boolean>();
 
-	private volatile boolean locked = false;
+	//private volatile boolean locked = false;
 
 	/**
 	 * Detailed constructor with default acquire timeout 10000 msecs and lock
@@ -47,17 +47,16 @@ public class JedisLock implements Lock {
 	 * @param lockKey
 	 *            lock key (ex. account:1, ...)
 	 */
-	public JedisLock(PoolFactory poolFactory, String lockKey) {
+	public JedisLock(PoolFactory poolFactory) {
 		this.poolFactory = poolFactory;
-		this.lockKey = lockKey + "_lock";
 	}
 
 	/**
 	 * Detailed constructor with default lock expiration of 60000 msecs.
 	 *
 	 */
-	public JedisLock(PoolFactory poolFactory, String lockKey, int timeoutMsecs) {
-		this(poolFactory, lockKey);
+	public JedisLock(PoolFactory poolFactory, int timeoutMsecs) {
+		this(poolFactory);
 		this.timeoutMsecs = timeoutMsecs;
 	}
 
@@ -65,16 +64,9 @@ public class JedisLock implements Lock {
 	 * Detailed constructor.
 	 *
 	 */
-	public JedisLock(PoolFactory poolFactory, String lockKey, int timeoutMsecs, int expireMsecs) {
-		this(poolFactory, lockKey, timeoutMsecs);
+	public JedisLock(PoolFactory poolFactory, int timeoutMsecs, int expireMsecs) {
+		this(poolFactory, timeoutMsecs);
 		this.expireMsecs = expireMsecs;
-	}
-
-	/**
-	 * @return lock key
-	 */
-	public String getLockKey() {
-		return lockKey;
 	}
 
 	private String get(final String key) {
@@ -135,14 +127,15 @@ public class JedisLock implements Lock {
 	 * @throws InterruptedException
 	 *             in case of thread interruption
 	 */
-	public synchronized boolean lock() throws InterruptedException {
+	public synchronized boolean lock(String lockKey) throws InterruptedException {
 		int timeout = timeoutMsecs;
 		while (timeout >= 0) {
 			long expires = System.currentTimeMillis() + expireMsecs + 1;
 			String expiresStr = String.valueOf(expires); // 锁到期时间
 			if (this.setNX(lockKey, expiresStr)) {
 				// lock acquired
-				locked = true;
+				lockedMap.put(lockKey, true);
+				//locked = true;
 				return true;
 			}
 
@@ -159,7 +152,8 @@ public class JedisLock implements Lock {
 
 					// [分布式的情况下]:如过这个时候，多个线程恰好都到了这里，但是只有一个线程的设置值和当前值相同，他才有权利获取锁
 					// lock acquired
-					locked = true;
+					//locked = true;
+					lockedMap.put(lockKey, true);
 					return true;
 				}
 			}
@@ -179,7 +173,8 @@ public class JedisLock implements Lock {
 	/**
 	 * Acqurired lock release.
 	 */
-	public synchronized void unlock() {
+	public synchronized void unlock(String lockKey) {
+		boolean locked = lockedMap.get(lockKey);
 		if (locked) {
 			JedisPool jedisPool = poolFactory.getWritePool();
 			Jedis jedis = jedisPool.getResource();

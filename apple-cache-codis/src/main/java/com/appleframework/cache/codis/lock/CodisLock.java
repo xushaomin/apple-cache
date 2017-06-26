@@ -1,5 +1,8 @@
 package com.appleframework.cache.codis.lock;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.appleframework.cache.codis.CodisResourcePool;
 import com.appleframework.cache.core.lock.Lock;
 
@@ -17,11 +20,6 @@ public class CodisLock implements Lock {
 	private static final int DEFAULT_ACQUIRY_RESOLUTION_MILLIS = 100;
 
 	/**
-	 * Lock key path.
-	 */
-	private String lockKey;
-
-	/**
 	 * 锁超时时间，防止线程在入锁以后，无限的执行等待
 	 */
 	private int expireMsecs = 60 * 1000;
@@ -31,7 +29,9 @@ public class CodisLock implements Lock {
 	 */
 	private int timeoutMsecs = 10 * 1000;
 
-	private volatile boolean locked = false;
+	//private volatile boolean locked = false;
+	
+	private Map<String, Boolean> lockedMap = new ConcurrentHashMap<String, Boolean>();
 
 	/**
 	 * Detailed constructor with default acquire timeout 10000 msecs and lock
@@ -40,17 +40,16 @@ public class CodisLock implements Lock {
 	 * @param lockKey
 	 *            lock key (ex. account:1, ...)
 	 */
-	public CodisLock(CodisResourcePool codisResourcePool, String lockKey) {
+	public CodisLock(CodisResourcePool codisResourcePool) {
 		this.codisResourcePool = codisResourcePool;
-		this.lockKey = lockKey + "_lock";
 	}
 
 	/**
 	 * Detailed constructor with default lock expiration of 60000 msecs.
 	 *
 	 */
-	public CodisLock(CodisResourcePool codisResourcePool, String lockKey, int timeoutMsecs) {
-		this(codisResourcePool, lockKey);
+	public CodisLock(CodisResourcePool codisResourcePool, int timeoutMsecs) {
+		this(codisResourcePool);
 		this.timeoutMsecs = timeoutMsecs;
 	}
 
@@ -58,16 +57,9 @@ public class CodisLock implements Lock {
 	 * Detailed constructor.
 	 *
 	 */
-	public CodisLock(CodisResourcePool codisResourcePool, String lockKey, int timeoutMsecs, int expireMsecs) {
-		this(codisResourcePool, lockKey, timeoutMsecs);
+	public CodisLock(CodisResourcePool codisResourcePool, int timeoutMsecs, int expireMsecs) {
+		this(codisResourcePool, timeoutMsecs);
 		this.expireMsecs = expireMsecs;
-	}
-
-	/**
-	 * @return lock key
-	 */
-	public String getLockKey() {
-		return lockKey;
 	}
 
 	private String get(final String key) {
@@ -100,14 +92,15 @@ public class CodisLock implements Lock {
 	 * @throws InterruptedException
 	 *             in case of thread interruption
 	 */
-	public synchronized boolean lock() throws InterruptedException {
+	public synchronized boolean lock(String lockKey) throws InterruptedException {
 		int timeout = timeoutMsecs;
 		while (timeout >= 0) {
 			long expires = System.currentTimeMillis() + expireMsecs + 1;
 			String expiresStr = String.valueOf(expires); // 锁到期时间
 			if (this.setNX(lockKey, expiresStr)) {
 				// lock acquired
-				locked = true;
+				//locked = true;
+				lockedMap.put(lockKey, true);
 				return true;
 			}
 
@@ -124,7 +117,8 @@ public class CodisLock implements Lock {
 
 					// [分布式的情况下]:如过这个时候，多个线程恰好都到了这里，但是只有一个线程的设置值和当前值相同，他才有权利获取锁
 					// lock acquired
-					locked = true;
+					//locked = true;
+					lockedMap.put(lockKey, true);
 					return true;
 				}
 			}
@@ -144,7 +138,8 @@ public class CodisLock implements Lock {
 	/**
 	 * Acqurired lock release.
 	 */
-	public synchronized void unlock() {
+	public synchronized void unlock(String lockKey) {
+		boolean locked = lockedMap.get(lockKey);
 		if (locked) {
 			try (Jedis jedis = codisResourcePool.getResource()) {
 				jedis.del(lockKey);
