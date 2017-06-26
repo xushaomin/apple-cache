@@ -31,16 +31,12 @@ public class JedisLockFactoryBean implements FactoryBean<Lock> {
 		this.poolFactory = poolFactory;
 	}
 
-	public PoolFactory getPoolFactory() {
-		return poolFactory;
+	public void setAcquireTimeout(long acquireTimeout) {
+		this.acquireTimeout = acquireTimeout;
 	}
 
-	public long getAcquireTimeout() {
-		return acquireTimeout;
+	public void setTimeout(long timeout) {
+		this.timeout = timeout;
 	}
-
-	public long getTimeout() {
-		return timeout;
-	}
-
+	
 }
