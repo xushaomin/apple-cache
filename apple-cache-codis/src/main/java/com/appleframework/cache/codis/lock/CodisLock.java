@@ -1,7 +1,5 @@
 package com.appleframework.cache.codis.lock;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 
 import com.appleframework.cache.codis.CodisResourcePool;
@@ -9,7 +7,6 @@ import com.appleframework.cache.core.lock.Lock;
 import com.appleframework.cache.core.utils.SequenceUtility;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.Transaction;
 
 /**
  * Redis distributed lock implementation.
