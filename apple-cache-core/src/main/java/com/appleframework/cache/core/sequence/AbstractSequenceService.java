@@ -31,7 +31,7 @@ public abstract class AbstractSequenceService implements SequenceService {
 	 * @return 生成的MD5摘要信息
 	 */
 	protected String getMD5(String message) {
-		message += "{apdplat}";
+		message += "{apple}";
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			LOG.debug("MD5摘要长度：" + md.getDigestLength());
