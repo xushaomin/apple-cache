@@ -1,17 +1,16 @@
 package com.appleframework.cache.core.sequence;
 
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.hyperic.sigar.Mem;
-import org.hyperic.sigar.NetFlags;
-import org.hyperic.sigar.NetInterfaceConfig;
-import org.hyperic.sigar.Sigar;
 
 import com.appleframework.cache.core.utils.ConvertUtils;
 
@@ -97,21 +96,9 @@ public abstract class AbstractSequenceService implements SequenceService {
 	protected String getSigarSequence(String osName) {
 		try {
 			Set<String> result = new HashSet<>();
-			Sigar sigar = new Sigar();
-			String[] ifaces = sigar.getNetInterfaceList();
-			for (String iface : ifaces) {
-				NetInterfaceConfig cfg = sigar.getNetInterfaceConfig(iface);
-				if (NetFlags.LOOPBACK_ADDRESS.equals(cfg.getAddress()) || (cfg.getFlags() & NetFlags.IFF_LOOPBACK) != 0
-						|| NetFlags.NULL_HWADDR.equals(cfg.getHwaddr())) {
-					continue;
-				}
-				String mac = cfg.getHwaddr();
-				result.add(mac);
-				LOG.debug("mac: " + mac);
-			}
-			if (result.size() < 1) {
-				return null;
-			}
+			String mac = this.getMac();
+			result.add(mac);
+			LOG.debug("mac: " + mac);
 			Properties props = System.getProperties();
 			String javaVersion = props.getProperty("java.version");
 			result.add(javaVersion);
@@ -123,9 +110,8 @@ public abstract class AbstractSequenceService implements SequenceService {
 			result.add(osVersion);
 			LOG.debug("操作系统的版本：    " + props.getProperty("os.version"));
 
-			Mem mem = sigar.getMem();
 			// 内存总量
-			String totalMem = mem.getTotal() / 1024L + "K av";
+			String totalMem = this.getTotalMemory() / 1024L + "K av";
 			LOG.debug("内存总量:    " + totalMem);
 			result.add(totalMem);
 
@@ -137,5 +123,20 @@ public abstract class AbstractSequenceService implements SequenceService {
 			LOG.error("生成 " + osName + " 平台下的机器码失败", ex);
 		}
 		return null;
+	}
+	
+	private long getTotalMemory() {
+		return Runtime.getRuntime().totalMemory();
+	}
+	
+	private String getMac() {
+		try {
+			InetAddress ip = InetAddress.getLocalHost();
+			NetworkInterface network = NetworkInterface.getByInetAddress(ip);
+			byte[] mac = network.getHardwareAddress();
+			return new String(mac);
+		} catch (Exception e) {
+			return UUID.randomUUID().toString();
+		}
 	}
 }
