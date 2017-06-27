@@ -17,7 +17,7 @@ package com.appleframework.cache.jedis.misc;
 
 import java.net.URI;
 
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 public class URIBuilder {
 
