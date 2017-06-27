@@ -196,14 +196,10 @@ public class CodisLock implements Lock {
 		String identifier = this.genIdentifier();
 		lockKey = keyPrefix + lockKey;
 		try (Jedis jedis = codisResourcePool.getResource()) {
-			while (true) {
-				// 通过前面返回的value值判断是不是该锁，若是该锁，则删除，释放锁
-				String value = jedis.get(lockKey);
-				if (identifier.equals(value)) {
-					jedis.del(lockKey);
-					continue;
-				}
-				break;
+			// 通过前面返回的value值判断是不是该锁，若是该锁，则删除，释放锁
+			String value = jedis.get(lockKey);
+			if (identifier.equals(value)) {
+				jedis.del(lockKey);
 			}
 		} catch (Exception e) {
 			logger.error(e);
