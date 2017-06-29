@@ -1,4 +1,4 @@
-package com.appleframework.cache.redis;
+package com.appleframework.cache.codis;
 
 import java.io.IOException;
 
@@ -9,16 +9,15 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.appleframework.cache.codis.lock.CodisLock;
 import com.appleframework.cache.core.lock.Lock;
-import com.appleframework.cache.jedis.factory.PoolFactory;
-import com.appleframework.cache.jedis.lock.JedisLock;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath*:config/apple-cache-redis-manager3.xml" })
-public class JedisLockTest {
+@ContextConfiguration(locations = { "classpath*:config/test-apple-cache-codis.xml" })
+public class CodisLockTest {
 
 	@Resource
-	private PoolFactory poolFactory;
+	private CodisResourcePool codisResourcePool;
 
 	int n = 500;
 
@@ -26,7 +25,7 @@ public class JedisLockTest {
 	public void testAddOpinion1() {
 		
 		for (int i = 0; i < 50; i++) {
-            ThreadA threadA = new ThreadA(poolFactory);
+            ThreadA threadA = new ThreadA(codisResourcePool);
             threadA.start();
         }
 		
@@ -45,21 +44,21 @@ class ThreadA extends Thread {
 
 	String lockKey = "test_lock";
 
-	private PoolFactory poolFactory;
+	private CodisResourcePool codisResourcePool;
 
-	public ThreadA(PoolFactory poolFactory) {
-		this.poolFactory = poolFactory;
+	public ThreadA(CodisResourcePool codisResourcePool) {
+		this.codisResourcePool = codisResourcePool;
 	}
 
 	@Override
 	public void run() {
-		Lock lock = new JedisLock(poolFactory, 999999000, 20000);
+		Lock lock = new CodisLock(codisResourcePool, 999999000, 20000);
 		try {
 			lock.lock(lockKey);
-			System.out.println(Thread.currentThread().getName() + "获得了锁");
+			System.out.println(Thread.currentThread().getName() + "鑾峰緱浜嗛攣");
 			System.out.println(--n);
 			Thread.sleep(2000);
-			System.out.println(Thread.currentThread().getName() + "解锁");
+			System.out.println(Thread.currentThread().getName() + "瑙ｉ攣");
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
