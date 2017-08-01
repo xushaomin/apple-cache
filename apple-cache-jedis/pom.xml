@@ -37,19 +37,9 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- 
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-redis</artifactId>
-			<version>1.5.0.RELEASE</version>
-		</dependency>
-		 -->
-		
-		<!-- required for @Configuration annotation -->
 		<dependency>
 			<groupId>cglib</groupId>
 			<artifactId>cglib</artifactId>
-			<version>2.2.2</version>
 		</dependency>
 		
 		<dependency>
@@ -66,13 +56,11 @@
 		<dependency>
 			<groupId>commons-beanutils</groupId>
   			<artifactId>commons-beanutils</artifactId>
-  			<version>1.9.2</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>commons-lang</groupId>
   			<artifactId>commons-lang</artifactId>
-  			<version>2.6</version>
 		</dependency>
 		
 	</dependencies>
