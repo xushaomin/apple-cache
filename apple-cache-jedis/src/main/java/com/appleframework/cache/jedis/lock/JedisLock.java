@@ -152,6 +152,8 @@ public class JedisLock implements Lock {
 			}
 		} catch (Exception e) {
 			logger.error(e);
+			unlock(jedis, lockKey);
+			lockedSuccess = false;
 		} finally {
 			jedisPool.returnResource(jedis);
 		}
@@ -194,6 +196,30 @@ public class JedisLock implements Lock {
 			jedisPool.returnResource(jedis);
 		}
 		return isLocked;
+	}
+	
+	private void unlock(Jedis jedis, String lockKey) {
+		String identifier = this.genIdentifier();
+		try {
+			while (true) {
+				// 监视lock，准备开始事务
+				jedis.watch(lockKey);
+				// 通过前面返回的value值判断是不是该锁，若是该锁，则删除，释放锁
+				String value = jedis.get(lockKey);
+				if (identifier.equals(value)) {
+					Transaction transaction = jedis.multi();
+					transaction.del(lockKey);
+					List<Object> results = transaction.exec();
+					if (results == null) {
+						continue;
+					}
+				}
+				jedis.unwatch();
+				break;
+			}
+		} catch (Exception e) {
+			logger.error(e);
+		}
 	}
 
 	/**
