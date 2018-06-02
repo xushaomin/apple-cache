@@ -154,7 +154,8 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 		JedisPool jedisPool = poolFactory.getReadPool();
 		Jedis jedis = jedisPool.getResource();
 		try {
-			List<byte[]> list = jedis.hmget(getKey(key), this.getByteProperties(clazz));
+			byte[][] byteProperties = this.getByteProperties(clazz);
+			List<byte[]> list = jedis.hmget(getKey(key), byteProperties);
 			T object = clazz.newInstance();
 			if (!isListNull(list)) {
 				String[] stringFields = this.getStrProperties(clazz);
@@ -301,8 +302,9 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 				= new HashMap<String, Response<List<byte[]>>>(keys.length);
 			
 			Pipeline pipeline = jedis.pipelined();
+			byte[][] byteProperties = this.getByteProperties(clazz);
 			for (String key : keys) {
-				responses.put(key, pipeline.hmget(getKey(key), this.getByteProperties(clazz)));
+				responses.put(key, pipeline.hmget(getKey(key), byteProperties));
 			}
 			pipeline.sync();
 
@@ -396,8 +398,9 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 				= new HashMap<String, Response<List<byte[]>>>(keys.length);
 			
 			Pipeline pipeline = jedis.pipelined();
+			byte[][] byteProperties = this.getByteProperties(clazz);
 			for (String key : keys) {
-				responses.put(key, pipeline.hmget(getKey(key), this.getByteProperties(clazz)));
+				responses.put(key, pipeline.hmget(getKey(key), byteProperties));
 			}
 			pipeline.sync();
 

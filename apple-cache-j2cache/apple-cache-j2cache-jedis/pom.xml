@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.appleframework.cache</groupId>
 		<artifactId>apple-cache-j2cache</artifactId>
-		<version>0.3.4.RELEASE</version>
+		<version>0.3.5.RELEASE</version>
 	</parent>
 	<artifactId>apple-cache-j2cache-jedis</artifactId>
 	<name>apple-cache-j2cache-jedis</name>
