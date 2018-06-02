@@ -30,24 +30,19 @@ import redis.clients.util.JedisClusterCRC16;
 import redis.clients.util.SafeEncoder;
 
 /**
- * ÔÚ¼¯ÈºÄ£Ê½ÏÂÌá¹©ÅúÁ¿²Ù×÷µÄ¹¦ÄÜ¡£ <br/>
- * ÓÉÓÚ¼¯ÈºÄ£Ê½´æÔÚ½ÚµãµÄ¶¯Ì¬Ìí¼ÓÉ¾³ı£¬ÇÒclient²»ÄÜÊµÊ±¸ĞÖª£¨Ö»ÓĞÔÚÖ´ĞĞÃüÁîÊ±²Å¿ÉÄÜÖªµÀ¼¯Èº·¢Éú±ä¸ü£©£¬
- * Òò´Ë£¬¸ÃÊµÏÖ²»±£Ö¤Ò»¶¨³É¹¦£¬½¨ÒéÔÚÅúÁ¿²Ù×÷Ö®Ç°µ÷ÓÃ refreshCluster() ·½·¨ÖØĞÂ»ñÈ¡¼¯ÈºĞÅÏ¢¡£<br />
- * Ó¦ÓÃĞèÒª±£Ö¤²»ÂÛ³É¹¦»¹ÊÇÊ§°Ü¶¼»áµ÷ÓÃclose() ·½·¨£¬·ñÔò¿ÉÄÜ»áÔì³ÉĞ¹Â¶¡£<br/>
- * Èç¹ûÊ§°ÜĞèÒªÓ¦ÓÃ×Ô¼ºÈ¥ÖØÊÔ£¬Òò´ËÃ¿¸öÅú´ÎÖ´ĞĞµÄÃüÁîÊıÁ¿ĞèÒª¿ØÖÆ¡£·ÀÖ¹Ê§°ÜºóÖØÊÔµÄÊıÁ¿¹ı¶à¡£<br />
- * »ùÓÚÒÔÉÏËµÃ÷£¬½¨ÒéÔÚ¼¯Èº»·¾³½ÏÎÈ¶¨£¨Ôö¼õ½Úµã²»»á¹ıÓÚÆµ·±£©µÄÇé¿öÏÂÊ¹ÓÃ£¬ÇÒÔÊĞíÊ§°Ü»òÓĞ¶ÔÓ¦µÄÖØÊÔ²ßÂÔ¡£<br />
- * 
- * 
- * @author youaremoon
- * @version
- * @since Ver 1.1
+ * åœ¨é›†ç¾¤æ¨¡å¼ä¸‹æä¾›æ‰¹é‡æ“ä½œçš„åŠŸèƒ½ã€‚ <br/>
+ * ç”±äºé›†ç¾¤æ¨¡å¼å­˜åœ¨èŠ‚ç‚¹çš„åŠ¨æ€æ·»åŠ åˆ é™¤ï¼Œä¸”clientä¸èƒ½å®æ—¶æ„ŸçŸ¥ï¼ˆåªæœ‰åœ¨æ‰§è¡Œå‘½ä»¤æ—¶æ‰å¯èƒ½çŸ¥é“é›†ç¾¤å‘ç”Ÿå˜æ›´ï¼‰ï¼Œ
+ * å› æ­¤ï¼Œè¯¥å®ç°ä¸ä¿è¯ä¸€å®šæˆåŠŸï¼Œå»ºè®®åœ¨æ‰¹é‡æ“ä½œä¹‹å‰è°ƒç”¨ refreshCluster() æ–¹æ³•é‡æ–°è·å–é›†ç¾¤ä¿¡æ¯ã€‚<br />
+ * åº”ç”¨éœ€è¦ä¿è¯ä¸è®ºæˆåŠŸè¿˜æ˜¯å¤±è´¥éƒ½ä¼šè°ƒç”¨close() æ–¹æ³•ï¼Œå¦åˆ™å¯èƒ½ä¼šé€ æˆæ³„éœ²ã€‚<br/>
+ * å¦‚æœå¤±è´¥éœ€è¦åº”ç”¨è‡ªå·±å»é‡è¯•ï¼Œå› æ­¤æ¯ä¸ªæ‰¹æ¬¡æ‰§è¡Œçš„å‘½ä»¤æ•°é‡éœ€è¦æ§åˆ¶ã€‚é˜²æ­¢å¤±è´¥åé‡è¯•çš„æ•°é‡è¿‡å¤šã€‚<br />
+ * åŸºäºä»¥ä¸Šè¯´æ˜ï¼Œå»ºè®®åœ¨é›†ç¾¤ç¯å¢ƒè¾ƒç¨³å®šï¼ˆå¢å‡èŠ‚ç‚¹ä¸ä¼šè¿‡äºé¢‘ç¹ï¼‰çš„æƒ…å†µä¸‹ä½¿ç”¨ï¼Œä¸”å…è®¸å¤±è´¥æˆ–æœ‰å¯¹åº”çš„é‡è¯•ç­–ç•¥ã€‚<br />
  */
 public class JedisClusterPipeline extends PipelineBase implements Closeable {
 
 	private static Logger logger = Logger.getLogger(JedisClusterPipeline.class);
 
-    // ²¿·Ö×Ö¶ÎÃ»ÓĞ¶ÔÓ¦µÄ»ñÈ¡·½·¨£¬Ö»ÄÜ²ÉÓÃ·´ÉäÀ´×ö
-    // ÄãÒ²¿ÉÒÔÈ¥¼Ì³ĞJedisClusterºÍJedisSlotBasedConnectionHandlerÀ´Ìá¹©·ÃÎÊ½Ó¿Ú
+    // éƒ¨åˆ†å­—æ®µæ²¡æœ‰å¯¹åº”çš„è·å–æ–¹æ³•ï¼Œåªèƒ½é‡‡ç”¨åå°„æ¥åš
+    // ä½ ä¹Ÿå¯ä»¥å»ç»§æ‰¿JedisClusterå’ŒJedisSlotBasedConnectionHandleræ¥æä¾›è®¿é—®æ¥å£
     private static final Field FIELD_CONNECTION_HANDLER;
     private static final Field FIELD_CACHE; 
     static {
@@ -57,12 +52,12 @@ public class JedisClusterPipeline extends PipelineBase implements Closeable {
 
     private JedisSlotBasedConnectionHandler connectionHandler;
     private JedisClusterInfoCache clusterInfoCache;
-    private Queue<Client> clients = new LinkedList<Client>();   // ¸ù¾İË³Ğò´æ´¢Ã¿¸öÃüÁî¶ÔÓ¦µÄClient
-    private Map<JedisPool, Jedis> jedisMap = new HashMap<>();   // ÓÃÓÚ»º´æÁ¬½Ó
-    private boolean hasDataInBuf = false;   // ÊÇ·ñÓĞÊı¾İÔÚ»º´æÇø
+    private Queue<Client> clients = new LinkedList<Client>();   // æ ¹æ®é¡ºåºå­˜å‚¨æ¯ä¸ªå‘½ä»¤å¯¹åº”çš„Client
+    private Map<JedisPool, Jedis> jedisMap = new HashMap<>();   // ç”¨äºç¼“å­˜è¿æ¥
+    private boolean hasDataInBuf = false;   // æ˜¯å¦æœ‰æ•°æ®åœ¨ç¼“å­˜åŒº
 
     /**
-     * ¸ù¾İjedisClusterÊµÀıÉú³É¶ÔÓ¦µÄJedisClusterPipeline
+     * æ ¹æ®jedisClusterå®ä¾‹ç”Ÿæˆå¯¹åº”çš„JedisClusterPipeline
      * @param 
      * @return
      */
@@ -81,7 +76,7 @@ public class JedisClusterPipeline extends PipelineBase implements Closeable {
     }
 
     /**
-     * Ë¢ĞÂ¼¯ÈºĞÅÏ¢£¬µ±¼¯ÈºĞÅÏ¢·¢Éú±ä¸üÊ±µ÷ÓÃ
+     * åˆ·æ–°é›†ç¾¤ä¿¡æ¯ï¼Œå½“é›†ç¾¤ä¿¡æ¯å‘ç”Ÿå˜æ›´æ—¶è°ƒç”¨
      * @param 
      * @return
      */
@@ -90,16 +85,16 @@ public class JedisClusterPipeline extends PipelineBase implements Closeable {
     }
 
     /**
-     * Í¬²½¶ÁÈ¡ËùÓĞÊı¾İ. ÓësyncAndReturnAll()Ïà±È£¬sync()Ö»ÊÇÃ»ÓĞ¶ÔÊı¾İ×ö·´ĞòÁĞ»¯
+     * åŒæ­¥è¯»å–æ‰€æœ‰æ•°æ®. ä¸syncAndReturnAll()ç›¸æ¯”ï¼Œsync()åªæ˜¯æ²¡æœ‰å¯¹æ•°æ®åšååºåˆ—åŒ–
      */
     public void sync() {
         innerSync(null);
     }
 
     /**
-     * Í¬²½¶ÁÈ¡ËùÓĞÊı¾İ ²¢°´ÃüÁîË³Ğò·µ»ØÒ»¸öÁĞ±í
+     * åŒæ­¥è¯»å–æ‰€æœ‰æ•°æ® å¹¶æŒ‰å‘½ä»¤é¡ºåºè¿”å›ä¸€ä¸ªåˆ—è¡¨
      * 
-     * @return °´ÕÕÃüÁîµÄË³Ğò·µ»ØËùÓĞµÄÊı¾İ
+     * @return æŒ‰ç…§å‘½ä»¤çš„é¡ºåºè¿”å›æ‰€æœ‰çš„æ•°æ®
      */
     public List<Object> syncAndReturnAll() {
         List<Object> responseList = new ArrayList<Object>();
@@ -112,14 +107,14 @@ public class JedisClusterPipeline extends PipelineBase implements Closeable {
 
         try {
             for (Client client : clients) {
-                // ÔÚsync()µ÷ÓÃÊ±ÆäÊµÊÇ²»ĞèÒª½âÎö½á¹ûÊı¾İµÄ£¬µ«ÊÇÈç¹û²»µ÷ÓÃget·½·¨£¬·¢ÉúÁËJedisMovedDataExceptionÕâÑùµÄ´íÎóÓ¦ÓÃÊÇ²»ÖªµÀµÄ£¬Òò´ËĞèÒªµ÷ÓÃget()À´´¥·¢´íÎó¡£
-                // ÆäÊµÈç¹ûResponseµÄdataÊôĞÔ¿ÉÒÔÖ±½Ó»ñÈ¡£¬¿ÉÒÔÊ¡µô½âÎöÊı¾İµÄÊ±¼ä£¬È»¶øËü²¢Ã»ÓĞÌá¹©¶ÔÓ¦·½·¨£¬Òª»ñÈ¡dataÊôĞÔ¾ÍµÃÓÃ·´Éä£¬²»ÏëÔÙ·´ÉäÁË£¬ËùÒÔ¾ÍÕâÑùÁË
+                // åœ¨sync()è°ƒç”¨æ—¶å…¶å®æ˜¯ä¸éœ€è¦è§£æç»“æœæ•°æ®çš„ï¼Œä½†æ˜¯å¦‚æœä¸è°ƒç”¨getæ–¹æ³•ï¼Œå‘ç”Ÿäº†JedisMovedDataExceptionè¿™æ ·çš„é”™è¯¯åº”ç”¨æ˜¯ä¸çŸ¥é“çš„ï¼Œå› æ­¤éœ€è¦è°ƒç”¨get()æ¥è§¦å‘é”™è¯¯ã€‚
+                // å…¶å®å¦‚æœResponseçš„dataå±æ€§å¯ä»¥ç›´æ¥è·å–ï¼Œå¯ä»¥çœæ‰è§£ææ•°æ®çš„æ—¶é—´ï¼Œç„¶è€Œå®ƒå¹¶æ²¡æœ‰æä¾›å¯¹åº”æ–¹æ³•ï¼Œè¦è·å–dataå±æ€§å°±å¾—ç”¨åå°„ï¼Œä¸æƒ³å†åå°„äº†ï¼Œæ‰€ä»¥å°±è¿™æ ·äº†
                 Object data = generateResponse(client.getOne()).get();
                 if (null != formatted) {
                     formatted.add(data);
                 }
 
-                // sizeÏàÍ¬ËµÃ÷ËùÓĞµÄclient¶¼ÒÑ¾­Ìí¼Ó£¬¾Í²»ÓÃÔÙµ÷ÓÃadd·½·¨ÁË
+                // sizeç›¸åŒè¯´æ˜æ‰€æœ‰çš„clientéƒ½å·²ç»æ·»åŠ ï¼Œå°±ä¸ç”¨å†è°ƒç”¨addæ–¹æ³•äº†
                 if (clientSet.size() != jedisMap.size()) {
                     clientSet.add(client);
                 }
@@ -134,7 +129,7 @@ public class JedisClusterPipeline extends PipelineBase implements Closeable {
             throw jre;
         } finally {
             if (clientSet.size() != jedisMap.size()) {
-                // ËùÓĞ»¹Ã»ÓĞÖ´ĞĞ¹ıµÄclientÒª±£Ö¤Ö´ĞĞ(flush)£¬·ÀÖ¹·Å»ØÁ¬½Ó³ØºóºóÃæµÄÃüÁî±»ÎÛÈ¾
+                // æ‰€æœ‰è¿˜æ²¡æœ‰æ‰§è¡Œè¿‡çš„clientè¦ä¿è¯æ‰§è¡Œ(flush)ï¼Œé˜²æ­¢æ”¾å›è¿æ¥æ± ååé¢çš„å‘½ä»¤è¢«æ±¡æŸ“
                 for (Jedis jedis : jedisMap.values()) {
                     if (clientSet.contains(jedis.getClient())) {
                         continue;
@@ -190,7 +185,7 @@ public class JedisClusterPipeline extends PipelineBase implements Closeable {
     private Jedis getJedis(int slot) {
         JedisPool pool = clusterInfoCache.getSlotPool(slot);
 
-        // ¸ù¾İpool´Ó»º´æÖĞ»ñÈ¡Jedis
+        // æ ¹æ®poolä»ç¼“å­˜ä¸­è·å–Jedis
         Jedis jedis = jedisMap.get(pool);
         if (null == jedis) {
             jedis = pool.getResource();
@@ -256,7 +251,7 @@ public class JedisClusterPipeline extends PipelineBase implements Closeable {
 
         System.out.println(batchResult.size());
 
-        // Êµ¼ÊÒµÎñ´úÂëÖĞ£¬closeÒªÔÚfinallyÖĞµ÷£¬ÕâÀïÖ®ËùÒÔÃ»ÕâÃ´Ğ´£¬ÊÇÒòÎªÀÁ
+        // å®é™…ä¸šåŠ¡ä»£ç ä¸­ï¼Œcloseè¦åœ¨finallyä¸­è°ƒï¼Œè¿™é‡Œä¹‹æ‰€ä»¥æ²¡è¿™ä¹ˆå†™ï¼Œæ˜¯å› ä¸ºæ‡’
         jc.close();
     }
 }
