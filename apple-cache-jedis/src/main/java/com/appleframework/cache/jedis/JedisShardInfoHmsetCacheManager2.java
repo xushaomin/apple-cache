@@ -13,17 +13,15 @@ import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager;
 import com.appleframework.cache.core.utils.ReflectionUtility;
 import com.appleframework.cache.core.utils.SerializeUtility;
-import com.appleframework.cache.jedis.factory.PoolFactory;
+import com.appleframework.cache.jedis.factory.JedisShardInfoFactory;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Response;
 
-@SuppressWarnings({ "deprecation" })
-public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
+public class JedisShardInfoHmsetCacheManager2 implements CacheManager {
 
-	private static Logger logger = Logger.getLogger(MasterSlaveJedisHmsetCacheManager.class);
+	private static Logger logger = Logger.getLogger(JedisShardInfoHmsetCacheManager2.class);
 	
 	private static Map<String, String[]> STR_MAP = new HashMap<>();
 	
@@ -31,12 +29,16 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 	
 	private static Map<String, PropertyDescriptor[]> DESC_MAP = new HashMap<>();
 	
-	protected PoolFactory poolFactory;
+	private JedisShardInfoFactory connectionFactory;
+		
+	private String name = "AC:";	
 	
-	private String name = "AC:";
-
-	public void setPoolFactory(PoolFactory poolFactory) {
-		this.poolFactory = poolFactory;
+	public void setConnectionFactory(JedisShardInfoFactory connectionFactory) {
+		this.connectionFactory = connectionFactory;
+	}
+	
+	private Jedis getJedis() {
+		return connectionFactory.getJedisConnection();
 	}
 	
 	private byte[] getKey(String key) {
@@ -67,7 +69,7 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 		}
 	}
 	
-	protected String[] getStrProperties(Class<?> clazz) {
+	private String[] getStrProperties(Class<?> clazz) {
 		String className = clazz.getName();
 		String[] strs = STR_MAP.get(className);
 		if(null == strs) {
@@ -103,20 +105,16 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 	}
 	
 	public void clear() throws CacheException {
-		JedisPool jedisPool = poolFactory.getWritePool();
-		Jedis jedis = jedisPool.getResource();
+		Jedis jedis = this.getJedis();
 		try {
 			jedis.del(getKey("*"));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
 	public Object get(String key) throws CacheException {
-		JedisPool jedisPool = poolFactory.getReadPool();
-		Jedis jedis = jedisPool.getResource();
+		Jedis jedis = this.getJedis();
 		try {
 			Map<byte[], byte[]> value = jedis.hgetAll(getKey(key));
 			Map<String, Object> map = new HashMap<>();
@@ -133,8 +131,6 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 	
@@ -151,8 +147,7 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 
 	@Override
 	public <T> T get(String key, Class<T> clazz) throws CacheException {
-		JedisPool jedisPool = poolFactory.getReadPool();
-		Jedis jedis = jedisPool.getResource();
+		Jedis jedis = this.getJedis();
 		try {
 			byte[][] byteProperties = this.getByteProperties(clazz);
 			List<byte[]> list = jedis.hmget(getKey(key), byteProperties);
@@ -177,27 +172,21 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
 	public boolean remove(String key) throws CacheException {
-		JedisPool jedisPool = poolFactory.getWritePool();
-		Jedis jedis = jedisPool.getResource();
+		Jedis jedis = this.getJedis();
 		try {
 			return jedis.del(getKey(key))>0;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 		return false;
 	}
 
 	public void set(String key, Object obj) throws CacheException {
-		JedisPool jedisPool = poolFactory.getWritePool();
-		Jedis jedis = jedisPool.getResource();
+		Jedis jedis = this.getJedis();
 		if (null != obj) {
 			try {
 				Map<byte[], byte[]> map = new HashMap<byte[], byte[]>();
@@ -212,15 +201,12 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 				jedis.hmset(getKey(key), map);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-			} finally {
-				jedisPool.returnResource(jedis);
 			}
 		}
 	}
 
 	public void set(String key, Object obj, int expireTime) throws CacheException {
-		JedisPool jedisPool = poolFactory.getWritePool();
-		Jedis jedis = jedisPool.getResource();
+		Jedis jedis = this.getJedis();
 		if (null != obj) {
 			try {
 				byte[] byteKey = getKey(key);
@@ -237,8 +223,6 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 				jedis.expire(byteKey, expireTime);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-			} finally {
-				jedisPool.returnResource(jedis);
 			}
 		}
 	}
@@ -250,8 +234,7 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 
 	@Override
 	public List<Object> getList(String... keys) throws CacheException {
-		JedisPool jedisPool = poolFactory.getReadPool();
-		Jedis jedis = jedisPool.getResource();
+		Jedis jedis = this.getJedis();
 		try {
 			List<Object> list = new ArrayList<Object>();
 			Map<String, Response<Map<byte[], byte[]>>> responses 
@@ -282,8 +265,6 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -294,8 +275,7 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 
 	@Override
 	public <T> List<T> getList(Class<T> clazz, String... keys) throws CacheException {
-		JedisPool jedisPool = poolFactory.getReadPool();
-		Jedis jedis = jedisPool.getResource();
+		Jedis jedis = this.getJedis();
 		try {
 			List<T> list = new ArrayList<T>();
 			Map<String, Response<List<byte[]>>> responses 
@@ -334,8 +314,6 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -346,8 +324,7 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 
 	@Override
 	public Map<String, Object> getMap(String... keys) throws CacheException {
-		JedisPool jedisPool = poolFactory.getReadPool();
-		Jedis jedis = jedisPool.getResource();
+		Jedis jedis = this.getJedis();
 		try {
 			Map<String, Object> map = new HashMap<>();
 			Map<String, Response<Map<byte[], byte[]>>> responses = new HashMap<String, Response<Map<byte[], byte[]>>>(
@@ -378,8 +355,6 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -390,8 +365,7 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 
 	@Override
 	public <T> Map<String, T> getMap(Class<T> clazz, String... keys) throws CacheException {
-		JedisPool jedisPool = poolFactory.getReadPool();
-		Jedis jedis = jedisPool.getResource();
+		Jedis jedis = this.getJedis();
 		try {
 			Map<String, T> map = new HashMap<>();
 			Map<String, Response<List<byte[]>>> responses 
@@ -430,8 +404,6 @@ public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 

@@ -21,7 +21,7 @@ public class SingleJedisBucketCacheManager implements CacheManager {
 
 	private static Logger logger = Logger.getLogger(SingleJedisBucketCacheManager.class);
 	
-	private JedisPool jedisPool;
+	protected JedisPool jedisPool;
 	
 	private String name = "AC_";
 	
@@ -31,6 +31,10 @@ public class SingleJedisBucketCacheManager implements CacheManager {
 	
 	public void setJedisPool(JedisPool jedisPool) {
 		this.jedisPool = jedisPool;
+	}
+
+	public JedisPool getJedisPool() {
+		return jedisPool;
 	}
 
 	public void clear() throws CacheException {

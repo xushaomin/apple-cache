@@ -33,14 +33,14 @@ public class JedisShardInfoBucketCacheManager implements CacheManager {
 		this.connectionFactory = connectionFactory;
 	}
 	
-	private Jedis getJedis() {
+	protected Jedis getJedis() {
 		return connectionFactory.getJedisConnection();
 	}
 
 	public void clear() throws CacheException {
 		Jedis jedis = this.getJedis();
 		try {
-			jedis.del("*");
+			jedis.del("*".getBytes());
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}

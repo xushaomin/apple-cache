@@ -29,7 +29,7 @@ public class JedisSentinelHsetCacheManager implements CacheManager {
 		this.connectionFactory = connectionFactory;
 	}
 	
-	private Jedis getJedis() {
+	protected Jedis getJedis() {
 		return connectionFactory.getJedisConnection();
 	}
 	

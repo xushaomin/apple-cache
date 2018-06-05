@@ -39,7 +39,7 @@ public class JedisClusterBucketCacheManager implements CacheManager {
 		this.connectionFactory = connectionFactory;
 	}
 	
-	private JedisCluster getJedis() {
+	public JedisCluster getJedis() {
 		return connectionFactory.getClusterConnection();
 	}
 

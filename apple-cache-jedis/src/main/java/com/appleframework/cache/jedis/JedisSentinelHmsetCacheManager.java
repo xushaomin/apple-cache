@@ -37,11 +37,11 @@ public class JedisSentinelHmsetCacheManager implements CacheManager {
 		this.connectionFactory = connectionFactory;
 	}
 	
-	private Jedis getJedis() {
+	protected Jedis getJedis() {
 		return connectionFactory.getJedisConnection();
 	}
 	
-	private byte[] getKey(String key) {
+	protected byte[] getKey(String key) {
 		return (name + key).getBytes();
 	}
 	
@@ -69,7 +69,7 @@ public class JedisSentinelHmsetCacheManager implements CacheManager {
 		}
 	}
 	
-	private String[] getStrProperties(Class<?> clazz) {
+	protected String[] getStrProperties(Class<?> clazz) {
 		String className = clazz.getName();
 		String[] strs = STR_MAP.get(className);
 		if(null == strs) {

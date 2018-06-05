@@ -30,7 +30,7 @@ public class SingleJedisHmsetCacheManager implements CacheManager {
 	
 	private static Map<String, PropertyDescriptor[]> DESC_MAP = new HashMap<>();
 	
-	private JedisPool jedisPool;
+	protected JedisPool jedisPool;
 	
 	private String name = "AC:";
 	
@@ -66,7 +66,7 @@ public class SingleJedisHmsetCacheManager implements CacheManager {
 		}
 	}
 	
-	private String[] getStrProperties(Class<?> clazz) {
+	protected String[] getStrProperties(Class<?> clazz) {
 		String className = clazz.getName();
 		String[] strs = STR_MAP.get(className);
 		if(null == strs) {

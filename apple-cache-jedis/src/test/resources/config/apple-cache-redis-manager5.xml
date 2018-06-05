@@ -24,7 +24,7 @@
 		<property name="minIdle" value="0" />
 	</bean>
 	
-	<bean id="cacheManager" class="com.appleframework.cache.jedis.JedisShardInfoBucketCacheManager"
+	<bean id="cacheManager2" class="com.appleframework.cache.jedis.JedisShardInfoBucketCacheManager2"
 		><!-- init-method="init" -->
 		<property name="connectionFactory" ref="jedisClusterFactory" />
 		<property name="name" value="TEST:HMSET" />

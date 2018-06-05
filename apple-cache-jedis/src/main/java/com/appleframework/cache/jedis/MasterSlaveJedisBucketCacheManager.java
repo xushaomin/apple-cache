@@ -34,6 +34,10 @@ public class MasterSlaveJedisBucketCacheManager implements CacheManager {
 		this.poolFactory = poolFactory;
 	}
 	
+	public PoolFactory getPoolFactory() {
+		return poolFactory;
+	}
+
 	public void clear() throws CacheException {
 		JedisPool jedisPool = poolFactory.getWritePool();
 		Jedis jedis = jedisPool.getResource();
