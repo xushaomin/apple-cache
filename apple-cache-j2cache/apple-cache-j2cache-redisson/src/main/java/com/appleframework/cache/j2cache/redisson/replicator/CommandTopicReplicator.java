@@ -24,7 +24,7 @@ public class CommandTopicReplicator implements CommandReplicator {
 		this.redisson = redisson;
 	}
 	
-	private RTopic<Command> topic;
+	private RTopic topic;
 	
 	public void init() {
 		topic = redisson.getTopic(Contants.TOPIC_PREFIX_KEY + name);

@@ -24,7 +24,7 @@ public class SpringCacheOperation implements CacheOperation {
 	private int expire = 0;
 	private RedissonClient redisson;
 	private CacheManager ehcacheManager;
-	private RTopic<Command> topic;
+	private RTopic topic;
 	
 	public SpringCacheOperation(CacheManager ehcacheManager, RedissonClient redisson, String name) {
 		this.name = name;
@@ -58,8 +58,9 @@ public class SpringCacheOperation implements CacheOperation {
 	
 	public void init() {
 		topic = redisson.getTopic(Contants.TOPIC_PREFIX_KEY + name);
-		topic.addListener(new MessageListener<Command>() {
-		    public void onMessage(String channel, Command message) {
+		topic.addListener(Command.class, new MessageListener<Command>() {
+		    @Override
+			public void onMessage(CharSequence channel, Command message) {
 		    	Object key = message.getKey();
 		    	Cache cache = getEhCache();
 		    	if(null != cache) {
@@ -76,7 +77,7 @@ public class SpringCacheOperation implements CacheOperation {
 			    		logger.error("ERROR OPERATE TYPE !!!");
 			    	}
 		    	}
-		    }
+			}
 		});
 	}
 
