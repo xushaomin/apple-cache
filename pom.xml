@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>com.appleframework.cache</groupId>
 	<artifactId>apple-cache</artifactId>
-	<version>0.3.5.RELEASE</version>
+	<version>0.3.6-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>apple-cache</name>
@@ -29,11 +29,13 @@
     </developers>
 
 	<properties>
-		<project.version>0.3.5.RELEASE</project.version>
+		<project.version>0.3.6-SNAPSHOT</project.version>
 		<java.version>1.7</java.version>
 		<log4j.version>1.2.17</log4j.version>
+		<slf4j.version>1.7.25</slf4j.version>
 		<spring.version>4.2.0.RELEASE</spring.version>
 		<lang3.version>3.1</lang3.version>
+		<codec.version>1.11</codec.version>
 	</properties>
 
 	<dependencyManagement>
@@ -44,6 +46,13 @@
 				<groupId>log4j</groupId>
 				<artifactId>log4j</artifactId>
 				<version>${log4j.version}</version>
+			</dependency>
+			
+			<dependency>
+			  	<groupId>org.slf4j</groupId>
+			  	<artifactId>slf4j-api</artifactId>
+			  	<version>${slf4j.version}</version>
+			  	<scope>provided</scope>
 			</dependency>
 			
 			<dependency>
@@ -120,6 +129,12 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
 				<version>${lang3.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>${codec.version}</version>
 			</dependency>
 			
 		</dependencies>
