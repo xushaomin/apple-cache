@@ -7,6 +7,7 @@ import org.springframework.beans.factory.FactoryBean;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.JoinConfig;
+import com.hazelcast.config.ManagementCenterConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -14,6 +15,7 @@ import com.hazelcast.core.HazelcastInstance;
 public class HazelcastInstanceFactoryBean implements FactoryBean<HazelcastInstance> {
 
 	private List<String> memberList = new ArrayList<>();
+	private String mancenterUrl;
 
 	public void setMembers(String members) {
 		String[] memberArray = members.split(",");
@@ -26,6 +28,12 @@ public class HazelcastInstanceFactoryBean implements FactoryBean<HazelcastInstan
 	public HazelcastInstance getObject() throws Exception {
 		Config config = new Config();
 		config.getNetworkConfig().setPortAutoIncrement(true);
+		if(null != mancenterUrl) {
+			ManagementCenterConfig manCenterConfig = new ManagementCenterConfig();
+			manCenterConfig.setUrl(mancenterUrl);
+			manCenterConfig.setEnabled(true);
+			config.setManagementCenterConfig(manCenterConfig);
+		}
 		NetworkConfig network = config.getNetworkConfig();
 		JoinConfig join = network.getJoin();
 		join.getMulticastConfig().setEnabled(false);
@@ -41,6 +49,10 @@ public class HazelcastInstanceFactoryBean implements FactoryBean<HazelcastInstan
 	@Override
 	public boolean isSingleton() {
 		return false;
+	}
+
+	public void setMancenterUrl(String mancenterUrl) {
+		this.mancenterUrl = mancenterUrl;
 	}
 
 }
