@@ -9,6 +9,7 @@ import org.ehcache.ValueSupplier;
 import org.ehcache.expiry.Duration;
 import org.ehcache.expiry.Expiry;
 
+@SuppressWarnings("deprecation")
 public class EhCacheExpiry implements Expiry<String, Serializable> {
 	
 	private Map<String, Duration> durationMap = new HashMap<>();

@@ -37,16 +37,17 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 		this.ehcacheManager = ehcacheManager;
 	}
 
+	@SuppressWarnings("deprecation")
 	public Cache<String, Serializable> getEhCache() {
 		Cache<String, Serializable> cache = ehcacheManager.getCache(name, String.class, Serializable.class);
 		if (null == cache) {
 			expiry = new EhCacheExpiry();
-
 			CacheConfigurationBuilder<String, Serializable> configuration = CacheConfigurationBuilder
 					.newCacheConfigurationBuilder(String.class, Serializable.class,
 							ResourcePoolsBuilder.newResourcePoolsBuilder()
 									.heap(ConfigurationFactoryBean.getHeap(), MemoryUnit.MB)
-									.offheap(ConfigurationFactoryBean.getOffheap(), MemoryUnit.MB))
+									.offheap(ConfigurationFactoryBean.getOffheap(), MemoryUnit.MB)
+									.disk(ConfigurationFactoryBean.getDisk(), MemoryUnit.MB, ConfigurationFactoryBean.isPersistent()))
 					.withExpiry(expiry);
 			try {
 				cache = ehcacheManager.createCache(name, configuration);

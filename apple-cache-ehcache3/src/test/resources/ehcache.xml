@@ -1,0 +1,17 @@
+<config
+        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xmlns='http://www.ehcache.org/v3'
+        xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core.xsd">
+    <!--ehcache的持久化操作保存地址-->
+    <!--<disk-store thread-pool=""></disk-store> 这个不能使用，用了只会报错 
+    <persistence directory="F:/Test2/ehcache-parent/ehcache-demo2/myData"/>-->
+    <!-- 1、声明一个名为foo的Cache-->
+    <cache alias="threeTieredCache">
+        <key-type>java.lang.String</key-type>
+        <value-type>java.io.Serializable</value-type>
+        <resources>
+            <heap unit="entries">10</heap>
+            <disk unit="MB" persistent="true">10</disk>
+        </resources>
+    </cache>
+</config>

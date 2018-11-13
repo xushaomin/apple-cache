@@ -4,10 +4,12 @@ public class ConfigurationFactoryBean {
 
 	private static int heap = 10;
 	private static int offheap = 100;
+	private static int disk = 1000;
 	private static int sizeOfMaxObjectGraph;
 	private static int sizeOfMaxObjectSize;
 	private static int defaultSizeOfMaxObjectSize;
 	private static int defaultSizeOfMaxObjectGraph;
+	private static boolean persistent = false;
 
 	public static int getHeap() {
 		return heap;
@@ -55,6 +57,22 @@ public class ConfigurationFactoryBean {
 
 	public void setDefaultSizeOfMaxObjectGraph(int defaultSizeOfMaxObjectGraph) {
 		ConfigurationFactoryBean.defaultSizeOfMaxObjectGraph = defaultSizeOfMaxObjectGraph;
+	}
+
+	public static int getDisk() {
+		return disk;
+	}
+
+	public static void setDisk(int disk) {
+		ConfigurationFactoryBean.disk = disk;
+	}
+
+	public static boolean isPersistent() {
+		return persistent;
+	}
+
+	public static void setPersistent(boolean persistent) {
+		ConfigurationFactoryBean.persistent = persistent;
 	}
 
 }
