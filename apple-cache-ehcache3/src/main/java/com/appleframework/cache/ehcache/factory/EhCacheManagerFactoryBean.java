@@ -12,16 +12,16 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 	
 	@Override
 	public CacheManager getObject() throws Exception {
-        URL xmlUrl = getClass().getResource("/ehcaches.xml");
+        URL xmlUrl = getClass().getResource("/ehcache.xml");
         CacheManager cacheManager = null;
         if(null == xmlUrl) {
         	cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build();
+            cacheManager.init();
         }
         else {
         	 Configuration xmlConfig = new XmlConfiguration(xmlUrl);
              cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
         }
-		cacheManager.init();
 		return cacheManager;
 	}
 
