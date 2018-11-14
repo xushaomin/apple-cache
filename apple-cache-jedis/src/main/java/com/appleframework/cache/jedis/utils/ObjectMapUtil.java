@@ -47,6 +47,12 @@ public class ObjectMapUtil {
 					} else if (typeClz == Float.class || typeClz == float.class) {
 						// field.set(object, Float.valueOf(value));
 						ReflectionUtility.invokeSetterMethod(object, name, Float.valueOf(value));
+					} else if (typeClz == Short.class || typeClz == short.class) {
+						// field.set(object, Short.valueOf(value));
+						ReflectionUtility.invokeSetterMethod(object, name, Short.valueOf(value));
+					} else if (typeClz == Boolean.class || typeClz == boolean.class) {
+						// field.set(object, Boolean.valueOf(value));
+						ReflectionUtility.invokeSetterMethod(object, name, Boolean.valueOf(value));
 					} else if (typeClz == byte[].class) {
 						// field.set(object, Hex.decodeHex(value.toCharArray()));
 						ReflectionUtility.invokeSetterMethod(object, name, Hex.decodeHex(value.toCharArray()));
