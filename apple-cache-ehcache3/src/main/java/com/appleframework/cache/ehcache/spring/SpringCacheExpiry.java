@@ -7,9 +7,10 @@ import org.ehcache.ValueSupplier;
 import org.ehcache.expiry.Duration;
 import org.ehcache.expiry.Expiry;
 
+@SuppressWarnings("deprecation")
 public class SpringCacheExpiry implements Expiry<String, Serializable> {
 	
-	private Duration duration;
+	private Duration duration = Duration.ZERO;
 
 	@Override
 	public Duration getExpiryForCreation(String key, Serializable value) {
@@ -18,12 +19,12 @@ public class SpringCacheExpiry implements Expiry<String, Serializable> {
 
 	@Override
 	public Duration getExpiryForAccess(String key, ValueSupplier<? extends Serializable> value) {
-		return null;
+		return duration;
 	}
 
 	@Override
 	public Duration getExpiryForUpdate(String key, ValueSupplier<? extends Serializable> oldValue, Serializable newValue) {
-		return null;
+		return duration;
 	}
 	
 	public SpringCacheExpiry(int seconds) {
