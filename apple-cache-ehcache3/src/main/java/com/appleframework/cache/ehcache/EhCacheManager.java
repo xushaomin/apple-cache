@@ -11,12 +11,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
-import org.ehcache.config.builders.CacheConfigurationBuilder;
-import org.ehcache.config.builders.ResourcePoolsBuilder;
-import org.ehcache.config.units.MemoryUnit;
 
 import com.appleframework.cache.core.CacheException;
-import com.appleframework.cache.ehcache.factory.ConfigurationFactoryBean;
 
 @SuppressWarnings("unchecked")
 public class EhCacheManager implements com.appleframework.cache.core.CacheManager {
@@ -26,8 +22,6 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 	private String name = "EHCACHE_MANAGER";
 
 	private CacheManager ehcacheManager;
-	
-	private EhCacheExpiry expiry;
 
 	public void setName(String name) {
 		this.name = name;
@@ -37,25 +31,8 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 		this.ehcacheManager = ehcacheManager;
 	}
 
-	@SuppressWarnings("deprecation")
 	public Cache<String, Serializable> getEhCache() {
-		Cache<String, Serializable> cache = ehcacheManager.getCache(name, String.class, Serializable.class);
-		if (null == cache) {
-			expiry = new EhCacheExpiry();
-			CacheConfigurationBuilder<String, Serializable> configuration = CacheConfigurationBuilder
-					.newCacheConfigurationBuilder(String.class, Serializable.class,
-							ResourcePoolsBuilder.newResourcePoolsBuilder()
-									.heap(ConfigurationFactoryBean.getHeap(), MemoryUnit.MB)
-									.offheap(ConfigurationFactoryBean.getOffheap(), MemoryUnit.MB)
-									.disk(ConfigurationFactoryBean.getDisk(), MemoryUnit.MB, ConfigurationFactoryBean.isPersistent()))
-					.withExpiry(expiry);
-			try {
-				cache = ehcacheManager.createCache(name, configuration);
-			} catch (Exception e) {
-				logger.warn("the cache name " + name + " is exist !");
-			}
-		}
-		return cache;
+		return ehcacheManager.getCache(name, String.class, Serializable.class);
 	}
 
 	public void clear() throws CacheException {
@@ -108,7 +85,7 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 	public void set(String key, Object value, int expireTime) throws CacheException {
 		if (null != value) {
 			try {
-				expiry.setExpiry(key, expireTime);
+				EhCacheExpiry.setExpiry(key, expireTime);
 				getEhCache().put(key, (Serializable) value);
 			} catch (Exception e) {
 				logger.error(e.getMessage());

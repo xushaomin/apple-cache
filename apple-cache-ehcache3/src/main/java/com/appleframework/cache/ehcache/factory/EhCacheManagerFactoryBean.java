@@ -1,27 +1,48 @@
 package com.appleframework.cache.ehcache.factory;
 
+import java.io.File;
+import java.io.Serializable;
 import java.net.URL;
 
 import org.ehcache.CacheManager;
 import org.ehcache.config.Configuration;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.ehcache.config.units.MemoryUnit;
 import org.ehcache.xml.XmlConfiguration;
 import org.springframework.beans.factory.FactoryBean;
 
+import com.appleframework.cache.ehcache.EhCacheExpiryUtil;
+
 public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
-	
+
+	private String cacheName = "apple";
+	private String filePath = System.getProperty("user.home");
+
+	@SuppressWarnings("deprecation")
 	@Override
 	public CacheManager getObject() throws Exception {
-        URL xmlUrl = getClass().getResource("/ehcache.xml");
-        CacheManager cacheManager = null;
-        if(null == xmlUrl) {
-        	cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build();
-            cacheManager.init();
-        }
-        else {
-        	 Configuration xmlConfig = new XmlConfiguration(xmlUrl);
-             cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
-        }
+		URL xmlUrl = getClass().getResource("/ehcache.xml");
+		CacheManager cacheManager = null;
+		if (null == xmlUrl) {
+			cacheManager = CacheManagerBuilder
+					.newCacheManagerBuilder()
+					.with(CacheManagerBuilder.persistence(new File(filePath, "ehcacheData")))
+					.withCache(cacheName,
+							CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Serializable.class,
+											ResourcePoolsBuilder.newResourcePoolsBuilder()
+													.heap(ConfigurationFactoryBean.getHeap(), MemoryUnit.MB)
+													.offheap(ConfigurationFactoryBean.getOffheap(), MemoryUnit.MB)
+													.disk(ConfigurationFactoryBean.getDisk(), MemoryUnit.MB, ConfigurationFactoryBean.isPersistent()))
+									.withExpiry(EhCacheExpiryUtil.instance()))
+					.build(true);
+		} else {
+			Configuration xmlConfig = new XmlConfiguration(xmlUrl);
+			cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
+			cacheManager.init();
+		}
+
 		return cacheManager;
 	}
 
@@ -33,6 +54,14 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 	@Override
 	public boolean isSingleton() {
 		return false;
+	}
+
+	public void setCacheName(String cacheName) {
+		this.cacheName = cacheName;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
 	}
 
 }

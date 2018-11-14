@@ -12,9 +12,9 @@ import org.ehcache.expiry.Expiry;
 @SuppressWarnings("deprecation")
 public class EhCacheExpiry implements Expiry<String, Serializable> {
 	
-	private Map<String, Duration> durationMap = new HashMap<>();
+	private static Map<String, Duration> durationMap = new HashMap<>();
 	
-	public void setExpiry(String key, int seconds) {
+	public static void setExpiry(String key, int seconds) {
 		Duration duration = Duration.of(seconds, TimeUnit.SECONDS);
 		durationMap.put(getKey(key), duration);
 	}
@@ -26,15 +26,15 @@ public class EhCacheExpiry implements Expiry<String, Serializable> {
 
 	@Override
 	public Duration getExpiryForAccess(String key, ValueSupplier<? extends Serializable> value) {
-		return null;
+		return durationMap.get(getKey(key));
 	}
 
 	@Override
 	public Duration getExpiryForUpdate(String key, ValueSupplier<? extends Serializable> oldValue, Serializable newValue) {
-		return null;
+		return durationMap.get(getKey(key));
 	}
 	
-	private String getKey(String key) {
+	private static String getKey(String key) {
 		return key;
 	}
 }
