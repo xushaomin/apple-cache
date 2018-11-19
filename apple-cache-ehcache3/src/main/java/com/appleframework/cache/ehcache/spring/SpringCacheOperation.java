@@ -35,14 +35,12 @@ public class SpringCacheOperation implements CacheOperation {
 		} else {
 			expiry = new SpringCacheExpiry();
 		}
-
 		CacheConfigurationBuilder<String, Serializable> configuration = CacheConfigurationBuilder
 				.newCacheConfigurationBuilder(String.class, Serializable.class,
 						ResourcePoolsBuilder.newResourcePoolsBuilder()
 								.heap(ConfigurationFactoryBean.getHeap(), MemoryUnit.MB)
 								.offheap(ConfigurationFactoryBean.getOffheap(), MemoryUnit.MB))
 				.withExpiry(expiry);
-
 		cache = ehcacheManager.getCache(name, String.class, Serializable.class);
 		if (null == cache) {
 			try {

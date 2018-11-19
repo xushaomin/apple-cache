@@ -17,7 +17,7 @@ import com.appleframework.cache.ehcache.EhCacheExpiryUtil;
 
 public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 
-	private String cacheName = "apple";
+	private String name = "apple_cache";
 	private String filePath = System.getProperty("user.home");
 
 	@SuppressWarnings("deprecation")
@@ -29,7 +29,7 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 			cacheManager = CacheManagerBuilder
 					.newCacheManagerBuilder()
 					.with(CacheManagerBuilder.persistence(new File(filePath, "ehcacheData")))
-					.withCache(cacheName,
+					.withCache(name,
 							CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Serializable.class,
 											ResourcePoolsBuilder.newResourcePoolsBuilder()
 													.heap(ConfigurationFactoryBean.getHeap(), MemoryUnit.MB)
@@ -56,8 +56,8 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 		return false;
 	}
 
-	public void setCacheName(String cacheName) {
-		this.cacheName = cacheName;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public void setFilePath(String filePath) {
