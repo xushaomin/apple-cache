@@ -77,6 +77,11 @@ public class HazelcastReplicatedMapCacheManager implements CacheManager {
 			throw new CacheException(e.getMessage());
 		}
 	}
+	
+	@Override
+	public void expire(String key, int timeout) throws CacheException {
+		
+	}
 
 	public void set(String key, Object obj) throws CacheException {
 		if (null != obj) {

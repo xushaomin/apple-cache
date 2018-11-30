@@ -119,6 +119,11 @@ public class J2RedissonMapCacheManager implements com.appleframework.cache.core.
 		}
 		return false;
 	}
+	
+	@Override
+	public void expire(String key, int timeout) throws CacheException {
+		
+	}
 
 	public void set(String key, Object value) throws CacheException {
 		if (null != value) {

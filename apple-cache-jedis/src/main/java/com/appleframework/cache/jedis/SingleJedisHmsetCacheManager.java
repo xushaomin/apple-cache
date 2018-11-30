@@ -190,6 +190,19 @@ public class SingleJedisHmsetCacheManager implements CacheManager {
 		return false;
 	}
 
+	@Override
+	public void expire(String key, int expireTime) throws CacheException {
+		Jedis jedis = jedisPool.getResource();
+		try {
+			byte[] byteKey = getKey(key);
+			jedis.expire(byteKey, expireTime);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
+			jedisPool.returnResource(jedis);
+		}
+	}
+	
 	public void set(String key, Object obj) throws CacheException {
 		Jedis jedis = jedisPool.getResource();
 		if (null != obj) {

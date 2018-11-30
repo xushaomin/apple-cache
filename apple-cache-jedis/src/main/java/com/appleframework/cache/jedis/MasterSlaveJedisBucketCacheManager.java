@@ -94,6 +94,19 @@ public class MasterSlaveJedisBucketCacheManager implements CacheManager {
 		}
 		return false;
 	}
+	
+	@Override
+	public void expire(String key, int expireTime) throws CacheException {
+		JedisPool jedisPool = poolFactory.getWritePool();
+		Jedis jedis = jedisPool.getResource();
+		try {
+			jedis.expire(getKey(key).getBytes(), expireTime);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
+			jedisPool.returnResource(jedis);
+		}
+	}
 
 	public void set(String key, Object obj) throws CacheException {
 		JedisPool jedisPool = poolFactory.getWritePool();

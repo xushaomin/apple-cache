@@ -128,6 +128,11 @@ public class J2RedissonBucketCacheManager implements com.appleframework.cache.co
 		return false;
 	}
 
+	@Override
+	public void expire(String key, int timeout) throws CacheException {
+		
+	}
+	
 	public void set(String key, Object value) throws CacheException {
 		if (null != value) {
 			try {

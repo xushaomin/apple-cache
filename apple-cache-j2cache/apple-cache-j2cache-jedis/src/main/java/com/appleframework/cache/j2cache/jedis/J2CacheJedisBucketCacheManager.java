@@ -159,6 +159,11 @@ public class J2CacheJedisBucketCacheManager implements com.appleframework.cache.
 		}
 		return false;
 	}
+	
+	@Override
+	public void expire(String key, int timeout) throws CacheException {
+		
+	}
 
 	public void set(String key, Object value) throws CacheException {
 		JedisPool jedisPool = poolFactory.getReadPool();

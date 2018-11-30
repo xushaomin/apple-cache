@@ -184,6 +184,16 @@ public class JedisSentinelHmsetCacheManager implements CacheManager {
 		}
 		return false;
 	}
+	
+	@Override
+	public void expire(String key, int timeout) throws CacheException {
+		Jedis jedis = this.getJedis();
+		try {
+			jedis.expire(getKey(key), timeout);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
 
 	public void set(String key, Object obj) throws CacheException {
 		Jedis jedis = this.getJedis();

@@ -68,6 +68,12 @@ public class CodisBucketCacheManager implements CacheManager {
 			jedis.expire(key.getBytes(), expireTime);
 		}
 	}
+	
+	public void expire(String key, int expireTime) throws CacheException {
+		try (Jedis jedis = codisResourcePool.getResource()) {
+			jedis.expire(key.getBytes(), expireTime);
+		}
+	}
 
 	@Override
 	public List<Object> getList(List<String> keyList) throws CacheException {

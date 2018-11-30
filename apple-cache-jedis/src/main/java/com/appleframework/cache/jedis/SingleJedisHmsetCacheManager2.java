@@ -78,7 +78,7 @@ public class SingleJedisHmsetCacheManager2 extends SingleJedisHmsetCacheManager 
 					T object = clazz.newInstance();
 					for (int i = 0; i < stringFields.length; i++) {
 						String boKey = stringFields[i];
-						Object boValue = (Object) SerializeUtility.unserialize(value.get(i));
+						Object boValue = (Object) SerializeUtility.unserialize(value.get(boKey.getBytes()));
 						if (null != boValue) {
 							try {
 								ReflectionUtility.invokeSetterMethod(object, boKey, boValue);
@@ -141,7 +141,7 @@ public class SingleJedisHmsetCacheManager2 extends SingleJedisHmsetCacheManager 
 					T object = clazz.newInstance();
 					for (int i = 0; i < stringFields.length; i++) {
 						String boKey = stringFields[i];
-						Object boValue = (Object) SerializeUtility.unserialize(value.get(i));
+						Object boValue = (Object) SerializeUtility.unserialize(value.get(boKey.getBytes()));
 						if (null != boValue) {
 							try {
 								ReflectionUtility.invokeSetterMethod(object, boKey, boValue);

@@ -78,6 +78,11 @@ public class HazelcastMultiMapCacheManager implements CacheManager {
 		}
 	}
 
+	@Override
+	public void expire(String key, int timeout) throws CacheException {
+		
+	}
+	
 	public void set(String key, Object obj) throws CacheException {
 		if (null != obj) {
 			try {

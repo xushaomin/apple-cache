@@ -100,6 +100,23 @@ public class SingleJedisHsetCacheManager implements CacheManager {
 		}
 		return false;
 	}
+	
+	@Override
+	public void expire(String key, int timeout) throws CacheException {
+		Jedis jedis = jedisPool.getResource();
+		try {
+			byte[] value = jedis.hget(name.getBytes(), key.getBytes());
+			if(null != value) {
+				CacheObject cache = (CacheObject)SerializeUtility.unserialize(value);
+				cache.setExpiredSecond(timeout);
+				jedis.hset(name.getBytes(), key.getBytes(), SerializeUtility.serialize(cache));
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
+			jedisPool.returnResource(jedis);
+		}
+	}
 
 	public void set(String key, Object obj) throws CacheException {
 		Jedis jedis = jedisPool.getResource();

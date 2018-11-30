@@ -96,6 +96,22 @@ public class JedisShardInfoHsetCacheManager implements CacheManager {
 		}
 		return false;
 	}
+	
+	@Override
+	public void expire(String key, int timeout) throws CacheException {
+		Jedis jedis = this.getJedis();
+		try {
+			byte[] value = jedis.hget(name.getBytes(), key.getBytes());
+			if(null != value) {
+				CacheObject cache = (CacheObject)SerializeUtility.unserialize(value);
+				cache.setExpiredSecond(timeout);
+				jedis.hset(name.getBytes(), key.getBytes(), SerializeUtility.serialize(cache));
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new CacheException(e.getMessage());
+		}
+	}
 
 	public void set(String key, Object obj) throws CacheException {
 		Jedis jedis = this.getJedis();

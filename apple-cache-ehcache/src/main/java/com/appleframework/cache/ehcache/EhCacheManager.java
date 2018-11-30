@@ -100,6 +100,17 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 			}
 		}
 	}
+	
+	public void expire(String key, int expireTime) throws CacheException {
+		try {
+			Element element = getEhCache().get(key);
+			element.setTimeToIdle(expireTime);
+			element.setTimeToLive(expireTime);
+			getEhCache().put(element);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
 
 	public void set(String key, Object value, int expireTime) throws CacheException {
 		if (null != value) {

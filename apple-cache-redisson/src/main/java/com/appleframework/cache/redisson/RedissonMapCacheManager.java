@@ -76,6 +76,11 @@ public class RedissonMapCacheManager implements CacheManager {
 			throw new CacheException(e.getMessage());
 		}
 	}
+	
+	@Override
+	public void expire(String key, int timeout) throws CacheException {
+		
+	}
 
 	public void set(String key, Object value) throws CacheException {
 		if (null != value) {

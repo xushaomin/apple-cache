@@ -216,6 +216,17 @@ public class CodisHmsetCacheManager implements CacheManager {
 			}
 		}
 	}
+	
+	public void expire(String key, int expireTime) throws CacheException {
+		try (Jedis jedis = codisResourcePool.getResource()) {
+			try {
+				byte[] byteKey = getKey(key);
+				jedis.expire(byteKey, expireTime);
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+			}
+		}
+	}
 
 	@Override
 	public List<Object> getList(List<String> keyList) throws CacheException {

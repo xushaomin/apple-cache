@@ -79,6 +79,16 @@ public class JedisShardInfoBucketCacheManager implements CacheManager {
 		return false;
 	}
 
+	@Override
+	public void expire(String key, int expireTime) throws CacheException {
+		Jedis jedis = this.getJedis();
+		try {
+			jedis.expire(getKey(key).getBytes(), expireTime);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
+	
 	public void set(String key, Object obj) throws CacheException {
 		Jedis jedis = this.getJedis();
 		if (null != obj) {

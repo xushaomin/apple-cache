@@ -33,6 +33,19 @@ public class CodisHsetCacheManager implements CacheManager {
 			jedis.del(name.getBytes());
 		}
 	}
+	
+	public void expire(String key, int expireTime) throws CacheException {
+		try (Jedis jedis = codisResourcePool.getResource()) {
+			byte[] value = jedis.hget(name.getBytes(), key.getBytes());
+			if (null != value) {
+				CacheObject cache = (CacheObject) SerializeUtility.unserialize(value);
+				if (null != cache) {
+					cache.setExpiredSecond(expireTime);
+					jedis.hset(name.getBytes(), key.getBytes(), SerializeUtility.serialize(cache));
+				}
+			}
+		}
+	}
 
 	public Object get(String key) throws CacheException {
 		try (Jedis jedis = codisResourcePool.getResource()) {

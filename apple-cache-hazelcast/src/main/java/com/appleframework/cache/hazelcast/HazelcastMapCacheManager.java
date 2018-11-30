@@ -93,6 +93,11 @@ public class HazelcastMapCacheManager implements CacheManager {
 	}
 
 	@Override
+	public void expire(String key, int timeout) throws CacheException {
+		
+	}
+
+	@Override
 	public List<Object> getList(List<String> keyList) throws CacheException {
 		return this.getList(keyList.toArray(new String[keyList.size()]));
 	}

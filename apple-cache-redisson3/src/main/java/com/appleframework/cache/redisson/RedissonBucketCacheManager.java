@@ -70,6 +70,11 @@ public class RedissonBucketCacheManager implements CacheManager {
 			throw new CacheException(e.getMessage());
 		}
 	}
+	
+	@Override
+	public void expire(String key, int timeout) throws CacheException {
+		// TODO Auto-generated method stub	
+	}
 
 	public void set(String key, Object value) throws CacheException {
 		if (null != value) {
