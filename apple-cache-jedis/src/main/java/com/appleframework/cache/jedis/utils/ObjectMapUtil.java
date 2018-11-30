@@ -5,9 +5,10 @@ import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Hex;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.appleframework.cache.core.utils.ReflectionUtility;
 
 public class ObjectMapUtil {
 
@@ -25,7 +26,7 @@ public class ObjectMapUtil {
 			String name = field.getName();
 			String value = map.get(name);
 			try {
-				if (value == null || "".equals(value))
+				if (value == null || "".equals(value) || "serialVersionUID".equals(value))
 					continue;
 				Class<?> typeClz = field.getType();
 				if (value != null) {
