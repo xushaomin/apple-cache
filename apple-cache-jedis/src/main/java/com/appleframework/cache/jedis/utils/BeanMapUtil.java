@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.BitSet;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,16 +61,25 @@ public class BeanMapUtil {
 		return null;
 	}
 	
-	private static String exchage(Object obj) {
-		if (null != obj) {
-			if(obj instanceof Date) {
-				return dateFormat.format(obj);
-			}
-			else {
-				return String.valueOf(obj);
+	private static String exchage(Object value) {
+		if (value instanceof Date) {
+			return dateFormat.format(value);
+		} else if (value instanceof byte[]) {
+			return new String((byte[]) value);
+		} else if (value instanceof BitSet) {
+			BitSet bitSet = (BitSet) value;
+			if (bitSet.size() > 0) {
+				boolean bi = bitSet.get(0);
+				if (bi) {
+					return "1";
+				} else {
+					return "0";
+				}
+			} else {
+				return "0";
 			}
 		} else {
-			return "";
+			return String.valueOf(value);
 		}
 	}
 	
