@@ -13,6 +13,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Hex;
+
 /**
  * bean和map相互转换 ClassName: BeanMapUtil <br/>
  * 
@@ -65,7 +67,7 @@ public class BeanMapUtil {
 		if (value instanceof Date) {
 			return dateFormat.format(value);
 		} else if (value instanceof byte[]) {
-			return new String((byte[]) value);
+			return Hex.encodeHexString((byte[]) value);
 		} else if (value instanceof BitSet) {
 			BitSet bitSet = (BitSet) value;
 			if (bitSet.size() > 0) {
