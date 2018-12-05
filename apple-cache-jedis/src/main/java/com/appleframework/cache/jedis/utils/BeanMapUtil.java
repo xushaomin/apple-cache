@@ -23,6 +23,9 @@ import org.apache.commons.codec.binary.Hex;
 public class BeanMapUtil {
 
 	private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	
+	private static String ZERO = "0";
+	private static String ONE = "1";
 
 	/**
 	 * 将一个 JavaBean 对象转化为一个 Map
@@ -42,7 +45,7 @@ public class BeanMapUtil {
 			for (int i = 0; i < propertyDescriptors.length; i++) {
 				PropertyDescriptor descriptor = propertyDescriptors[i];
 				String propertyName = descriptor.getName();
-				if (!propertyName.equals("class")) {
+				if (!"class".equals(propertyName) && !"serialVersionUID".equals(propertyName)) {
 					Method readMethod = descriptor.getReadMethod();
 					try {
 						Object result = readMethod.invoke(bean, new Object[0]);
@@ -73,12 +76,12 @@ public class BeanMapUtil {
 			if (bitSet.size() > 0) {
 				boolean bi = bitSet.get(0);
 				if (bi) {
-					return "1";
+					return ONE;
 				} else {
-					return "0";
+					return ZERO;
 				}
 			} else {
-				return "0";
+				return ZERO;
 			}
 		} else {
 			return String.valueOf(value);
@@ -94,7 +97,7 @@ public class BeanMapUtil {
 			for (int i = 0; i < propertyDescriptors.length; i++) {
 				PropertyDescriptor descriptor = propertyDescriptors[i];
 				String propertyName = descriptor.getName();
-				if (!propertyName.equals("class")) {
+				if (!"class".equals(propertyName) && !"serialVersionUID".equals(propertyName)) {
 					Method readMethod = descriptor.getReadMethod();
 					try {
 						Object result = readMethod.invoke(bean, new Object[0]);
