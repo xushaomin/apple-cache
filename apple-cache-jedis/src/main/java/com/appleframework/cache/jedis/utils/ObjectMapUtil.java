@@ -53,7 +53,15 @@ public class ObjectMapUtil {
 						ReflectionUtility.invokeSetterMethod(object, name, Short.valueOf(value));
 					} else if (typeClz == Boolean.class || typeClz == boolean.class) {
 						// field.set(object, Boolean.valueOf(value));
-						ReflectionUtility.invokeSetterMethod(object, name, Boolean.valueOf(value));
+						if("1".equals(value)) {
+							ReflectionUtility.invokeSetterMethod(object, name, Boolean.TRUE);
+						}
+						else if("0".equals(value)) {
+							ReflectionUtility.invokeSetterMethod(object, name, Boolean.FALSE);
+						}
+						else {
+							ReflectionUtility.invokeSetterMethod(object, name, Boolean.valueOf(value));
+						}
 					} else if (typeClz == byte[].class) {
 						// field.set(object, Hex.decodeHex(value.toCharArray()));
 						ReflectionUtility.invokeSetterMethod(object, name, Hex.decodeHex(value.toCharArray()));
