@@ -26,6 +26,10 @@ public class ClassObjectUtil {
 					return Float.valueOf(value);
 				} else if (typeClz == Short.class || typeClz == short.class) {
 					return Short.valueOf(value);
+				} else if (typeClz == Character.class || typeClz == char.class) {
+					return Character.valueOf(value.charAt(0));
+				} else if (typeClz == Byte.class || typeClz == byte.class) {
+					return Byte.valueOf(value);
 				} else if (typeClz == Boolean.class || typeClz == boolean.class) {
 					if("1".equals(value)) {
 						return Boolean.TRUE;
@@ -47,6 +51,6 @@ public class ClassObjectUtil {
 		} else {
 			return null;
 		}
-
 	}
+	
 }
