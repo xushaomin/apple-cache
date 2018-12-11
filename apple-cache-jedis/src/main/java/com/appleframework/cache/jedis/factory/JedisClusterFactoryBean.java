@@ -16,7 +16,7 @@ public class JedisClusterFactoryBean implements FactoryBean<JedisClusterFactory>
 
 	private static Logger logger = Logger.getLogger(JedisClusterFactoryBean.class);
 
-	private final JedisClusterFactory factory = new JedisClusterFactory();
+	private static JedisClusterFactory factory = null;
 
 	private String serverNodes;
 
@@ -24,11 +24,14 @@ public class JedisClusterFactoryBean implements FactoryBean<JedisClusterFactory>
 
 	@Override
 	public JedisClusterFactory getObject() throws Exception {
-		logger.info("begin init redis...");
-		factory.setRedisServers(getNodeList());
-		factory.setPoolConfig(poolConfig);
-		factory.init();
-		test();
+		if(null == factory) {
+			logger.info("begin init redis...");
+			factory = new JedisClusterFactory();
+			factory.setRedisServers(getNodeList());
+			factory.setPoolConfig(poolConfig);
+			factory.init();
+			test();
+		}
 		return factory;
 	}
 
