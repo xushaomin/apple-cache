@@ -36,7 +36,7 @@ public class SpringCacheManager extends BaseSpringCacheManager {
 				cacheMap.put(name, cache);
 			}
 			else {
-				cache = new com.appleframework.cache.jedis.spring.SpringCache(poolFactory, name, expire.intValue());
+				cache = new com.appleframework.cache.jedis.spring.master.SpringCache(poolFactory, name, expire.intValue());
 				cacheMap.put(name, cache);
 			}
 		}
