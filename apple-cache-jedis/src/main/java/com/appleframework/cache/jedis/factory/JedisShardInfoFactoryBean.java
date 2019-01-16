@@ -20,11 +20,13 @@ public class JedisShardInfoFactoryBean implements FactoryBean<JedisShardInfoFact
     private int timeout = Protocol.DEFAULT_TIMEOUT;
     private String password;
     private int database = 0;
+    
+    private boolean singleton = true;
 
 	@Override
 	public JedisShardInfoFactory getObject() throws Exception {
 		logger.info("begin init redis...");
-		factory = new JedisShardInfoFactory();
+		JedisShardInfoFactory factory = new JedisShardInfoFactory();
 		factory.setPoolConfig(poolConfig);
 		factory.setHostName(host);
 		factory.setDatabase(database);
@@ -51,7 +53,7 @@ public class JedisShardInfoFactoryBean implements FactoryBean<JedisShardInfoFact
 
 	@Override
 	public boolean isSingleton() {
-		return true;
+		return singleton;
 	}
 
 	public void destroy() {
@@ -81,6 +83,10 @@ public class JedisShardInfoFactoryBean implements FactoryBean<JedisShardInfoFact
 
 	public void setDatabase(int database) {
 		this.database = database;
+	}
+	
+	public void setSingleton(Boolean singleton) {
+		this.singleton = singleton;
 	}
 
 }

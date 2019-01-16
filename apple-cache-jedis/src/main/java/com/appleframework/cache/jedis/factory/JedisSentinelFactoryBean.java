@@ -22,6 +22,8 @@ public class JedisSentinelFactoryBean implements FactoryBean<JedisSentinelFactor
 	private String serverNodes;
 	
 	private JedisPoolConfig poolConfig;
+	
+	private boolean singleton = true;
 
 	@Override
 	public JedisSentinelFactory getObject() throws Exception {
@@ -49,7 +51,7 @@ public class JedisSentinelFactoryBean implements FactoryBean<JedisSentinelFactor
 
 	@Override
 	public boolean isSingleton() {
-		return true;
+		return singleton;
 	}
 	
 	public List<RedisNode> getNodeList() {
@@ -80,6 +82,10 @@ public class JedisSentinelFactoryBean implements FactoryBean<JedisSentinelFactor
 
 	public void setPoolConfig(JedisPoolConfig poolConfig) {
 		this.poolConfig = poolConfig;
+	}
+	
+	public void setSingleton(Boolean singleton) {
+		this.singleton = singleton;
 	}
 	
 }

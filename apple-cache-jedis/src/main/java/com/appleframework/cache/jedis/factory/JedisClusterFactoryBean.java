@@ -21,6 +21,8 @@ public class JedisClusterFactoryBean implements FactoryBean<JedisClusterFactory>
 	private String serverNodes;
 
 	private JedisPoolConfig poolConfig;
+	
+	private boolean singleton = true;
 
 	@Override
 	public JedisClusterFactory getObject() throws Exception {
@@ -30,6 +32,7 @@ public class JedisClusterFactoryBean implements FactoryBean<JedisClusterFactory>
 		factory.setPoolConfig(poolConfig);
 		factory.init();
 		test();
+		logger.info("test the redis...");
 		return factory;
 	}
 
@@ -46,7 +49,7 @@ public class JedisClusterFactoryBean implements FactoryBean<JedisClusterFactory>
 
 	@Override
 	public boolean isSingleton() {
-		return true;
+		return singleton;
 	}
 
 	public List<RedisNode> getNodeList() {
@@ -74,4 +77,9 @@ public class JedisClusterFactoryBean implements FactoryBean<JedisClusterFactory>
 	public void setServerNodes(String serverNodes) {
 		this.serverNodes = serverNodes;
 	}
+
+	public void setSingleton(Boolean singleton) {
+		this.singleton = singleton;
+	}
+	
 }
