@@ -24,7 +24,7 @@ public class JedisLockFactoryBean implements FactoryBean<Lock> {
 
 	@Override
 	public boolean isSingleton() {
-		return false;
+		return true;
 	}
 
 	public void setPoolFactory(PoolFactory poolFactory) {

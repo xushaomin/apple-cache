@@ -16,7 +16,7 @@ public class JedisClusterFactoryBean implements FactoryBean<JedisClusterFactory>
 
 	private static Logger logger = Logger.getLogger(JedisClusterFactoryBean.class);
 
-	private static JedisClusterFactory factory = null;
+	private JedisClusterFactory factory = null;
 
 	private String serverNodes;
 
@@ -24,14 +24,12 @@ public class JedisClusterFactoryBean implements FactoryBean<JedisClusterFactory>
 
 	@Override
 	public JedisClusterFactory getObject() throws Exception {
-		if(null == factory) {
-			logger.info("begin init redis...");
-			factory = new JedisClusterFactory();
-			factory.setRedisServers(getNodeList());
-			factory.setPoolConfig(poolConfig);
-			factory.init();
-			test();
-		}
+		logger.info("begin init redis...");
+		factory = new JedisClusterFactory();
+		factory.setRedisServers(getNodeList());
+		factory.setPoolConfig(poolConfig);
+		factory.init();
+		test();
 		return factory;
 	}
 
@@ -48,7 +46,7 @@ public class JedisClusterFactoryBean implements FactoryBean<JedisClusterFactory>
 
 	@Override
 	public boolean isSingleton() {
-		return false;
+		return true;
 	}
 
 	public List<RedisNode> getNodeList() {

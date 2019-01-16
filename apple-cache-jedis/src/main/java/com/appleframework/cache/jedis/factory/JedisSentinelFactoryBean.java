@@ -16,7 +16,7 @@ public class JedisSentinelFactoryBean implements FactoryBean<JedisSentinelFactor
 
 	private static Logger logger = Logger.getLogger(JedisSentinelFactoryBean.class);
 
-	private static JedisSentinelFactory factory = null;
+	private JedisSentinelFactory factory = null;
 	
 	private String sentinelMaster = "";
 	private String serverNodes;
@@ -25,15 +25,13 @@ public class JedisSentinelFactoryBean implements FactoryBean<JedisSentinelFactor
 
 	@Override
 	public JedisSentinelFactory getObject() throws Exception {
-		if (null == factory) {
-			logger.info("begin init redis...");
-			factory = new JedisSentinelFactory();
-			factory.setRedisServers(getNodeList());
-			factory.setSentinelMaster(sentinelMaster);
-			factory.setPoolConfig(poolConfig);
-			factory.init();
-			test();
-		}
+		logger.info("begin init redis...");
+		factory = new JedisSentinelFactory();
+		factory.setRedisServers(getNodeList());
+		factory.setSentinelMaster(sentinelMaster);
+		factory.setPoolConfig(poolConfig);
+		factory.init();
+		test();
 		return factory;
 	}
 	
@@ -51,7 +49,7 @@ public class JedisSentinelFactoryBean implements FactoryBean<JedisSentinelFactor
 
 	@Override
 	public boolean isSingleton() {
-		return false;
+		return true;
 	}
 	
 	public List<RedisNode> getNodeList() {

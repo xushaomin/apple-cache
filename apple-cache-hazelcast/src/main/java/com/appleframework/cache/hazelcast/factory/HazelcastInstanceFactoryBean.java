@@ -48,7 +48,7 @@ public class HazelcastInstanceFactoryBean implements FactoryBean<HazelcastInstan
 
 	@Override
 	public boolean isSingleton() {
-		return false;
+		return true;
 	}
 
 	public void setMancenterUrl(String mancenterUrl) {

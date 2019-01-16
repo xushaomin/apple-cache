@@ -11,7 +11,7 @@ public class JedisShardInfoFactoryBean implements FactoryBean<JedisShardInfoFact
 
 	private static Logger logger = Logger.getLogger(JedisShardInfoFactoryBean.class);
 
-	private static JedisShardInfoFactory factory = null;
+	private JedisShardInfoFactory factory = null;
 
 	private JedisPoolConfig poolConfig;
 
@@ -23,18 +23,16 @@ public class JedisShardInfoFactoryBean implements FactoryBean<JedisShardInfoFact
 
 	@Override
 	public JedisShardInfoFactory getObject() throws Exception {
-		if(null == factory) {
-			logger.info("begin init redis...");
-			factory = new JedisShardInfoFactory();
-			factory.setPoolConfig(poolConfig);
-			factory.setHostName(host);
-			factory.setDatabase(database);
-			factory.setPassword(password);
-			factory.setPort(port);
-			factory.setTimeout(timeout);
-			factory.init();
-			test();
-		}
+		logger.info("begin init redis...");
+		factory = new JedisShardInfoFactory();
+		factory.setPoolConfig(poolConfig);
+		factory.setHostName(host);
+		factory.setDatabase(database);
+		factory.setPassword(password);
+		factory.setPort(port);
+		factory.setTimeout(timeout);
+		factory.init();
+		test();
 		return factory;
 	}
 
@@ -53,7 +51,7 @@ public class JedisShardInfoFactoryBean implements FactoryBean<JedisShardInfoFact
 
 	@Override
 	public boolean isSingleton() {
-		return false;
+		return true;
 	}
 
 	public void destroy() {
