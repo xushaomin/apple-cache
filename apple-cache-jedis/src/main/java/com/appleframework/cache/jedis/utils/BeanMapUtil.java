@@ -6,8 +6,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.BitSet;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,8 +19,6 @@ import org.apache.commons.codec.binary.Hex;
  * @since JDK 1.7
  */
 public class BeanMapUtil {
-
-	private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	private static String ZERO = "0";
 	private static String ONE = "1";
@@ -68,7 +64,7 @@ public class BeanMapUtil {
 	
 	private static String exchage(Object value) {
 		if (value instanceof Date) {
-			return dateFormat.format(value);
+			return DateFormatUtil.formatDate((Date) value);
 		} else if (value instanceof byte[]) {
 			return Hex.encodeHexString((byte[]) value);
 		} else if (value instanceof BitSet) {
