@@ -1,0 +1,112 @@
+package com.appleframework.cache.jedis.spring.shard;
+
+import org.apache.log4j.Logger;
+
+import com.appleframework.cache.core.CacheObject;
+import com.appleframework.cache.core.CacheObjectImpl;
+import com.appleframework.cache.core.config.SpringCacheConfig;
+import com.appleframework.cache.core.spring.CacheOperation;
+import com.appleframework.cache.core.utils.SerializeUtility;
+import com.appleframework.cache.jedis.factory.JedisShardInfoFactory;
+
+import redis.clients.jedis.Jedis;
+
+public class SpringCacheOperationHset implements CacheOperation {
+
+	private static Logger logger = Logger.getLogger(SpringCacheOperationHset.class);
+
+	private String name;
+	private int expireTime = 0;
+	private JedisShardInfoFactory connectionFactory;
+
+	public SpringCacheOperationHset(String name, int expireTime, JedisShardInfoFactory connectionFactory) {
+		this.name = name;
+		this.expireTime = expireTime;
+		this.connectionFactory = connectionFactory;
+	}
+	
+	private byte[] getNameKey() {
+		return (SpringCacheConfig.getCacheKeyPrefix() + name).getBytes();
+	}
+	
+	public Object get(String key) {
+		Object object = null;
+		Jedis jedis = connectionFactory.getJedisConnection();
+		try {
+			byte[] cacheValue = jedis.hget(getNameKey(), key.getBytes());
+			if (null != cacheValue) {
+				CacheObject cache = (CacheObject) SerializeUtility.unserialize(cacheValue);
+				if (null != cache) {
+					if (cache.isExpired()) {
+						this.resetCacheObject(key, cache);
+					} else {
+						object = cache.getObject();
+					}
+				}
+			}
+		} catch (Exception e) {
+			logger.warn("Cache Error : ", e);
+		}
+		return object;
+	}
+	
+	private void resetCacheObject(String key, CacheObject cache) {
+		Jedis jedis = connectionFactory.getJedisConnection();
+		try {
+			cache.setExpiredTime(getExpiredTime());
+			byte[] byteKey = getNameKey();
+			byte[] byteValue = SerializeUtility.serialize(cache);
+			jedis.hset(byteKey, key.getBytes(), byteValue);
+			if(expireTime > 0)
+				jedis.expire(byteKey, expireTime * 2);
+		} catch (Exception e) {
+			logger.warn("Cache Error : ", e);
+		}
+	}
+	
+	public void put(String key, Object value) {
+		if (value == null)
+			this.delete(key);
+		Jedis jedis = connectionFactory.getJedisConnection();
+		try {
+			Object cache = new CacheObjectImpl(value, getExpiredTime());
+			byte[] byteKey = getNameKey();
+			byte[] byteValue = SerializeUtility.serialize(cache);
+			jedis.hset(byteKey, key.getBytes(), byteValue);
+			if(expireTime > 0)
+				jedis.expire(byteKey, expireTime * 2);
+		} catch (Exception e) {
+			logger.warn("Cache Error : ", e);
+		}
+	}
+
+	public void clear() {
+		Jedis jedis = connectionFactory.getJedisConnection();
+		try {
+			jedis.del(getNameKey());
+		} catch (Exception e) {
+			logger.warn("Cache Error : ", e);
+		}
+	}
+
+	public void delete(String key) {
+		Jedis jedis = connectionFactory.getJedisConnection();
+		try {
+			jedis.hdel(getNameKey(), key.getBytes());
+		} catch (Exception e) {
+			logger.warn("Cache Error : ", e);
+		}
+	}
+
+	public int getExpireTime() {
+		return expireTime;
+	}
+	
+	private long getExpiredTime() {
+		long lastTime = 2592000000L;
+		if (expireTime > 0) {
+			lastTime = expireTime * 1000;
+		}
+		return System.currentTimeMillis() + lastTime;
+	}
+}
