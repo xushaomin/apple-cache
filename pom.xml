@@ -144,6 +144,7 @@
 		<module>apple-cache-core</module>
 		<module>apple-cache-config</module>
 		<module>apple-cache-jedis</module>
+		<module>apple-cache-jedis3</module>
 		<module>apple-cache-memcache</module>
     	<module>apple-cache-hazelcast</module>
     	<module>apple-cache-codis</module>
