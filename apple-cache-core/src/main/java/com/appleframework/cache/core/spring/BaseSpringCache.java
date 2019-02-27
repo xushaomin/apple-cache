@@ -68,8 +68,14 @@ public abstract class BaseSpringCache implements Cache {
 	// 通过key获取缓存值，可以使用valueLoader.call()来调使用@Cacheable注解的方法。
 	// 当@Cacheable注解的sync属性配置为true时使用此方法。因此方法内需要保证回源到数据库的同步性。
 	// 避免在缓存失效时大量请求回源到数据库
+	@SuppressWarnings("unchecked")
 	public <T> T get(Object key, Callable<T> valueLoader) {
-		return null;
+		if(!SpringCacheConfig.isCacheEnable()) {
+			return null;
+		}
+		Object cacheValue = this.cacheOperation.get(key.toString());
+		Object value = (cacheValue != null ? cacheValue : null);
+		return (T) value;
 	}
 
 	// 通过key获取缓存值，返回的是实际值，即方法的返回值类型
