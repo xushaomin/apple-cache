@@ -10,7 +10,7 @@ import com.appleframework.cache.jedis.utils.DateUtil;
 public class ClassObjectUtil {
 
 	public static Object getObject(Class<?> typeClz, String value) throws RuntimeException {
-		if (value != null && StringUtils.isNotEmpty(value)) {
+		if (StringUtils.isNotEmpty(value)) {
 			try {
 				if (typeClz == String.class) {
 					return value;
