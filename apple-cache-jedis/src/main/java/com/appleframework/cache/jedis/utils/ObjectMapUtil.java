@@ -24,7 +24,7 @@ public class ObjectMapUtil {
 				continue;
 			}
 			Class<?> typeClz = field.getType();
-			if (StringUtils.isNotEmpty(value)) {
+			if (!StringUtils.isBlank(value)) {
 				Object valueObject = ClassObjectUtil.getObject(typeClz, value);
 				ReflectionUtility.invokeSetterMethod(object, name, valueObject);
 			}
