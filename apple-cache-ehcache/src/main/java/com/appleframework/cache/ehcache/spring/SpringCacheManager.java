@@ -31,5 +31,9 @@ public class SpringCacheManager extends BaseSpringCacheManager {
 	public void setEhcacheManager(CacheManager ehcacheManager) {
 		this.ehcacheManager = ehcacheManager;
 	}
+	
+	public void destory() {
+		ehcacheManager.shutdown();
+	}
 
 }
