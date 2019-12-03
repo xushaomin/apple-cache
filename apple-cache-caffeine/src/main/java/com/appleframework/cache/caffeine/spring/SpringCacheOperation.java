@@ -66,7 +66,6 @@ public class SpringCacheOperation implements CacheOperation {
 	private void resetCacheObject(String key, CacheObject cache) {
 		try {
 			String nkey = getKey(key);
-			// cache.setExpiredSecond(expire);
 			cacheManager.remove(nkey);
 		} catch (Exception e) {
 			logger.warn("cache error", e);
@@ -80,7 +79,7 @@ public class SpringCacheOperation implements CacheOperation {
 		try {
 			if (SpringCacheConfig.isCacheObject()) {
 				CacheObject object = CacheObjectImpl.create(value, expire);
-				cacheManager.set(nkey, object);
+				cacheManager.set(nkey, object, expire * 2);
 			} else {
 				if (expire > 0) {
 					cacheManager.set(nkey, (Serializable) value, expire);

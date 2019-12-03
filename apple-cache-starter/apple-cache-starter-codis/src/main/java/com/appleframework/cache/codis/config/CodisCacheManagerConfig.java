@@ -1,7 +1,5 @@
 package com.appleframework.cache.codis.config;
 
-import javax.annotation.Resource;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,12 +12,9 @@ import com.appleframework.cache.codis.CodisResourcePool;
 @Configuration
 public class CodisCacheManagerConfig {
 
-	@Resource
-	private CodisResourcePool codisResourcePool;
-
 	@Bean
 	@ConditionalOnMissingBean(CodisBucketCacheManager.class)
-	public CodisBucketCacheManager codisBucketCacheManagerFactory() {
+	public CodisBucketCacheManager codisBucketCacheManagerFactory(CodisResourcePool codisResourcePool) {
 		CodisBucketCacheManager cacheManager = new CodisBucketCacheManager();
 		cacheManager.setCodisResourcePool(codisResourcePool);
 		return cacheManager;
@@ -27,7 +22,7 @@ public class CodisCacheManagerConfig {
 
 	@Bean
 	@ConditionalOnMissingBean(CodisHmsetCacheManager.class)
-	public CodisHmsetCacheManager codisHmsetCacheManagerFactory() {
+	public CodisHmsetCacheManager codisHmsetCacheManagerFactory(CodisResourcePool codisResourcePool) {
 		CodisHmsetCacheManager cacheManager = new CodisHmsetCacheManager();
 		cacheManager.setCodisResourcePool(codisResourcePool);
 		return cacheManager;
@@ -35,7 +30,7 @@ public class CodisCacheManagerConfig {
 
 	@Bean
 	@ConditionalOnMissingBean(CodisHsetCacheManager.class)
-	public CodisHsetCacheManager codisHsetCacheManagerFactory() {
+	public CodisHsetCacheManager codisHsetCacheManagerFactory(CodisResourcePool codisResourcePool) {
 		CodisHsetCacheManager cacheManager = new CodisHsetCacheManager();
 		cacheManager.setCodisResourcePool(codisResourcePool);
 		return cacheManager;
