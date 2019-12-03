@@ -7,9 +7,9 @@ import org.apache.log4j.Logger;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import com.appleframework.cache.core.config.SpringCacheConfig;
-import com.appleframework.cache.core.spring.CacheOperation;
+import com.appleframework.cache.core.spring.BaseCacheOperation;
 
-public class SpringCacheOperationBucket implements CacheOperation {
+public class SpringCacheOperationBucket implements BaseCacheOperation {
 
 	private static Logger logger = Logger.getLogger(SpringCacheOperationBucket.class);
 
