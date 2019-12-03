@@ -7,10 +7,10 @@ import org.apache.log4j.Logger;
 import com.appleframework.cache.core.CacheObject;
 import com.appleframework.cache.core.CacheObjectImpl;
 import com.appleframework.cache.core.config.SpringCacheConfig;
-import com.appleframework.cache.core.spring.CacheOperation;
+import com.appleframework.cache.core.spring.BaseCacheOperation;
 import com.hazelcast.core.HazelcastInstance;
 
-public class SpringCacheOperation implements CacheOperation {
+public class SpringCacheOperation implements BaseCacheOperation {
 
 	private static Logger logger = Logger.getLogger(SpringCacheOperation.class);
 

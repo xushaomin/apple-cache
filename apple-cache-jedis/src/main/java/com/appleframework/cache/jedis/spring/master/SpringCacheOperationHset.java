@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import com.appleframework.cache.core.CacheObject;
 import com.appleframework.cache.core.CacheObjectImpl;
 import com.appleframework.cache.core.config.SpringCacheConfig;
-import com.appleframework.cache.core.spring.CacheOperation;
+import com.appleframework.cache.core.spring.BaseCacheOperation;
 import com.appleframework.cache.core.utils.SerializeUtility;
 import com.appleframework.cache.jedis.factory.PoolFactory;
 
@@ -13,7 +13,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 @SuppressWarnings("deprecation")
-public class SpringCacheOperationHset implements CacheOperation {
+public class SpringCacheOperationHset implements BaseCacheOperation {
 
 	private static Logger logger = Logger.getLogger(SpringCacheOperationHset.class);
 

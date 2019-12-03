@@ -9,9 +9,9 @@ import org.redisson.api.RedissonClient;
 import com.appleframework.cache.core.CacheObject;
 import com.appleframework.cache.core.CacheObjectImpl;
 import com.appleframework.cache.core.config.SpringCacheConfig;
-import com.appleframework.cache.core.spring.CacheOperation;
+import com.appleframework.cache.core.spring.BaseCacheOperation;
 
-public class SpringCacheOperation implements CacheOperation {
+public class SpringCacheOperation implements BaseCacheOperation {
 
 	private static Logger logger = Logger.getLogger(SpringCacheOperation.class);
 

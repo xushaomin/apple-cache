@@ -9,14 +9,14 @@ import org.redisson.api.listener.MessageListener;
 
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.Command.CommandType;
-import com.appleframework.cache.core.spring.CacheOperation;
+import com.appleframework.cache.core.spring.BaseCacheOperation;
 import com.appleframework.cache.j2cache.redisson.utils.Contants;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
-public class SpringCacheOperation implements CacheOperation {
+public class SpringCacheOperation implements BaseCacheOperation {
 
 	private static Logger logger = Logger.getLogger(SpringCacheOperation.class);
 

@@ -6,11 +6,11 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
 
 import com.appleframework.cache.core.config.SpringCacheConfig;
-import com.appleframework.cache.core.spring.CacheOperation;
+import com.appleframework.cache.core.spring.BaseCacheOperation;
 
 public abstract class BaseSpringCache implements Cache {
 	
-	protected CacheOperation cacheOperation;
+	protected BaseCacheOperation cacheOperation;
 
 	protected String name;
 
@@ -53,7 +53,7 @@ public abstract class BaseSpringCache implements Cache {
 	// 获取实际使用的缓存，如：RedisTemplate、com.github.benmanes.caffeine.cache.Cache<Object, Object>。
 	// 暂时没发现实际用处，可能只是提供获取原生缓存的bean，以便需要扩展一些缓存操作或统计之类的东西
 	@Override
-	public CacheOperation getNativeCache() {
+	public BaseCacheOperation getNativeCache() {
 		return this.cacheOperation;
 	}
 

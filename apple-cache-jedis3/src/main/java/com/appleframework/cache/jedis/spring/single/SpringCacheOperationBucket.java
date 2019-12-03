@@ -5,14 +5,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.appleframework.cache.core.config.SpringCacheConfig;
-import com.appleframework.cache.core.spring.CacheOperation;
+import com.appleframework.cache.core.spring.BaseCacheOperation;
 import com.appleframework.cache.core.utils.SerializeUtility;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
 
-public class SpringCacheOperationBucket implements CacheOperation {
+public class SpringCacheOperationBucket implements BaseCacheOperation {
 
 	private static Logger logger = Logger.getLogger(SpringCacheOperationBucket.class);
 

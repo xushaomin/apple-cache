@@ -1,6 +1,6 @@
 package com.appleframework.cache.core.spring;
 
-public interface CacheOperation {	
+public interface BaseCacheOperation {	
 
 	public Object get(String key);
 
