@@ -50,5 +50,6 @@
 
 	<modules>
 		<module>apple-cache-starter-ehcache3</module>
+		<module>apple-cache-starter-codis</module>
 	</modules>
 </project>

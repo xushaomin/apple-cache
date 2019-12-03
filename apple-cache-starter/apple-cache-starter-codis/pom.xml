@@ -5,39 +5,22 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>apple-cache</artifactId>
 		<groupId>com.appleframework.cache</groupId>
+		<artifactId>apple-cache-starter</artifactId>
 		<version>0.3.8.RELEASE</version>
 	</parent>
-	<artifactId>apple-cache-codis</artifactId>
-	<name>apple-cache-codis</name>
-	<url>http://mvnrepo.appleframework.com</url>
-
+	<artifactId>apple-cache-starter-codis</artifactId>
+	<name>apple-cache-starter-codis</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 	<dependencies>
-
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-		</dependency>
-
 		<dependency>
 			<groupId>com.appleframework.cache</groupId>
-			<artifactId>apple-cache-core</artifactId>
+			<artifactId>apple-cache-codis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>io.codis.jodis</groupId>
 			<artifactId>jodis</artifactId>
@@ -49,21 +32,15 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
 		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-autoconfigure</artifactId>
+			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-		</dependency>
-
 	</dependencies>
 </project>

@@ -5,7 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager;
@@ -16,10 +19,12 @@ import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Response;
 
 @SuppressWarnings("unchecked")
+@Component
 public class CodisBucketCacheManager implements CacheManager {
 
 	private static Logger logger = Logger.getLogger(CodisBucketCacheManager.class);
 	
+	@Resource
 	private CodisResourcePool codisResourcePool;
 	
 	public CodisResourcePool getCodisResourcePool() {
