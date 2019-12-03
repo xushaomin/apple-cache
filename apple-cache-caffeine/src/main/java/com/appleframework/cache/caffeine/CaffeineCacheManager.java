@@ -34,7 +34,6 @@ public class CaffeineCacheManager implements CacheManager {
             public Serializable load(String key) throws Exception {
                 return null;
             }
-            // 重写这个方法将oldValue值返回回去，进而刷新缓存
             @Override
             public Serializable reload(String key, Serializable oldValue) throws Exception {
                 return null;
