@@ -20,7 +20,6 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 	private String name = "apple_cache";
 	private String filePath = System.getProperty("user.home");
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public CacheManager getObject() throws Exception {
 		URL xmlUrl = getClass().getResource("/ehcache.xml");

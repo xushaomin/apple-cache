@@ -27,7 +27,6 @@ public class SpringCacheOperation implements CacheOperation {
 		return cache;
 	}
 
-	@SuppressWarnings("deprecation")
 	private void init(CacheManager ehcacheManager) {
 		SpringCacheExpiry expiry = null;
 		if (expire > 0 && !SpringCacheConfig.isCacheObject()) {

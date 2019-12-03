@@ -28,7 +28,7 @@ public class ConfigurationFactoryBean {
 		return disk;
 	}
 
-	public static void setDisk(int disk) {
+	public void setDisk(int disk) {
 		ConfigurationFactoryBean.disk = disk;
 	}
 
@@ -36,7 +36,7 @@ public class ConfigurationFactoryBean {
 		return persistent;
 	}
 
-	public static void setPersistent(boolean persistent) {
+	public void setPersistent(boolean persistent) {
 		ConfigurationFactoryBean.persistent = persistent;
 	}
 
@@ -44,7 +44,7 @@ public class ConfigurationFactoryBean {
 		return name;
 	}
 
-	public static void setName(String name) {
+	public void setName(String name) {
 		ConfigurationFactoryBean.name = name;
 	}
 

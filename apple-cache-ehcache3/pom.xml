@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.appleframework.cache</groupId>
 		<artifactId>apple-cache</artifactId>
-		<version>0.3.7.RELEASE</version>
+		<version>0.3.8.RELEASE</version>
 	</parent>
 	<artifactId>apple-cache-ehcache3</artifactId>
 	<name>apple-cache-ehcache3</name>
@@ -44,8 +44,8 @@
 		<dependency>
       		<groupId>org.ehcache</groupId>
       		<artifactId>ehcache</artifactId>
-      		<version>3.6.3</version>
+      		<version>3.8.1</version>
       	</dependency>
-      	
+      	      	
 	</dependencies>
 </project>

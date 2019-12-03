@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>com.appleframework.cache</groupId>
 	<artifactId>apple-cache</artifactId>
-	<version>0.3.7.RELEASE</version>
+	<version>0.3.8.RELEASE</version>
 	<packaging>pom</packaging>
 
 	<name>apple-cache</name>
@@ -29,7 +29,7 @@
     </developers>
 
 	<properties>
-		<project.version>0.3.7.RELEASE</project.version>
+		<project.version>0.3.8.RELEASE</project.version>
 		<java.version>1.7</java.version>
 		<log4j.version>1.2.17</log4j.version>
 		<slf4j.version>1.7.25</slf4j.version>
@@ -137,6 +137,12 @@
 				<version>${codec.version}</version>
 			</dependency>
 			
+			<dependency>
+            	<groupId>com.fasterxml.jackson.core</groupId>
+            	<artifactId>jackson-databind</artifactId>
+            	<version>2.10.1</version>
+        	</dependency>
+			
 		</dependencies>
 	</dependencyManagement>
 	
@@ -153,7 +159,8 @@
 		<module>apple-cache-ehcache</module>
 		<module>apple-cache-ehcache3</module>
     	<module>apple-cache-j2cache</module>
-  	</modules>
+    <module>apple-cache-starter</module>
+  </modules>
 	
 	<build>
 		<plugins>

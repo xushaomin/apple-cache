@@ -1,22 +1,24 @@
 package com.appleframework.cache.ehcache;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
-import org.ehcache.ValueSupplier;
-import org.ehcache.expiry.Duration;
-import org.ehcache.expiry.Expiry;
+import org.ehcache.expiry.ExpiryPolicy;
 
-@SuppressWarnings("deprecation")
-public class EhCacheExpiry implements Expiry<String, Serializable> {
-	
-	private static Map<String, Duration> durationMap = new HashMap<>();
-	
+public class EhCacheExpiry implements ExpiryPolicy<String, Serializable> {
+
+	private static Map<String, Duration> durationMap = new HashMap<String, Duration>();
+
 	public static void setExpiry(String key, int seconds) {
-		Duration duration = Duration.of(seconds, TimeUnit.SECONDS);
+		Duration duration = Duration.ofSeconds(seconds);
 		durationMap.put(getKey(key), duration);
+	}
+
+	private static String getKey(String key) {
+		return key;
 	}
 
 	@Override
@@ -25,16 +27,13 @@ public class EhCacheExpiry implements Expiry<String, Serializable> {
 	}
 
 	@Override
-	public Duration getExpiryForAccess(String key, ValueSupplier<? extends Serializable> value) {
+	public Duration getExpiryForAccess(String key, Supplier<? extends Serializable> value) {
 		return durationMap.get(getKey(key));
 	}
 
 	@Override
-	public Duration getExpiryForUpdate(String key, ValueSupplier<? extends Serializable> oldValue, Serializable newValue) {
+	public Duration getExpiryForUpdate(String key, Supplier<? extends Serializable> oldValue, Serializable newValue) {
 		return durationMap.get(getKey(key));
 	}
-	
-	private static String getKey(String key) {
-		return key;
-	}
+
 }
