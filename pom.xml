@@ -151,6 +151,7 @@
 		<module>apple-cache-config</module>
 		<module>apple-cache-jedis</module>
 		<module>apple-cache-jedis3</module>
+		<module>apple-cache-springredis</module>
 		<module>apple-cache-memcache</module>
     	<module>apple-cache-hazelcast</module>
     	<module>apple-cache-codis</module>
@@ -159,8 +160,8 @@
 		<module>apple-cache-ehcache</module>
 		<module>apple-cache-ehcache3</module>
     	<module>apple-cache-j2cache</module>
-    <module>apple-cache-starter</module>
-  </modules>
+    	<module>apple-cache-starter</module>
+  	</modules>
 	
 	<build>
 		<plugins>

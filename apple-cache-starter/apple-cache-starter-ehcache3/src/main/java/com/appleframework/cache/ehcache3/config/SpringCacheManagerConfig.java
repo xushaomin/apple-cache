@@ -2,8 +2,6 @@ package com.appleframework.cache.ehcache3.config;
 
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.ehcache.CacheManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -14,9 +12,6 @@ import com.appleframework.cache.ehcache.spring.SpringCacheManager;
 
 @Configuration
 public class SpringCacheManagerConfig {
-
-	@Resource
-	private CacheManager ehcacheManager;
 	
 	@Value("${spring.cache.enable:true}")
 	private boolean cacheEnable = true;
@@ -31,7 +26,7 @@ public class SpringCacheManagerConfig {
 	
 	@Bean
 	@ConditionalOnMissingBean(SpringCacheManager.class)
-	public SpringCacheManager springCacheManagerFactory() {
+	public SpringCacheManager springCacheManagerFactory(CacheManager ehcacheManager) {
 		SpringCacheManager springCacheManager = new SpringCacheManager();
 		springCacheManager.setEhcacheManager(ehcacheManager);
 		springCacheManager.setCacheEnable(cacheEnable);
@@ -55,10 +50,6 @@ public class SpringCacheManagerConfig {
 
 	public void setExpireConfig(Map<String, Integer> expireConfig) {
 		this.expireConfig = expireConfig;
-	}
-
-	public void setEhcacheManager(CacheManager ehcacheManager) {
-		this.ehcacheManager = ehcacheManager;
 	}
 	
 }
