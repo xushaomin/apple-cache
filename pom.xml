@@ -160,6 +160,7 @@
 		<module>apple-cache-ehcache</module>
 		<module>apple-cache-ehcache3</module>
     	<module>apple-cache-j2cache</module>
+    	<module>apple-cache-caffeine</module>
     	<module>apple-cache-starter</module>
   	</modules>
 	
