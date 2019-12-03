@@ -23,7 +23,9 @@ public abstract class BaseSpringCacheManager extends AbstractCacheManager {
 	}
 
 	public void setExpireConfig(Map<String, Integer> expireConfig) {
-		this.expireMap = expireConfig;
+		if(null != expireConfig) {
+			this.expireMap = expireConfig;
+		}
 	}
 	
 	public void setCacheObject(Boolean isCacheObject) {

@@ -31,7 +31,7 @@ public class SpringCacheExpiry implements ExpiryPolicy<String, Serializable> {
 	}
 	
 	public SpringCacheExpiry() {
-		this.duration = null;
+		this.duration = Duration.ofSeconds(Long.MAX_VALUE);
 	}
 	
 }
