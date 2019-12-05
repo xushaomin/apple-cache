@@ -10,7 +10,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import com.appleframework.cache.core.CacheException;
@@ -19,7 +20,7 @@ import com.appleframework.cache.core.CacheManager;
 @SuppressWarnings({ "unchecked" })
 public class RedisBucketCacheManager implements CacheManager {
 
-	private static Logger logger = Logger.getLogger(RedisBucketCacheManager.class);
+	private static Logger logger = LoggerFactory.getLogger(RedisBucketCacheManager.class);
 
 	@Resource
 	private RedisTemplate<String, Object> redisTemplate;

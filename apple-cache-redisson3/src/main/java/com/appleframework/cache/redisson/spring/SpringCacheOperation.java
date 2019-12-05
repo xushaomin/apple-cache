@@ -2,18 +2,19 @@ package com.appleframework.cache.redisson.spring;
 
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
 import org.redisson.api.RMapCache;
 import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheObject;
 import com.appleframework.cache.core.CacheObjectImpl;
 import com.appleframework.cache.core.config.SpringCacheConfig;
-import com.appleframework.cache.core.spring.CacheOperation;
+import com.appleframework.cache.core.spring.BaseCacheOperation;
 
-public class SpringCacheOperation implements CacheOperation {
+public class SpringCacheOperation implements BaseCacheOperation {
 
-	private static Logger logger = Logger.getLogger(SpringCacheOperation.class);
+	private static Logger logger = LoggerFactory.getLogger(SpringCacheOperation.class);
 
 	private String name;
 	private int expire = 0;

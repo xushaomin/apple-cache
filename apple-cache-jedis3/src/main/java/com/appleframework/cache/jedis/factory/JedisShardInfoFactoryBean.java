@@ -1,6 +1,7 @@
 package com.appleframework.cache.jedis.factory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 
 import redis.clients.jedis.Jedis;
@@ -9,7 +10,7 @@ import redis.clients.jedis.Protocol;
 
 public class JedisShardInfoFactoryBean implements FactoryBean<JedisShardInfoFactory> {
 
-	private static Logger logger = Logger.getLogger(JedisShardInfoFactoryBean.class);
+	private static Logger logger = LoggerFactory.getLogger(JedisShardInfoFactoryBean.class);
 
 	private JedisShardInfoFactory factory = null;
 

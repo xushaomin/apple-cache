@@ -10,7 +10,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.utils.ConvertUtils;
 
@@ -21,7 +22,7 @@ import com.appleframework.cache.core.utils.ConvertUtils;
  */
 public abstract class AbstractSequenceService implements SequenceService {
 
-	private static Logger LOG = Logger.getLogger(AbstractSequenceService.class);
+	private static Logger LOG = LoggerFactory.getLogger(AbstractSequenceService.class);
 
 	/**
 	 * 对一段String生成MD5摘要信息

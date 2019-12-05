@@ -2,7 +2,8 @@ package com.appleframework.cache.jedis.lock;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.lock.Lock;
 import com.appleframework.cache.core.utils.SequenceUtility;
@@ -19,7 +20,7 @@ import redis.clients.jedis.Transaction;
  */
 public class JedisLock implements Lock {
 
-	private static Logger logger = Logger.getLogger(JedisLock.class);
+	private static Logger logger = LoggerFactory.getLogger(JedisLock.class);
 
 	private PoolFactory poolFactory;
 
@@ -113,7 +114,7 @@ public class JedisLock implements Lock {
 				}
 			}
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage());
 		}
 	}
 
@@ -148,7 +149,7 @@ public class JedisLock implements Lock {
 				lockedSuccess = true;
 			}
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage());
 			unlock(jedis, lockKey);
 			lockedSuccess = false;
 		}
@@ -186,7 +187,7 @@ public class JedisLock implements Lock {
 				isLocked = true;
 			}
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage());
 		}
 		return isLocked;
 	}
@@ -211,7 +212,7 @@ public class JedisLock implements Lock {
 				break;
 			}
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage());
 		}
 	}
 
@@ -247,7 +248,7 @@ public class JedisLock implements Lock {
 				break;
 			}
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage());
 		}
 	}
 

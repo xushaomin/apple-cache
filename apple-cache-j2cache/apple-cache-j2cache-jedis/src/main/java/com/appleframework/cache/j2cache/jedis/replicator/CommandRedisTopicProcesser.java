@@ -1,6 +1,7 @@
 package com.appleframework.cache.j2cache.jedis.replicator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.Command.CommandType;
@@ -16,7 +17,7 @@ import redis.clients.jedis.Jedis;
 
 public class CommandRedisTopicProcesser extends BinaryJedisPubSub implements CommandProcesser {
 
-	protected final static Logger logger = Logger.getLogger(CommandRedisTopicProcesser.class);
+	protected final static Logger logger = LoggerFactory.getLogger(CommandRedisTopicProcesser.class);
 
 	private String name = "J2_CACHE_MANAGER";
 

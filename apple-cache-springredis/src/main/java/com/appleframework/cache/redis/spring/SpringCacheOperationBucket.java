@@ -3,7 +3,8 @@ package com.appleframework.cache.redis.spring;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import com.appleframework.cache.core.config.SpringCacheConfig;
@@ -11,7 +12,7 @@ import com.appleframework.cache.core.spring.BaseCacheOperation;
 
 public class SpringCacheOperationBucket implements BaseCacheOperation {
 
-	private static Logger logger = Logger.getLogger(SpringCacheOperationBucket.class);
+	private static Logger logger = LoggerFactory.getLogger(SpringCacheOperationBucket.class);
 
 	private String name;
 	private int expireTime = 0;

@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.beanutils.PropertyUtilsBean;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager;
@@ -22,7 +23,7 @@ import redis.clients.jedis.Response;
 
 public class MasterSlaveJedisHmsetCacheManager implements CacheManager {
 
-	private static Logger logger = Logger.getLogger(MasterSlaveJedisHmsetCacheManager.class);
+	private static Logger logger = LoggerFactory.getLogger(MasterSlaveJedisHmsetCacheManager.class);
 	
 	private static Map<String, String[]> STR_MAP = new HashMap<>();
 	

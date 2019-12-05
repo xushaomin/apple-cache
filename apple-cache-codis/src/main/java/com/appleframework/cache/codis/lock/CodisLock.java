@@ -1,6 +1,7 @@
 package com.appleframework.cache.codis.lock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.codis.CodisResourcePool;
 import com.appleframework.cache.core.lock.Lock;
@@ -15,7 +16,7 @@ import redis.clients.jedis.Jedis;
  */
 public class CodisLock implements Lock {
 
-	private static Logger logger = Logger.getLogger(CodisLock.class);
+	private static Logger logger = LoggerFactory.getLogger(CodisLock.class);
 
 	private CodisResourcePool codisResourcePool;
 
@@ -111,7 +112,7 @@ public class CodisLock implements Lock {
 				}
 			}
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage());
 		}
 	}
 
@@ -144,7 +145,7 @@ public class CodisLock implements Lock {
 				lockedSuccess = true;
 			}
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage());
 		}
 		return lockedSuccess;
 	}
@@ -178,7 +179,7 @@ public class CodisLock implements Lock {
 				isLocked = true;
 			}
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage());
 		}
 		return isLocked;
 	}
@@ -202,7 +203,7 @@ public class CodisLock implements Lock {
 				jedis.del(lockKey);
 			}
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage());
 		}
 	}
 

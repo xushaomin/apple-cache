@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>apple-cache</artifactId>
 		<groupId>com.appleframework.cache</groupId>
-		<version>0.3.7.RELEASE</version>
+		<version>0.3.8.RELEASE</version>
 	</parent>
 	<artifactId>apple-cache-caffeine</artifactId>
 	<name>apple-cache-caffeine</name>
@@ -40,6 +40,11 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
 		</dependency>
 		
 		<dependency>

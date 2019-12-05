@@ -21,9 +21,11 @@ public class EhCacheSpringTest2 {
 			System.out.println(testService.getCache2("zyq"));
 			
 			for (int i = 1; i < 100; i++) {
+				System.out.println("1-----------------------");
 				System.out.println(testService.getCache("xusm"));
 				Thread.sleep(6000);
 				System.out.println(testService.getCache2("zyq"));
+				System.out.println("2-----------------------");
 			}
 			System.in.read();
 		} catch (Exception e) {

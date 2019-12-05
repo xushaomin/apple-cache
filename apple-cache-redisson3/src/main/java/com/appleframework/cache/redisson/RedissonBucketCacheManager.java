@@ -5,20 +5,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
 import org.redisson.api.RBatch;
 import org.redisson.api.RBucket;
 import org.redisson.api.RBucketAsync;
 import org.redisson.api.RFuture;
 import org.redisson.api.RKeys;
 import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager;
 
 public class RedissonBucketCacheManager implements CacheManager {
 
-	private static Logger logger = Logger.getLogger(RedissonBucketCacheManager.class);
+	private static Logger logger = LoggerFactory.getLogger(RedissonBucketCacheManager.class);
 		
 	private RedissonClient redisson;
 
@@ -184,7 +185,7 @@ public class RedissonBucketCacheManager implements CacheManager {
 				futureMap.put(key, bucket.getAsync());
 			}
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage());
 		}
 		batch.execute();
 		return futureMap;
@@ -199,7 +200,7 @@ public class RedissonBucketCacheManager implements CacheManager {
 			try {
 				object = value.get();
 			} catch (Exception e) {
-				logger.error(e);
+				logger.error(e.getMessage());
 			}
 			returnMap.put(key, object);
 		}
@@ -216,7 +217,7 @@ public class RedissonBucketCacheManager implements CacheManager {
 			try {
 				object = value.get();
 			} catch (Exception e) {
-				logger.error(e);
+				logger.error(e.getMessage());
 			}
 			returnMap.put(key, object);
 		}

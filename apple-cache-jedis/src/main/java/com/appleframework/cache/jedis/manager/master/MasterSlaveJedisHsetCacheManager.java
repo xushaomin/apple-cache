@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager;
@@ -20,7 +21,7 @@ import redis.clients.jedis.JedisPool;
 @SuppressWarnings({ "unchecked", "deprecation" })
 public class MasterSlaveJedisHsetCacheManager implements CacheManager {
 
-	private static Logger logger = Logger.getLogger(MasterSlaveJedisHsetCacheManager.class);
+	private static Logger logger = LoggerFactory.getLogger(MasterSlaveJedisHsetCacheManager.class);
 	
 	private PoolFactory poolFactory;
 	

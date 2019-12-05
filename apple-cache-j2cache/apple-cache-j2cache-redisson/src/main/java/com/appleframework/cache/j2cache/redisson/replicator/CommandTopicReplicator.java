@@ -1,8 +1,9 @@
 package com.appleframework.cache.j2cache.redisson.replicator;
 
-import org.apache.log4j.Logger;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.CommandReplicator;
@@ -10,7 +11,7 @@ import com.appleframework.cache.j2cache.redisson.utils.Contants;
 
 public class CommandTopicReplicator implements CommandReplicator {
 	
-	private static Logger logger = Logger.getLogger(CommandTopicReplicator.class);
+	private static Logger logger = LoggerFactory.getLogger(CommandTopicReplicator.class);
 	
 	private String name = "J2_CACHE_MANAGER";
 
@@ -36,7 +37,7 @@ public class CommandTopicReplicator implements CommandReplicator {
 			try {
 				logger.warn("The publish channel is " + name);
 				Long o = topic.publish(command);
-				logger.info(o);
+				logger.info(o + "");
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}

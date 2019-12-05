@@ -2,14 +2,15 @@ package com.appleframework.cache.j2cache.jedis.spring;
 
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.config.SpringCacheConfig;
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.Command.CommandType;
-import com.appleframework.cache.core.spring.BaseCacheOperation;
 import com.appleframework.cache.core.replicator.CommandReplicator;
+import com.appleframework.cache.core.spring.BaseCacheOperation;
 import com.appleframework.cache.core.utils.SerializeUtility;
 import com.appleframework.cache.jedis.factory.PoolFactory;
 
@@ -22,7 +23,7 @@ import redis.clients.jedis.JedisPool;
 @SuppressWarnings("deprecation")
 public class SpringCacheOperation implements BaseCacheOperation {
 
-	private static Logger logger = Logger.getLogger(SpringCacheOperation.class);
+	private static Logger logger = LoggerFactory.getLogger(SpringCacheOperation.class);
 
 	private String name;
 	private int expire = 0;

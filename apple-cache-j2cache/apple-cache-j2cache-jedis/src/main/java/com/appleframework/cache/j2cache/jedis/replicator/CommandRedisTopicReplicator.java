@@ -1,6 +1,7 @@
 package com.appleframework.cache.j2cache.jedis.replicator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.CommandReplicator;
@@ -12,7 +13,7 @@ import redis.clients.jedis.JedisPool;
 
 public class CommandRedisTopicReplicator implements CommandReplicator {
 	
-	private static Logger logger = Logger.getLogger(CommandRedisTopicReplicator.class);
+	private static Logger logger = LoggerFactory.getLogger(CommandRedisTopicReplicator.class);
 	
 	private String name = "J2_CACHE_MANAGER";
 
@@ -35,7 +36,7 @@ public class CommandRedisTopicReplicator implements CommandReplicator {
 			try {
 				logger.warn("The publish channel is " + name);
 				Long o = jedis.publish(name.getBytes(), SerializeUtility.serialize(command));
-				logger.info(o);
+				logger.info(o + "");
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			} finally {

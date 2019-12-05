@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
 import org.redisson.api.RBucket;
 import org.redisson.api.RKeys;
 import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.replicator.Command;
@@ -21,7 +22,7 @@ import net.sf.ehcache.Element;
 
 public class J2RedissonBucketCacheManager implements com.appleframework.cache.core.CacheManager {
 
-	private static Logger logger = Logger.getLogger(J2RedissonBucketCacheManager.class);
+	private static Logger logger = LoggerFactory.getLogger(J2RedissonBucketCacheManager.class);
 
 	private String name = "J2_CACHE_MANAGER";
 

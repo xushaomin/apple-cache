@@ -7,7 +7,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.appleframework.cache.core.CacheException;
@@ -22,7 +23,7 @@ import redis.clients.jedis.Response;
 @Component
 public class CodisBucketCacheManager implements CacheManager {
 
-	private static Logger logger = Logger.getLogger(CodisBucketCacheManager.class);
+	private static Logger logger = LoggerFactory.getLogger(CodisBucketCacheManager.class);
 	
 	@Resource
 	private CodisResourcePool codisResourcePool;

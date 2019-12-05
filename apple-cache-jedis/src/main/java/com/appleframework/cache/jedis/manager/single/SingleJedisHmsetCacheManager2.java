@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager2;
@@ -21,7 +22,7 @@ import redis.clients.jedis.Response;
 @SuppressWarnings({ "deprecation" })
 public class SingleJedisHmsetCacheManager2 extends SingleJedisHmsetCacheManager implements CacheManager2 {
 
-	private static Logger logger = Logger.getLogger(MasterSlaveJedisHmsetCacheManager2.class);
+	private static Logger logger = LoggerFactory.getLogger(MasterSlaveJedisHmsetCacheManager2.class);
 
 	private Map<String, Response<Map<byte[], byte[]>>> pipeline(Jedis jedis, String wkey) {
 		Set<byte[]> keys = jedis.keys(wkey.getBytes());

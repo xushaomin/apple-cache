@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.jedis.config.RedisNode;
 
@@ -18,7 +19,7 @@ import redis.clients.util.Pool;
 
 public class JedisSentinelFactory {
 
-	private static Logger logger = Logger.getLogger(JedisSentinelFactory.class);
+	private static Logger logger = LoggerFactory.getLogger(JedisSentinelFactory.class);
 
     private int timeout = Protocol.DEFAULT_TIMEOUT;
     private String password;

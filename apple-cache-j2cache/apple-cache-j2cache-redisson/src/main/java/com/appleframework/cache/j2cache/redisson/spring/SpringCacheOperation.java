@@ -2,10 +2,11 @@ package com.appleframework.cache.j2cache.redisson.spring;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.listener.MessageListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.Command.CommandType;
@@ -18,7 +19,7 @@ import net.sf.ehcache.Element;
 
 public class SpringCacheOperation implements BaseCacheOperation {
 
-	private static Logger logger = Logger.getLogger(SpringCacheOperation.class);
+	private static Logger logger = LoggerFactory.getLogger(SpringCacheOperation.class);
 
 	private String name;
 	private int expire = 0;

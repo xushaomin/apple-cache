@@ -1,6 +1,7 @@
 package com.appleframework.cache.jedis.spring.master;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheObject;
 import com.appleframework.cache.core.CacheObjectImpl;
@@ -15,7 +16,7 @@ import redis.clients.jedis.JedisPool;
 @SuppressWarnings("deprecation")
 public class SpringCacheOperationHset implements BaseCacheOperation {
 
-	private static Logger logger = Logger.getLogger(SpringCacheOperationHset.class);
+	private static Logger logger = LoggerFactory.getLogger(SpringCacheOperationHset.class);
 
 	private String name;
 	private int expireTime = 0;

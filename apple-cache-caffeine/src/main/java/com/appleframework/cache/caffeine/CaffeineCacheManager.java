@@ -7,7 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager;
@@ -18,7 +19,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 @SuppressWarnings("unchecked")
 public class CaffeineCacheManager implements CacheManager {
 
-	private static Logger logger = Logger.getLogger(CaffeineCacheManager.class);
+	private static Logger logger = LoggerFactory.getLogger(CaffeineCacheManager.class);
 
 	private Long maximumSize = Long.MAX_VALUE;
 

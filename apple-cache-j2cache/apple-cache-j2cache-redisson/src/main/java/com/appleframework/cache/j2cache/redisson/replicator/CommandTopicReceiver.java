@@ -1,9 +1,10 @@
 package com.appleframework.cache.j2cache.redisson.replicator;
 
-import org.apache.log4j.Logger;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.listener.MessageListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.replicator.Command;
 import com.appleframework.cache.core.replicator.CommandProcesser;
@@ -12,7 +13,7 @@ import com.appleframework.cache.j2cache.redisson.utils.Contants;
 
 public class CommandTopicReceiver implements CommandReceiver {
 	
-	protected final static Logger logger = Logger.getLogger(CommandTopicReceiver.class);
+	protected final static Logger logger = LoggerFactory.getLogger(CommandTopicReceiver.class);
 	
 	private String name = "J2_CACHE_MANAGER";
 	

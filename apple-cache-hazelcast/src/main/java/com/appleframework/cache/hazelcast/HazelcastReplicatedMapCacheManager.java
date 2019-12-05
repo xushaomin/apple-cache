@@ -7,7 +7,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager;
@@ -21,7 +22,7 @@ import com.hazelcast.core.ReplicatedMap;
 @SuppressWarnings("unchecked")
 public class HazelcastReplicatedMapCacheManager implements CacheManager {
 
-	private static Logger logger = Logger.getLogger(HazelcastMapCacheManager.class);
+	private static Logger logger = LoggerFactory.getLogger(HazelcastMapCacheManager.class);
 	
 	private static String CACHE_KEY = "spring-cache";
 

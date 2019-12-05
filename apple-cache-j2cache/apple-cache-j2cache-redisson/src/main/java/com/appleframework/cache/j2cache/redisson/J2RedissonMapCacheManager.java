@@ -6,9 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
 import org.redisson.api.RMapCache;
 import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.replicator.Command;
@@ -21,7 +22,7 @@ import net.sf.ehcache.Element;
 
 public class J2RedissonMapCacheManager implements com.appleframework.cache.core.CacheManager {
 
-	private static Logger logger = Logger.getLogger(J2RedissonMapCacheManager.class);
+	private static Logger logger = LoggerFactory.getLogger(J2RedissonMapCacheManager.class);
 
 	private String name = "AC_";
 

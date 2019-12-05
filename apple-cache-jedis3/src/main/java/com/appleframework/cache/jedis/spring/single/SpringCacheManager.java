@@ -3,6 +3,7 @@ package com.appleframework.cache.jedis.spring.single;
 import org.springframework.cache.Cache;
 
 import com.appleframework.cache.core.spring.BaseSpringCacheManager;
+
 import redis.clients.jedis.JedisPool;
 
 public class SpringCacheManager extends BaseSpringCacheManager {

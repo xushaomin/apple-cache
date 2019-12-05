@@ -10,7 +10,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 
 import org.apache.commons.beanutils.PropertyUtilsBean;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +22,7 @@ import com.appleframework.cache.core.utils.ReflectionUtility;
 @Component
 public class RedisHmsetCacheManager implements CacheManager {
 
-	private static Logger logger = Logger.getLogger(RedisHmsetCacheManager.class);
+	private static Logger logger = LoggerFactory.getLogger(RedisHmsetCacheManager.class);
 	
 	private static Map<String, List<Object>> STR_MAP = new HashMap<>();
 		

@@ -12,7 +12,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.BinaryJedisCluster;
 import redis.clients.jedis.Client;
@@ -39,7 +40,7 @@ import redis.clients.jedis.util.SafeEncoder;
  */
 public class JedisClusterPipeline extends PipelineBase implements Closeable {
 
-	private static Logger logger = Logger.getLogger(JedisClusterPipeline.class);
+	private static Logger logger = LoggerFactory.getLogger(JedisClusterPipeline.class);
 
     // 部分字段没有对应的获取方法，只能采用反射来做
     // 你也可以去继承JedisCluster和JedisSlotBasedConnectionHandler来提供访问接口

@@ -5,7 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 在Windows平台上生成机器码
@@ -14,7 +15,7 @@ import org.apache.log4j.Logger;
  */
 public final class WindowsSequenceService extends AbstractSequenceService {
 	
-	private static Logger LOG = Logger.getLogger(WindowsSequenceService.class);
+	private static Logger LOG = LoggerFactory.getLogger(WindowsSequenceService.class);
 
 	@Override
 	public String getSequence() {

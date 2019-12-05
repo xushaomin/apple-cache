@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager;
@@ -20,7 +21,7 @@ import net.rubyeye.xmemcached.exception.MemcachedException;
  */
 public class XMemCachedManager implements CacheManager {
 
-	private static Logger logger = Logger.getLogger(XMemCachedManager.class);
+	private static Logger logger = LoggerFactory.getLogger(XMemCachedManager.class);
 
 	private MemcachedClient memcachedClient;
 

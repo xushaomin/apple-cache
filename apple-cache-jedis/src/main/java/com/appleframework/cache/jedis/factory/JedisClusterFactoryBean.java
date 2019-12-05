@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 
 import com.appleframework.cache.jedis.config.RedisNode;
@@ -14,7 +15,7 @@ import redis.clients.jedis.JedisPoolConfig;
 
 public class JedisClusterFactoryBean implements FactoryBean<JedisClusterFactory> {
 
-	private static Logger logger = Logger.getLogger(JedisClusterFactoryBean.class);
+	private static Logger logger = LoggerFactory.getLogger(JedisClusterFactoryBean.class);
 
 	private JedisClusterFactory factory = null;
 

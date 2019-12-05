@@ -2,12 +2,13 @@ package com.appleframework.cache.ehcache.spring;
 
 import java.io.Serializable;
 
-import org.apache.log4j.Logger;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.MemoryUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheObjectImpl;
 import com.appleframework.cache.core.config.SpringCacheConfig;
@@ -17,7 +18,7 @@ import com.appleframework.cache.ehcache.factory.ConfigurationFactoryBean;
 
 public class SpringCacheOperation implements BaseCacheOperation {
 
-	private static Logger logger = Logger.getLogger(SpringCacheOperation.class);
+	private static Logger logger = LoggerFactory.getLogger(SpringCacheOperation.class);
 
 	private String name;
 	private int expire = 0;

@@ -4,7 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheObject;
 import com.appleframework.cache.core.CacheObjectImpl;
@@ -16,7 +17,7 @@ import net.rubyeye.xmemcached.exception.MemcachedException;
 
 public class SpringCacheOperation implements BaseCacheOperation {
 
-	private static Logger log = Logger.getLogger(SpringCacheOperation.class);
+	private static Logger log = LoggerFactory.getLogger(SpringCacheOperation.class);
 
 	private Set<String> keySet = new HashSet<String>();
 	private String name;

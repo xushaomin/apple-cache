@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheObject;
@@ -24,7 +25,7 @@ import redis.clients.jedis.JedisPool;
 @SuppressWarnings("deprecation")
 public class J2CacheJedisHsetCacheManager implements com.appleframework.cache.core.CacheManager {
 
-	private static Logger logger = Logger.getLogger(J2CacheJedisHsetCacheManager.class);
+	private static Logger logger = LoggerFactory.getLogger(J2CacheJedisHsetCacheManager.class);
 
 	private String name = "AC_";
 

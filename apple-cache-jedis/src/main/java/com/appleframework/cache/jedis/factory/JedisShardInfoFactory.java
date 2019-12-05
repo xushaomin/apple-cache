@@ -1,7 +1,8 @@
 package com.appleframework.cache.jedis.factory;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -12,7 +13,7 @@ import redis.clients.util.Pool;
 
 public class JedisShardInfoFactory {
 
-	private static Logger logger = Logger.getLogger(JedisShardInfoFactory.class);
+	private static Logger logger = LoggerFactory.getLogger(JedisShardInfoFactory.class);
 
     private String hostName = "localhost";
     private int port = Protocol.DEFAULT_PORT;

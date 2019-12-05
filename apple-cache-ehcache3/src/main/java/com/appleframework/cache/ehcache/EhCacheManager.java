@@ -8,16 +8,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheException;
 
 @SuppressWarnings("unchecked")
 public class EhCacheManager implements com.appleframework.cache.core.CacheManager {
 
-	private static Logger logger = Logger.getLogger(EhCacheManager.class);
+	private static Logger logger = LoggerFactory.getLogger(EhCacheManager.class);
 
 	private String name = "EHCACHE_MANAGER";
 

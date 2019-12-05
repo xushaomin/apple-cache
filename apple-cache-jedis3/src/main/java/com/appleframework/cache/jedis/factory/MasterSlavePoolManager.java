@@ -6,15 +6,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.JedisPool;
 
 public class MasterSlavePoolManager {
 
-	private ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
+	private static Logger logger = LoggerFactory.getLogger(MasterSlavePoolManager.class);
 
-	private static Logger logger = Logger.getLogger(MasterSlavePoolManager.class);
+	private ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
 
 	private List<JedisPool> okSlavePools = new ArrayList<JedisPool>();
 

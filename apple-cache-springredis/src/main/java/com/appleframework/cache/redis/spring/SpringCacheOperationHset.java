@@ -1,6 +1,7 @@
 package com.appleframework.cache.redis.spring;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import com.appleframework.cache.core.CacheObject;
@@ -10,7 +11,7 @@ import com.appleframework.cache.core.spring.BaseCacheOperation;
 
 public class SpringCacheOperationHset implements BaseCacheOperation {
 
-	private static Logger logger = Logger.getLogger(SpringCacheOperationHset.class);
+	private static Logger logger = LoggerFactory.getLogger(SpringCacheOperationHset.class);
 
 	private String name;
 	private int expireTime = 0;

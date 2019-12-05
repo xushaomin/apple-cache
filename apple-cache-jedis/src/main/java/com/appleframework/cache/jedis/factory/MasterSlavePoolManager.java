@@ -6,7 +6,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -15,7 +16,7 @@ public class MasterSlavePoolManager {
 
 	private ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
 
-	private static Logger logger = Logger.getLogger(MasterSlavePoolManager.class);
+	private static Logger logger = LoggerFactory.getLogger(MasterSlavePoolManager.class);
 
 	private List<JedisPool> okSlavePools = new ArrayList<JedisPool>();
 
@@ -31,7 +32,6 @@ public class MasterSlavePoolManager {
 	}
 
 	private void init() {
-		// 启动一个线程每1秒钟slave连接池是否有问题
 		exec.scheduleWithFixedDelay(new Runnable() {
 			@SuppressWarnings("deprecation")
 			public void run() {
