@@ -10,6 +10,7 @@ import com.appleframework.cache.core.spring.BaseCacheOperation;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.ObjectExistsException;
 import net.sf.ehcache.config.CacheConfiguration;
 
 public class SpringCacheOperation implements BaseCacheOperation {
@@ -31,7 +32,11 @@ public class SpringCacheOperation implements BaseCacheOperation {
 	private void init(CacheManager ehcacheManager){
 		cache = ehcacheManager.getCache(name);
 		if(null == cache) {
-			ehcacheManager.addCache(name);
+			try {
+				ehcacheManager.addCache(name);
+			} catch (ObjectExistsException e) {
+				logger.warn("Cache " + name + " already exists");
+			}
 			cache = ehcacheManager.getCache(name);
 		}
 		CacheConfiguration config = cache.getCacheConfiguration();

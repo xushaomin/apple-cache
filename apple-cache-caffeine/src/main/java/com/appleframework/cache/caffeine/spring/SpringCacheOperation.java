@@ -65,8 +65,8 @@ public class SpringCacheOperation implements CacheOperation {
 
 	private void resetCacheObject(String key, CacheObject cache) {
 		try {
-			String nkey = getKey(key);
-			cacheManager.remove(nkey);
+			cache.setExpiredSecond(expire);
+			cacheManager.set(key, cache);
 		} catch (Exception e) {
 			logger.warn("cache error", e);
 		}

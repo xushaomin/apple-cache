@@ -12,6 +12,7 @@ import org.ehcache.config.units.MemoryUnit;
 import com.appleframework.cache.core.CacheObjectImpl;
 import com.appleframework.cache.core.config.SpringCacheConfig;
 import com.appleframework.cache.core.spring.BaseCacheOperation;
+import com.appleframework.cache.ehcache.EhCacheExpiry;
 import com.appleframework.cache.ehcache.factory.ConfigurationFactoryBean;
 
 public class SpringCacheOperation implements BaseCacheOperation {
@@ -44,9 +45,9 @@ public class SpringCacheOperation implements BaseCacheOperation {
 		if (null == cache) {
 			try {
 				cache = ehcacheManager.createCache(name, configuration);
-			} catch (Exception e) {
-				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
 				logger.warn("the cache name " + name + " is exist !");
+				cache = ehcacheManager.getCache(name, String.class, Serializable.class);
 			}
 		}
 	}
@@ -103,9 +104,9 @@ public class SpringCacheOperation implements BaseCacheOperation {
 				CacheObjectImpl object = CacheObjectImpl.create(value, expire);
 				getEhCache().put(key, object);
 			} else {
-				/*
-				 * if (expire > 0) { EhCacheExpiry.setExpiry(key, expire); }
-				 */
+				if (expire > 0) {
+					EhCacheExpiry.setExpiry(key, expire);
+				}
 				getEhCache().put(key, (Serializable) value);
 			}
 

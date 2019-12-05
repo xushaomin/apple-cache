@@ -48,7 +48,8 @@ public class SpringCacheOperationHset implements BaseCacheOperation {
 
 	private void resetCacheObject(String key, CacheObject cache) {
 		try {
-			this.delete(key);
+			cache.setExpiredTime(getExpiredTime());
+			redisTemplate.opsForHash().put(getNameKey(), key, cache);
 		} catch (Exception e) {
 			logger.warn("Cache Error : ", e);
 		}
