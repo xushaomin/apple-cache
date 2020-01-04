@@ -3,6 +3,8 @@ package com.appleframework.cache.ehcache3.config;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
@@ -39,10 +41,8 @@ public class AppleCacheAutoConfiguration {
 	@ConditionalOnMissingBean
 	public EhCacheConfiguration configurationFactoryBean() {
 		EhCacheConfiguration bean = new EhCacheConfiguration();
-		bean.setCacheEnable(properties.getCacheEnable());
-		bean.setCacheObject(properties.getCacheObject());
-		bean.setFilePath(properties.getFilePath());
-		bean.setProperties(properties.getConfig());
+		bean.setDirectory(properties.getDirectory());
+		bean.setProperties(properties.getCacheTemplate());
 		return bean;
 	}
 
@@ -52,10 +52,14 @@ public class AppleCacheAutoConfiguration {
 			return ehCacheManager;
 		}
 		URL xmlUrl = getClass().getResource("/ehcache.xml");
-		String filePath = properties.getFilePath();
+		String directory = properties.getDirectory();
 		String initName = properties.getInitName();
 		if (null == xmlUrl) {
-			EhCacheProperties property = properties.getConfig().get(initName);
+			Map<String, EhCacheProperties> cacheTemplate = properties.getCacheTemplate();
+			EhCacheProperties property = null;
+			if(null != cacheTemplate) {
+				property = properties.getCacheTemplate().get(initName);
+			}
 			int heap = 10;
 			int offheap = 100;
 			int disk = 1000;
@@ -75,7 +79,7 @@ public class AppleCacheAutoConfiguration {
 
 			ehCacheManager = CacheManagerBuilder
 					.newCacheManagerBuilder()
-					.with(CacheManagerBuilder.persistence(new File(filePath, "ehcacheData")))
+					.with(CacheManagerBuilder.persistence(new File(directory, "ehcacheData")))
 					.withCache(initName,
 							CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Serializable.class,
 											ResourcePoolsBuilder.newResourcePoolsBuilder()
@@ -96,15 +100,20 @@ public class AppleCacheAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean(SpringCacheManager.class)
 	public SpringCacheManager springCacheManagerFactory() throws Exception {
-		//configurationFactoryBean();
 		SpringCacheManager springCacheManager = new SpringCacheManager();
 		if(null == ehCacheManager) {
 			ehCacheManagerFactory();
 		}
 		springCacheManager.setEhcacheManager(ehCacheManager);
-		springCacheManager.setCacheEnable(properties.getCacheEnable());
-		springCacheManager.setCacheObject(properties.getCacheObject());
-		springCacheManager.setExpireConfig(properties.getExpireConfig());
+		Map<String, Integer> expireConfig = new HashMap<String, Integer>();
+		for (Map.Entry<String, EhCacheProperties> map : properties.getCacheTemplate().entrySet()) {
+			String key = map.getKey();
+			EhCacheProperties property = map.getValue();
+			if(property.isSpringCache()) {
+				expireConfig.put(key, property.getExpiry());
+			}
+		}	
+		springCacheManager.setExpireConfig(expireConfig);
 		return springCacheManager;
 	}
 	

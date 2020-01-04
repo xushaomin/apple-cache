@@ -16,13 +16,15 @@ public class SpringCacheManager extends BaseSpringCacheManager {
 	public Cache getCache(String name) {
 		Cache cache = cacheMap.get(name);
 		if (cache == null) {
-			Integer expire = expireMap.get(name);
-			if (expire == null) {
-				expire = 0;
-				expireMap.put(name, expire);
-			}
-			cache = new SpringCache(ehcacheManager, name, expire.intValue());
-			cacheMap.put(name, cache);
+			synchronized (this) {
+				Integer expire = expireMap.get(name);
+				if (expire == null) {
+					expire = 0;
+					expireMap.put(name, expire);
+				}
+				cache = new SpringCache(ehcacheManager, name, expire.intValue());
+				cacheMap.put(name, cache);
+	        }
 		}
 		return cache;
 	}

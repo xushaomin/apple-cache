@@ -15,12 +15,6 @@ public class AppleCacheProperties {
 	
 	private String initName = "default";
 
-	private Boolean cacheEnable = true;
-
-	private Boolean cacheObject = true;
-
-	private Boolean springCache = false;
-
 	private Map<String, EhCacheProperties> cacheTemplate;
 		
 	public String getInitName() {
@@ -29,30 +23,6 @@ public class AppleCacheProperties {
 
 	public void setInitName(String initName) {
 		this.initName = initName;
-	}
-
-	public Boolean getCacheEnable() {
-		return cacheEnable;
-	}
-
-	public void setCacheEnable(Boolean cacheEnable) {
-		this.cacheEnable = cacheEnable;
-	}
-
-	public Boolean getCacheObject() {
-		return cacheObject;
-	}
-
-	public void setCacheObject(Boolean cacheObject) {
-		this.cacheObject = cacheObject;
-	}
-
-	public Boolean getSpringCache() {
-		return springCache;
-	}
-
-	public void setSpringCache(Boolean springCache) {
-		this.springCache = springCache;
 	}
 
 	public String getDirectory() {

@@ -6,7 +6,12 @@ public class EhCacheProperties {
 	private int offheap = 100;
 	private int disk = 1000;
 	private boolean persistent = false;
-	private long expiry = 0;
+	private int expiry = 0;
+	
+	private boolean springCache = true;
+	private boolean cacheObject = false;
+	private boolean cacheEnable = true;
+
 	
 	public int getHeap() {
 		return heap;
@@ -40,12 +45,36 @@ public class EhCacheProperties {
 		this.persistent = persistent;
 	}
 
-	public long getExpiry() {
+	public int getExpiry() {
 		return expiry;
 	}
 
-	public void setExpiry(long expiry) {
+	public void setExpiry(int expiry) {
 		this.expiry = expiry;
+	}
+
+	public boolean isSpringCache() {
+		return springCache;
+	}
+
+	public void setSpringCache(boolean springCache) {
+		this.springCache = springCache;
+	}
+
+	public boolean isCacheObject() {
+		return cacheObject;
+	}
+
+	public void setCacheObject(boolean cacheObject) {
+		this.cacheObject = cacheObject;
+	}
+
+	public boolean isCacheEnable() {
+		return cacheEnable;
+	}
+
+	public void setCacheEnable(boolean cacheEnable) {
+		this.cacheEnable = cacheEnable;
 	}
 	
 }

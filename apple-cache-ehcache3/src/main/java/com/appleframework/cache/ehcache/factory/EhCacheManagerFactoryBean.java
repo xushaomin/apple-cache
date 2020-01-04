@@ -21,7 +21,7 @@ import com.appleframework.cache.ehcache.config.EhCacheProperties;
 public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 
 	private String name = "default";
-	private String filePath = System.getProperty("user.home");
+	private String directory = System.getProperty("user.home");
 
 	@Override
 	public CacheManager getObject() throws Exception {
@@ -47,7 +47,7 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 			}
 			cacheManager = CacheManagerBuilder
 					.newCacheManagerBuilder()
-					.with(CacheManagerBuilder.persistence(new File(filePath, "ehcacheData")))
+					.with(CacheManagerBuilder.persistence(new File(directory, "ehcacheData")))
 					.withCache(name,
 							CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Serializable.class,
 											ResourcePoolsBuilder.newResourcePoolsBuilder()
@@ -79,8 +79,8 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 		this.name = name;
 	}
 
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
+	public void setDirectory(String directory) {
+		this.directory = directory;
 	}
 
 }

@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheObjectImpl;
-import com.appleframework.cache.core.config.SpringCacheConfig;
 import com.appleframework.cache.core.spring.BaseCacheOperation;
 import com.appleframework.cache.ehcache.EhCacheExpiry;
 import com.appleframework.cache.ehcache.config.EhCacheConfiguration;
@@ -24,6 +23,10 @@ public class SpringCacheOperation implements BaseCacheOperation {
 
 	private String name;
 	private int expire = 0;
+	
+	private EhCacheProperties properties;
+	
+	private boolean isCacheObject = false;
 
 	private Cache<String, Serializable> cache;
 
@@ -32,22 +35,27 @@ public class SpringCacheOperation implements BaseCacheOperation {
 	}
 
 	private void init(CacheManager ehcacheManager) {
-		SpringCacheExpiry expiry = null;
-		if (expire > 0 && !SpringCacheConfig.isCacheObject()) {
-			expiry = new SpringCacheExpiry(expire);
-		} else {
-			expiry = new SpringCacheExpiry();
-		}
-		EhCacheProperties properties = EhCacheConfiguration.getProperties().get(name);
+		
+		properties = EhCacheConfiguration.getProperties().get(name);
 		int heap = 10;
 		int offheap = 100;
 		if(null != properties) {
 			heap = properties.getHeap();
 			offheap = properties.getOffheap();
+			isCacheObject = properties.isCacheObject();
+			expire = properties.getExpiry();
 		}
 		else {
 			heap = EhCacheContants.DEFAULT_HEAP;
 			offheap = EhCacheContants.DEFAULT_OFFHEAP;
+		}
+
+		
+		SpringCacheExpiry expiry = null;
+		if (expire > 0 && !isCacheObject) {
+			expiry = new SpringCacheExpiry(expire);
+		} else {
+			expiry = new SpringCacheExpiry();
 		}
 
 		CacheConfigurationBuilder<String, Serializable> configuration = CacheConfigurationBuilder
@@ -83,7 +91,7 @@ public class SpringCacheOperation implements BaseCacheOperation {
 		try {
 			Object element = getEhCache().get(key);
 			if (null != element) {
-				if (SpringCacheConfig.isCacheObject()) {
+				if (isCacheObject) {
 					CacheObjectImpl cache = (CacheObjectImpl) element;
 					if (null != cache) {
 						if (cache.isExpired()) {
@@ -115,7 +123,7 @@ public class SpringCacheOperation implements BaseCacheOperation {
 		if (value == null)
 			this.delete(key);
 		try {
-			if (SpringCacheConfig.isCacheObject()) {
+			if (isCacheObject) {
 				CacheObjectImpl object = CacheObjectImpl.create(value, expire);
 				getEhCache().put(key, object);
 			} else {
