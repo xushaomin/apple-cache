@@ -10,17 +10,25 @@ import java.util.Set;
 
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.ehcache.config.units.MemoryUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheException;
+import com.appleframework.cache.ehcache.config.EhCacheConfiguration;
+import com.appleframework.cache.ehcache.config.EhCacheContants;
+import com.appleframework.cache.ehcache.config.EhCacheProperties;
 
 @SuppressWarnings("unchecked")
 public class EhCacheManager implements com.appleframework.cache.core.CacheManager {
 
 	private static Logger logger = LoggerFactory.getLogger(EhCacheManager.class);
 
-	private String name = "EHCACHE_MANAGER";
+    private volatile Cache<String, Serializable> cache;  
+
+	private String name = "default";
 
 	private CacheManager ehcacheManager;
 
@@ -33,9 +41,45 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 	}
 
 	public Cache<String, Serializable> getEhCache() {
-		return ehcacheManager.getCache(name, String.class, Serializable.class);
+		if (cache == null) {
+			synchronized (Cache.class) {
+				if (cache == null) {
+					initCache();
+				}
+			}
+		}
+		return cache;
 	}
-
+	
+	private void initCache() {
+		EhCacheProperties properties = EhCacheConfiguration.getProperties().get(name);
+		int heap = 10;
+		int offheap = 100;
+		if(null != properties) {
+			heap = properties.getHeap();
+			offheap = properties.getOffheap();
+		}
+		else {
+			heap = EhCacheContants.DEFAULT_HEAP;
+			offheap = EhCacheContants.DEFAULT_OFFHEAP;
+		}
+		CacheConfigurationBuilder<String, Serializable> configuration = CacheConfigurationBuilder
+				.newCacheConfigurationBuilder(String.class, Serializable.class,
+						ResourcePoolsBuilder.newResourcePoolsBuilder()
+								.heap(heap, MemoryUnit.MB)
+								.offheap(offheap, MemoryUnit.MB))
+				.withExpiry(EhCacheExpiryUtil.instance());
+		cache = ehcacheManager.getCache(name, String.class, Serializable.class);
+		if (null == cache) {
+			try {
+				cache = ehcacheManager.createCache(name, configuration);
+			} catch (IllegalArgumentException e) {
+				logger.warn("the cache name " + name + " is exist !");
+				cache = ehcacheManager.getCache(name, String.class, Serializable.class);
+			}
+		}
+	}
+	
 	public void clear() throws CacheException {
 		try {
 			getEhCache().clear();

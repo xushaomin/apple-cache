@@ -4,71 +4,33 @@ import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import com.appleframework.cache.ehcache.config.EhCacheProperties;
+
 @ConfigurationProperties(prefix = "apple.cache.ehcache3")
 public class AppleCacheProperties {
 
 	public static final String PREFIX = "apple.cache.ehcache3";
 
-	private String name = "apple_cache";
-
-	private Integer heap = 10;
-
-	private Integer offheap = 100;
-
-	private Integer disk = 1000;
-
-	private Boolean persistent = false;
-
 	private String filePath = System.getProperty("user.home");
+	
+	private String initName = "default";
 
 	private Boolean cacheEnable = true;
 
 	private Boolean cacheObject = true;
 
-	private String cacheKeyPrefix;
-
-	private Map<String, Integer> expireConfig;
-
 	private Boolean springCache = false;
 
-	public String getName() {
-		return name;
+	private Map<String, EhCacheProperties> config;
+	
+	private Map<String, Integer> expireConfig;
+	
+	public String getInitName() {
+		return initName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Integer getHeap() {
-		return heap;
-	}
-
-	public void setHeap(Integer heap) {
-		this.heap = heap;
-	}
-
-	public Integer getOffheap() {
-		return offheap;
-	}
-
-	public void setOffheap(Integer offheap) {
-		this.offheap = offheap;
-	}
-
-	public Integer getDisk() {
-		return disk;
-	}
-
-	public void setDisk(Integer disk) {
-		this.disk = disk;
-	}
-
-	public Boolean getPersistent() {
-		return persistent;
-	}
-
-	public void setPersistent(Boolean persistent) {
-		this.persistent = persistent;
+	public void setInitName(String initName) {
+		this.initName = initName;
 	}
 
 	public String getFilePath() {
@@ -95,12 +57,20 @@ public class AppleCacheProperties {
 		this.cacheObject = cacheObject;
 	}
 
-	public String getCacheKeyPrefix() {
-		return cacheKeyPrefix;
+	public Boolean getSpringCache() {
+		return springCache;
 	}
 
-	public void setCacheKeyPrefix(String cacheKeyPrefix) {
-		this.cacheKeyPrefix = cacheKeyPrefix;
+	public void setSpringCache(Boolean springCache) {
+		this.springCache = springCache;
+	}
+
+	public Map<String, EhCacheProperties> getConfig() {
+		return config;
+	}
+
+	public void setConfig(Map<String, EhCacheProperties> config) {
+		this.config = config;
 	}
 
 	public Map<String, Integer> getExpireConfig() {
@@ -109,14 +79,6 @@ public class AppleCacheProperties {
 
 	public void setExpireConfig(Map<String, Integer> expireConfig) {
 		this.expireConfig = expireConfig;
-	}
-
-	public Boolean getSpringCache() {
-		return springCache;
-	}
-
-	public void setSpringCache(Boolean springCache) {
-		this.springCache = springCache;
 	}
 
 }

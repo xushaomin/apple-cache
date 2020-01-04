@@ -14,10 +14,13 @@ import org.ehcache.xml.XmlConfiguration;
 import org.springframework.beans.factory.FactoryBean;
 
 import com.appleframework.cache.ehcache.EhCacheExpiryUtil;
+import com.appleframework.cache.ehcache.config.EhCacheConfiguration;
+import com.appleframework.cache.ehcache.config.EhCacheContants;
+import com.appleframework.cache.ehcache.config.EhCacheProperties;
 
 public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 
-	private String name = "apple_cache";
+	private String name = "default";
 	private String filePath = System.getProperty("user.home");
 
 	@Override
@@ -25,15 +28,32 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 		URL xmlUrl = getClass().getResource("/ehcache.xml");
 		CacheManager cacheManager = null;
 		if (null == xmlUrl) {
+			EhCacheProperties properties = EhCacheConfiguration.getProperties().get("default");
+			int heap = 10;
+			int offheap = 100;
+			int disk = 1000;
+			boolean persistent = false;
+			if(null != properties) {
+				heap = properties.getHeap();
+				offheap = properties.getOffheap();
+				disk = properties.getDisk();
+				persistent = properties.isPersistent();
+			}
+			else {
+				heap = EhCacheContants.DEFAULT_HEAP;
+				offheap = EhCacheContants.DEFAULT_OFFHEAP;
+				disk = EhCacheContants.DEFAULT_DISK;
+				persistent = EhCacheContants.DEFAULT_PERSISTENT;
+			}
 			cacheManager = CacheManagerBuilder
 					.newCacheManagerBuilder()
 					.with(CacheManagerBuilder.persistence(new File(filePath, "ehcacheData")))
 					.withCache(name,
 							CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Serializable.class,
 											ResourcePoolsBuilder.newResourcePoolsBuilder()
-													.heap(ConfigurationFactoryBean.getHeap(), MemoryUnit.MB)
-													.offheap(ConfigurationFactoryBean.getOffheap(), MemoryUnit.MB)
-													.disk(ConfigurationFactoryBean.getDisk(), MemoryUnit.MB, ConfigurationFactoryBean.isPersistent()))
+													.heap(heap, MemoryUnit.MB)
+													.offheap(offheap, MemoryUnit.MB)
+													.disk(disk, MemoryUnit.MB, persistent))
 									.withExpiry(EhCacheExpiryUtil.instance()))
 					.build(true);
 		} else {

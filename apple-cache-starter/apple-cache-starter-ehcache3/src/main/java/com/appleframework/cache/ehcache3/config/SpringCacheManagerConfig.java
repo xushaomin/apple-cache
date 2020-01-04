@@ -18,10 +18,7 @@ public class SpringCacheManagerConfig {
 	
 	@Value("${spring.cache.oject:true}")
 	private boolean cacheObject = true;
-	
-	@Value("${spring.cache.keyPrefix:springcache}")
-	private String cacheKeyPrefix;
-	
+		
 	private Map<String, Integer> expireConfig;
 	
 	@Bean
@@ -31,7 +28,6 @@ public class SpringCacheManagerConfig {
 		springCacheManager.setEhcacheManager(ehcacheManager);
 		springCacheManager.setCacheEnable(cacheEnable);
 		springCacheManager.setCacheObject(cacheObject);
-		springCacheManager.setCacheKeyPrefix(cacheKeyPrefix);
 		springCacheManager.setExpireConfig(expireConfig);
 		return springCacheManager;
 	}
@@ -42,10 +38,6 @@ public class SpringCacheManagerConfig {
 
 	public void setCacheObject(boolean cacheObject) {
 		this.cacheObject = cacheObject;
-	}
-
-	public void setCacheKeyPrefix(String cacheKeyPrefix) {
-		this.cacheKeyPrefix = cacheKeyPrefix;
 	}
 
 	public void setExpireConfig(Map<String, Integer> expireConfig) {

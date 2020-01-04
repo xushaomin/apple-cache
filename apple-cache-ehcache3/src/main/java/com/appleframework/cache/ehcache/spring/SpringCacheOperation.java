@@ -14,7 +14,9 @@ import com.appleframework.cache.core.CacheObjectImpl;
 import com.appleframework.cache.core.config.SpringCacheConfig;
 import com.appleframework.cache.core.spring.BaseCacheOperation;
 import com.appleframework.cache.ehcache.EhCacheExpiry;
-import com.appleframework.cache.ehcache.factory.ConfigurationFactoryBean;
+import com.appleframework.cache.ehcache.config.EhCacheConfiguration;
+import com.appleframework.cache.ehcache.config.EhCacheContants;
+import com.appleframework.cache.ehcache.config.EhCacheProperties;
 
 public class SpringCacheOperation implements BaseCacheOperation {
 
@@ -36,11 +38,23 @@ public class SpringCacheOperation implements BaseCacheOperation {
 		} else {
 			expiry = new SpringCacheExpiry();
 		}
+		EhCacheProperties properties = EhCacheConfiguration.getProperties().get(name);
+		int heap = 10;
+		int offheap = 100;
+		if(null != properties) {
+			heap = properties.getHeap();
+			offheap = properties.getOffheap();
+		}
+		else {
+			heap = EhCacheContants.DEFAULT_HEAP;
+			offheap = EhCacheContants.DEFAULT_OFFHEAP;
+		}
+
 		CacheConfigurationBuilder<String, Serializable> configuration = CacheConfigurationBuilder
 				.newCacheConfigurationBuilder(String.class, Serializable.class,
 						ResourcePoolsBuilder.newResourcePoolsBuilder()
-								.heap(ConfigurationFactoryBean.getHeap(), MemoryUnit.MB)
-								.offheap(ConfigurationFactoryBean.getOffheap(), MemoryUnit.MB))
+								.heap(heap, MemoryUnit.MB)
+								.offheap(offheap, MemoryUnit.MB))
 				.withExpiry(expiry);
 		cache = ehcacheManager.getCache(name, String.class, Serializable.class);
 		if (null == cache) {

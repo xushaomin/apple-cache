@@ -17,7 +17,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
 import com.appleframework.cache.ehcache.EhCacheExpiryUtil;
-import com.appleframework.cache.ehcache.factory.ConfigurationFactoryBean;
+import com.appleframework.cache.ehcache.config.EhCacheConfiguration;
+import com.appleframework.cache.ehcache.config.EhCacheContants;
+import com.appleframework.cache.ehcache.config.EhCacheProperties;
 
 @Configuration
 @Order(2)
@@ -35,15 +37,33 @@ public class EhCacheManagerFactoryConfig {
 			if("null".equals(filePath)) {
 				filePath = System.getProperty("java.home");
 			}
+			String name = "default";
+			EhCacheProperties properties = EhCacheConfiguration.getProperties().get(name);
+			int heap = 10;
+			int offheap = 100;
+			int disk = 1000;
+			boolean persistent = false;
+			if(null != properties) {
+				heap = properties.getHeap();
+				offheap = properties.getOffheap();
+				disk = properties.getDisk();
+				persistent = properties.isPersistent();
+			}
+			else {
+				heap = EhCacheContants.DEFAULT_HEAP;
+				offheap = EhCacheContants.DEFAULT_OFFHEAP;
+				disk = EhCacheContants.DEFAULT_DISK;
+				persistent = EhCacheContants.DEFAULT_PERSISTENT;
+			}
 			ehCacheManager = CacheManagerBuilder
 					.newCacheManagerBuilder()
 					.with(CacheManagerBuilder.persistence(new File(filePath, "ehcacheData")))
-					.withCache(ConfigurationFactoryBean.getName(),
+					.withCache(name,
 							CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Serializable.class,
 											ResourcePoolsBuilder.newResourcePoolsBuilder()
-													.heap(ConfigurationFactoryBean.getHeap(), MemoryUnit.MB)
-													.offheap(ConfigurationFactoryBean.getOffheap(), MemoryUnit.MB)
-													.disk(ConfigurationFactoryBean.getDisk(), MemoryUnit.MB, ConfigurationFactoryBean.isPersistent()))
+													.heap(heap, MemoryUnit.MB)
+													.offheap(offheap, MemoryUnit.MB)
+													.disk(disk, MemoryUnit.MB, persistent))
 									.withExpiry(EhCacheExpiryUtil.instance()))
 					.build(true);
 		} else {
