@@ -3,6 +3,7 @@ package com.appleframework.cache.ehcache.factory;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.Map;
 
 import org.ehcache.CacheManager;
 import org.ehcache.config.Configuration;
@@ -28,7 +29,12 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 		URL xmlUrl = getClass().getResource("/ehcache.xml");
 		CacheManager cacheManager = null;
 		if (null == xmlUrl) {
-			EhCacheProperties properties = EhCacheConfiguration.getProperties().get("default");
+			EhCacheProperties properties = null;
+			Map<String, EhCacheProperties> cacheTemplate = EhCacheConfiguration.getProperties();
+			if(null != cacheTemplate.get(name) ) {
+				properties = cacheTemplate.get(name);
+			}
+
 			int heap = 10;
 			int offheap = 100;
 			int disk = 1000;

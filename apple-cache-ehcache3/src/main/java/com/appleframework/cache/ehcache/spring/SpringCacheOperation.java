@@ -1,6 +1,7 @@
 package com.appleframework.cache.ehcache.spring;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
@@ -35,8 +36,10 @@ public class SpringCacheOperation implements BaseCacheOperation {
 	}
 
 	private void init(CacheManager ehcacheManager) {
-		
-		properties = EhCacheConfiguration.getProperties().get(name);
+		Map<String, EhCacheProperties> cacheTemplate = EhCacheConfiguration.getProperties();
+		if(null != cacheTemplate.get(name) ) {
+			properties = cacheTemplate.get(name);
+		}
 		int heap = 10;
 		int offheap = 100;
 		if(null != properties) {
@@ -58,15 +61,15 @@ public class SpringCacheOperation implements BaseCacheOperation {
 			expiry = new SpringCacheExpiry();
 		}
 
-		CacheConfigurationBuilder<String, Serializable> configuration = CacheConfigurationBuilder
-				.newCacheConfigurationBuilder(String.class, Serializable.class,
-						ResourcePoolsBuilder.newResourcePoolsBuilder()
-								.heap(heap, MemoryUnit.MB)
-								.offheap(offheap, MemoryUnit.MB))
-				.withExpiry(expiry);
 		cache = ehcacheManager.getCache(name, String.class, Serializable.class);
 		if (null == cache) {
 			try {
+				CacheConfigurationBuilder<String, Serializable> configuration = CacheConfigurationBuilder
+						.newCacheConfigurationBuilder(String.class, Serializable.class,
+								ResourcePoolsBuilder.newResourcePoolsBuilder()
+										.heap(heap, MemoryUnit.MB)
+										.offheap(offheap, MemoryUnit.MB))
+						.withExpiry(expiry);
 				cache = ehcacheManager.createCache(name, configuration);
 			} catch (IllegalArgumentException e) {
 				logger.warn("the cache name " + name + " is exist !");

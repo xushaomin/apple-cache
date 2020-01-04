@@ -52,7 +52,12 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 	}
 	
 	private void initCache() {
-		EhCacheProperties properties = EhCacheConfiguration.getProperties().get(name);
+		EhCacheProperties properties = null;
+		Map<String, EhCacheProperties> cacheTemplate = EhCacheConfiguration.getProperties();
+		if(null != cacheTemplate.get(name) ) {
+			properties = cacheTemplate.get(name);
+		}
+
 		int heap = 10;
 		int offheap = 100;
 		if(null != properties) {
@@ -63,15 +68,15 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 			heap = EhCacheContants.DEFAULT_HEAP;
 			offheap = EhCacheContants.DEFAULT_OFFHEAP;
 		}
-		CacheConfigurationBuilder<String, Serializable> configuration = CacheConfigurationBuilder
-				.newCacheConfigurationBuilder(String.class, Serializable.class,
-						ResourcePoolsBuilder.newResourcePoolsBuilder()
-								.heap(heap, MemoryUnit.MB)
-								.offheap(offheap, MemoryUnit.MB))
-				.withExpiry(EhCacheExpiryUtil.instance());
 		cache = ehcacheManager.getCache(name, String.class, Serializable.class);
 		if (null == cache) {
 			try {
+				CacheConfigurationBuilder<String, Serializable> configuration = CacheConfigurationBuilder
+						.newCacheConfigurationBuilder(String.class, Serializable.class,
+								ResourcePoolsBuilder.newResourcePoolsBuilder()
+										.heap(heap, MemoryUnit.MB)
+										.offheap(offheap, MemoryUnit.MB))
+						.withExpiry(EhCacheExpiryUtil.instance());
 				cache = ehcacheManager.createCache(name, configuration);
 			} catch (IllegalArgumentException e) {
 				logger.warn("the cache name " + name + " is exist !");

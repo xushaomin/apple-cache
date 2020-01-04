@@ -14,6 +14,9 @@ public class EhCacheExpiry implements ExpiryPolicy<String, Serializable> {
 
 	public static void setExpiry(String key, int seconds) {
 		Duration duration = Duration.ofSeconds(seconds);
+		if(seconds <= 0) {
+			duration = Duration.ofSeconds(Long.MAX_VALUE);
+		}
 		durationMap.put(getKey(key), duration);
 	}
 

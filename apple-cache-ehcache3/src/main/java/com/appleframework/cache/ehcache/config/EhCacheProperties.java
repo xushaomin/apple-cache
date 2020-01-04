@@ -10,8 +10,6 @@ public class EhCacheProperties {
 	
 	private boolean springCache = true;
 	private boolean cacheObject = false;
-	private boolean cacheEnable = true;
-
 	
 	public int getHeap() {
 		return heap;
@@ -67,14 +65,6 @@ public class EhCacheProperties {
 
 	public void setCacheObject(boolean cacheObject) {
 		this.cacheObject = cacheObject;
-	}
-
-	public boolean isCacheEnable() {
-		return cacheEnable;
-	}
-
-	public void setCacheEnable(boolean cacheEnable) {
-		this.cacheEnable = cacheEnable;
 	}
 	
 }
