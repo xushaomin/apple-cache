@@ -16,7 +16,7 @@ public class SpringCacheManager extends BaseSpringCacheManager {
 	public Cache getCache(String name) {
 		Cache cache = cacheMap.get(name);
 		if (cache == null) {
-			synchronized (this) {
+			synchronized (Cache.class) {
 				Integer expire = expireMap.get(name);
 				if (expire == null) {
 					expire = 0;

@@ -20,7 +20,7 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 
 	private static Logger logger = LoggerFactory.getLogger(EhCacheManager.class);
 	
-	private String name = "EHCACHE_MANAGER";
+	private String name = "default";
 	
 	private CacheManager ehcacheManager;
 		
@@ -35,12 +35,12 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 	public Cache getEhCache() {
 		Cache cache = ehcacheManager.getCache(name);
 		if(null == cache) {
-			ehcacheManager.addCache(name);
-			return ehcacheManager.getCache(name);
+			synchronized (Cache.class) {
+				ehcacheManager.addCache(name);
+			}
+			cache = ehcacheManager.getCache(name);
 		}
-		else {
-			return cache;
-		}
+		return cache;
 	}
 
 	public void clear() throws CacheException {

@@ -23,7 +23,7 @@ public class SpringCacheOperation implements BaseCacheOperation {
 	
 	private long timeToIdleSeconds = 0L;
 	private long timeToLiveSeconds = 0L;
-		
+	
 	private Cache cache;
 	
 	private Cache getEhCache() {
