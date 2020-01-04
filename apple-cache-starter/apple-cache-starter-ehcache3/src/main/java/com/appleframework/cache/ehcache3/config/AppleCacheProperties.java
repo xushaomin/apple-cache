@@ -11,7 +11,7 @@ public class AppleCacheProperties {
 
 	public static final String PREFIX = "apple.cache.ehcache3";
 
-	private String filePath = System.getProperty("user.home");
+	private String directory = System.getProperty("user.home");
 	
 	private String initName = "default";
 
@@ -21,24 +21,14 @@ public class AppleCacheProperties {
 
 	private Boolean springCache = false;
 
-	private Map<String, EhCacheProperties> config;
-	
-	private Map<String, Integer> expireConfig;
-	
+	private Map<String, EhCacheProperties> cacheTemplate;
+		
 	public String getInitName() {
 		return initName;
 	}
 
 	public void setInitName(String initName) {
 		this.initName = initName;
-	}
-
-	public String getFilePath() {
-		return filePath;
-	}
-
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
 	}
 
 	public Boolean getCacheEnable() {
@@ -65,20 +55,20 @@ public class AppleCacheProperties {
 		this.springCache = springCache;
 	}
 
-	public Map<String, EhCacheProperties> getConfig() {
-		return config;
+	public String getDirectory() {
+		return directory;
 	}
 
-	public void setConfig(Map<String, EhCacheProperties> config) {
-		this.config = config;
+	public void setDirectory(String directory) {
+		this.directory = directory;
 	}
 
-	public Map<String, Integer> getExpireConfig() {
-		return expireConfig;
+	public Map<String, EhCacheProperties> getCacheTemplate() {
+		return cacheTemplate;
 	}
 
-	public void setExpireConfig(Map<String, Integer> expireConfig) {
-		this.expireConfig = expireConfig;
+	public void setCacheTemplate(Map<String, EhCacheProperties> cacheTemplate) {
+		this.cacheTemplate = cacheTemplate;
 	}
 
 }

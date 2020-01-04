@@ -6,6 +6,7 @@ public class EhCacheProperties {
 	private int offheap = 100;
 	private int disk = 1000;
 	private boolean persistent = false;
+	private long expiry = 0;
 	
 	public int getHeap() {
 		return heap;
@@ -37,5 +38,14 @@ public class EhCacheProperties {
 
 	public void setPersistent(boolean persistent) {
 		this.persistent = persistent;
-	}	
+	}
+
+	public long getExpiry() {
+		return expiry;
+	}
+
+	public void setExpiry(long expiry) {
+		this.expiry = expiry;
+	}
+	
 }
