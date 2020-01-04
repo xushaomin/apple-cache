@@ -106,14 +106,17 @@ public class AppleCacheAutoConfiguration {
 		}
 		springCacheManager.setEhcacheManager(ehCacheManager);
 		Map<String, Integer> expireConfig = new HashMap<String, Integer>();
-		for (Map.Entry<String, EhCacheProperties> map : properties.getCacheTemplate().entrySet()) {
-			String key = map.getKey();
-			EhCacheProperties property = map.getValue();
-			if(property.isSpringCache()) {
-				expireConfig.put(key, property.getExpiry());
-			}
-		}	
-		springCacheManager.setExpireConfig(expireConfig);
+		Map<String, EhCacheProperties> cacheTemplate = properties.getCacheTemplate();
+		if(null != cacheTemplate) {
+			for (Map.Entry<String, EhCacheProperties> map : properties.getCacheTemplate().entrySet()) {
+				String key = map.getKey();
+				EhCacheProperties property = map.getValue();
+				if(property.isSpringCache()) {
+					expireConfig.put(key, property.getExpiry());
+				}
+			}	
+			springCacheManager.setExpireConfig(expireConfig);
+		}
 		return springCacheManager;
 	}
 	
