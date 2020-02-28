@@ -15,7 +15,7 @@
 	
 	<bean id="cacheManager" class="com.appleframework.cache.ehcache.EhCacheManager">
 		<property name="ehcacheManager" ref="ehCacheManagerFactoryBean" />
-		<property name="name" value="${cache.name}" />
+		<property name="cacheName" value="test" />
 	</bean>
 
 </beans>

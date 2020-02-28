@@ -6,7 +6,8 @@ public class EhCacheProperties {
 	private int offheap = 100;
 	private int disk = 1000;
 	private boolean persistent = false;
-	private int expiry = 0;
+	private int ttl = 0;
+	private int tti = 0;
 	
 	private boolean springCache = true;
 	private boolean cacheObject = false;
@@ -43,12 +44,20 @@ public class EhCacheProperties {
 		this.persistent = persistent;
 	}
 
-	public int getExpiry() {
-		return expiry;
+	public int getTtl() {
+		return ttl;
 	}
 
-	public void setExpiry(int expiry) {
-		this.expiry = expiry;
+	public void setTtl(int ttl) {
+		this.ttl = ttl;
+	}
+
+	public int getTti() {
+		return tti;
+	}
+
+	public void setTti(int tti) {
+		this.tti = tti;
 	}
 
 	public boolean isSpringCache() {

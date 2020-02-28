@@ -11,6 +11,7 @@ import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.MemoryUnit;
+import org.ehcache.expiry.ExpiryPolicy;
 import org.ehcache.xml.XmlConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -64,17 +65,36 @@ public class AppleCacheAutoConfiguration {
 			int offheap = 100;
 			int disk = 1000;
 			boolean persistent = false;
+			int ttl = 0;
+			int tti = 0;
+			ExpiryPolicy<Object, Object> expiryPolicy = null;
 			if(null != property) {
 				heap = property.getHeap();
 				offheap = property.getOffheap();
 				disk = property.getDisk();
 				persistent = property.isPersistent();
+				ttl = property.getTtl();
+				tti = property.getTti();
 			}
 			else {
 				heap = EhCacheContants.DEFAULT_HEAP;
 				offheap = EhCacheContants.DEFAULT_OFFHEAP;
 				disk = EhCacheContants.DEFAULT_DISK;
 				persistent = EhCacheContants.DEFAULT_PERSISTENT;
+				ttl = EhCacheContants.DEFAULT_TTL;
+				tti = EhCacheContants.DEFAULT_TTI;
+			}
+			
+			if(ttl > 0) {
+				expiryPolicy = EhCacheExpiryUtil.instance("ttl", ttl);
+			}
+			
+			if(tti > 0) {
+				expiryPolicy = EhCacheExpiryUtil.instance("tti", tti);
+			}
+			
+			if(tti <=0 && tti <=0 ) {
+				expiryPolicy = EhCacheExpiryUtil.instance();
 			}
 
 			ehCacheManager = CacheManagerBuilder
@@ -86,7 +106,7 @@ public class AppleCacheAutoConfiguration {
 													.heap(heap, MemoryUnit.MB)
 													.offheap(offheap, MemoryUnit.MB)
 													.disk(disk, MemoryUnit.MB, persistent))
-									.withExpiry(EhCacheExpiryUtil.instance()))
+									.withExpiry(expiryPolicy))
 					.build(true);
 		} else {
 			org.ehcache.config.Configuration xmlConfig = new XmlConfiguration(xmlUrl);
@@ -112,7 +132,7 @@ public class AppleCacheAutoConfiguration {
 				String key = map.getKey();
 				EhCacheProperties property = map.getValue();
 				if(property.isSpringCache()) {
-					expireConfig.put(key, property.getExpiry());
+					expireConfig.put(key, property.getTti());
 				}
 			}	
 			springCacheManager.setExpireConfig(expireConfig);

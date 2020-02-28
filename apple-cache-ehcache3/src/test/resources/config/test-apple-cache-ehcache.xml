@@ -12,7 +12,7 @@
      default-lazy-init="true">
 		
 	<bean id="ehCacheManagerFactoryBean" class="com.appleframework.cache.ehcache.factory.EhCacheManagerFactoryBean">
-		<property name="cacheName" value="test"></property>
+		<property name="name" value="test"></property>
 	</bean>
 	
 	<bean id="cacheManager" class="com.appleframework.cache.ehcache.EhCacheManager">

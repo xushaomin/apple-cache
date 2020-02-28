@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheObjectImpl;
 import com.appleframework.cache.core.spring.BaseCacheOperation;
-import com.appleframework.cache.ehcache.EhCacheExpiry;
+import com.appleframework.cache.ehcache.EhCacheExpiryUtil;
 import com.appleframework.cache.ehcache.config.EhCacheConfiguration;
 import com.appleframework.cache.ehcache.config.EhCacheContants;
 import com.appleframework.cache.ehcache.config.EhCacheProperties;
@@ -46,7 +46,7 @@ public class SpringCacheOperation implements BaseCacheOperation {
 			heap = properties.getHeap();
 			offheap = properties.getOffheap();
 			isCacheObject = properties.isCacheObject();
-			expire = properties.getExpiry();
+			expire = properties.getTti();
 		}
 		else {
 			heap = EhCacheContants.DEFAULT_HEAP;
@@ -131,7 +131,7 @@ public class SpringCacheOperation implements BaseCacheOperation {
 				getEhCache().put(key, object);
 			} else {
 				if (expire > 0) {
-					EhCacheExpiry.setExpiry(key, expire);
+					EhCacheExpiryUtil.setExpiry(key, expire);
 				}
 				getEhCache().put(key, (Serializable) value);
 			}

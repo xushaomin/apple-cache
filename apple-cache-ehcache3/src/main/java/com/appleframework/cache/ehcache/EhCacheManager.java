@@ -124,7 +124,7 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 	
 	public void expire(String key, int expireTime) throws CacheException {
 		try {
-			EhCacheExpiry.setExpiry(key, expireTime);
+			EhCacheExpiryUtil.setExpiry(key, expireTime);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
@@ -143,7 +143,7 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 	public void set(String key, Object value, int expireTime) throws CacheException {
 		if (null != value) {
 			try {
-				EhCacheExpiry.setExpiry(key, expireTime);
+				EhCacheExpiryUtil.setExpiry(key, expireTime);
 				getEhCache().put(key, (Serializable) value);
 			} catch (Exception e) {
 				logger.error(e.getMessage());

@@ -11,6 +11,7 @@ import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.MemoryUnit;
+import org.ehcache.expiry.ExpiryPolicy;
 import org.ehcache.xml.XmlConfiguration;
 import org.springframework.beans.factory.FactoryBean;
 
@@ -39,18 +40,38 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 			int offheap = 100;
 			int disk = 1000;
 			boolean persistent = false;
+			int ttl = 0;
+			int tti = 0;
+			ExpiryPolicy<Object, Object> expiryPolicy = null;
 			if(null != properties) {
 				heap = properties.getHeap();
 				offheap = properties.getOffheap();
 				disk = properties.getDisk();
 				persistent = properties.isPersistent();
+				ttl = properties.getTtl();
+				tti = properties.getTti();
 			}
 			else {
 				heap = EhCacheContants.DEFAULT_HEAP;
 				offheap = EhCacheContants.DEFAULT_OFFHEAP;
 				disk = EhCacheContants.DEFAULT_DISK;
 				persistent = EhCacheContants.DEFAULT_PERSISTENT;
+				ttl = EhCacheContants.DEFAULT_TTL;
+				tti = EhCacheContants.DEFAULT_TTI;
 			}
+			
+			if(ttl > 0) {
+				expiryPolicy = EhCacheExpiryUtil.instance("ttl", ttl);
+			}
+			
+			if(tti > 0) {
+				expiryPolicy = EhCacheExpiryUtil.instance("tti", tti);
+			}
+			
+			if(tti <=0 && tti <=0 ) {
+				expiryPolicy = EhCacheExpiryUtil.instance();
+			}
+
 			cacheManager = CacheManagerBuilder
 					.newCacheManagerBuilder()
 					.with(CacheManagerBuilder.persistence(new File(directory, "ehcacheData")))
@@ -60,7 +81,7 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 													.heap(heap, MemoryUnit.MB)
 													.offheap(offheap, MemoryUnit.MB)
 													.disk(disk, MemoryUnit.MB, persistent))
-									.withExpiry(EhCacheExpiryUtil.instance()))
+									.withExpiry(expiryPolicy))
 					.build(true);
 		} else {
 			Configuration xmlConfig = new XmlConfiguration(xmlUrl);
