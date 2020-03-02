@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.core.CacheManager;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.ReplicatedMap;
+import com.hazelcast.replicatedmap.ReplicatedMap;
 
 /**
  * @author cruise.xu

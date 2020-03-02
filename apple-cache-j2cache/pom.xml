@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.appleframework.cache</groupId>
 		<artifactId>apple-cache</artifactId>
-		<version>0.4.0.RELEASE</version>
+		<version>0.4.1.RELEASE</version>
 	</parent>
 	<artifactId>apple-cache-j2cache</artifactId>
 	<name>apple-cache-j2cache</name>

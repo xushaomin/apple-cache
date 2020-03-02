@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>apple-cache</artifactId>
 		<groupId>com.appleframework.cache</groupId>
-		<version>0.4.0.RELEASE</version>
+		<version>0.4.1.RELEASE</version>
 	</parent>
 	<artifactId>apple-cache-redisson3</artifactId>
 	<name>apple-cache-redisson3</name>
@@ -45,7 +45,7 @@
 		<dependency>
 			<groupId>org.redisson</groupId>
 			<artifactId>redisson</artifactId>
-			<version>3.11.6</version>
+			<version>3.12.3</version>
 		</dependency>
 		
 	</dependencies>

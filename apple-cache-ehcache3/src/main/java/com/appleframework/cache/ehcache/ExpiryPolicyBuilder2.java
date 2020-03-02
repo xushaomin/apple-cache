@@ -1,5 +1,12 @@
 package com.appleframework.cache.ehcache;
 
+import java.time.Duration;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+
 /*
  * Copyright Terracotta, Inc.
  *
@@ -19,19 +26,12 @@ package com.appleframework.cache.ehcache;
 import org.ehcache.config.Builder;
 import org.ehcache.expiry.ExpiryPolicy;
 
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
-
 /**
  * Builder and utilities for getting predefined {@link ExpiryPolicy} instances.
  */
 public class ExpiryPolicyBuilder2<K, V> implements Builder<ExpiryPolicy<K, V>> {
 
-	private static Map<Object, Duration> durationMap = new HashMap<Object, Duration>();
+	private static Map<Object, Duration> durationMap = new ConcurrentHashMap<Object, Duration>();
 
 	public static void setExpiry(String key, int seconds) {
 		Duration duration = Duration.ofSeconds(seconds);

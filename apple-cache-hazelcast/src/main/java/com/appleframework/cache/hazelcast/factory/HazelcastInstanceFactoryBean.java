@@ -30,8 +30,7 @@ public class HazelcastInstanceFactoryBean implements FactoryBean<HazelcastInstan
 		config.getNetworkConfig().setPortAutoIncrement(true);
 		if(null != mancenterUrl) {
 			ManagementCenterConfig manCenterConfig = new ManagementCenterConfig();
-			manCenterConfig.setUrl(mancenterUrl);
-			manCenterConfig.setEnabled(true);
+			manCenterConfig.setScriptingEnabled(true);
 			config.setManagementCenterConfig(manCenterConfig);
 		}
 		NetworkConfig network = config.getNetworkConfig();
