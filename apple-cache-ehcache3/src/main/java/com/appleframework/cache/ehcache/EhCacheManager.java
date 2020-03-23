@@ -11,15 +11,14 @@ import java.util.Set;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
-import org.ehcache.config.builders.ResourcePoolsBuilder;
-import org.ehcache.config.units.MemoryUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheException;
 import com.appleframework.cache.ehcache.config.EhCacheConfiguration;
-import com.appleframework.cache.ehcache.config.EhCacheContants;
 import com.appleframework.cache.ehcache.config.EhCacheProperties;
+import com.appleframework.cache.ehcache.utils.EhCacheConfigurationUtil;
+import com.appleframework.cache.ehcache.utils.EhCacheExpiryUtil;
 
 @SuppressWarnings("unchecked")
 public class EhCacheManager implements com.appleframework.cache.core.CacheManager {
@@ -57,26 +56,11 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 		if(null != cacheTemplate.get(name) ) {
 			properties = cacheTemplate.get(name);
 		}
-
-		int heap = 10;
-		int offheap = 100;
-		if(null != properties) {
-			heap = properties.getHeap();
-			offheap = properties.getOffheap();
-		}
-		else {
-			heap = EhCacheContants.DEFAULT_HEAP;
-			offheap = EhCacheContants.DEFAULT_OFFHEAP;
-		}
+		
 		cache = ehcacheManager.getCache(name, String.class, Serializable.class);
 		if (null == cache) {
 			try {
-				CacheConfigurationBuilder<String, Serializable> configuration = CacheConfigurationBuilder
-						.newCacheConfigurationBuilder(String.class, Serializable.class,
-								ResourcePoolsBuilder.newResourcePoolsBuilder()
-										.heap(heap, MemoryUnit.MB)
-										.offheap(offheap, MemoryUnit.MB))
-						.withExpiry(EhCacheExpiryUtil.instance());
+				CacheConfigurationBuilder<String, Serializable> configuration = EhCacheConfigurationUtil.initCacheConfiguration(properties);
 				cache = ehcacheManager.createCache(name, configuration);
 			} catch (IllegalArgumentException e) {
 				logger.warn("the cache name " + name + " is exist !");

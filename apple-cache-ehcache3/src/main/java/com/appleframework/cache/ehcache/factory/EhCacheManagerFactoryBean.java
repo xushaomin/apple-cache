@@ -1,24 +1,17 @@
 package com.appleframework.cache.ehcache.factory;
 
-import java.io.File;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.Map;
 
 import org.ehcache.CacheManager;
-import org.ehcache.config.Configuration;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
-import org.ehcache.config.builders.CacheManagerBuilder;
-import org.ehcache.config.builders.ResourcePoolsBuilder;
-import org.ehcache.config.units.MemoryUnit;
-import org.ehcache.expiry.ExpiryPolicy;
-import org.ehcache.xml.XmlConfiguration;
 import org.springframework.beans.factory.FactoryBean;
 
-import com.appleframework.cache.ehcache.EhCacheExpiryUtil;
 import com.appleframework.cache.ehcache.config.EhCacheConfiguration;
-import com.appleframework.cache.ehcache.config.EhCacheContants;
 import com.appleframework.cache.ehcache.config.EhCacheProperties;
+import com.appleframework.cache.ehcache.utils.EhCacheConfigurationUtil;
+import com.appleframework.cache.ehcache.utils.EhCacheManagerUtil;
 
 public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 
@@ -32,61 +25,16 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 		if (null == xmlUrl) {
 			EhCacheProperties properties = null;
 			Map<String, EhCacheProperties> cacheTemplate = EhCacheConfiguration.getProperties();
-			if(null != cacheTemplate.get(name) ) {
+			if (null != cacheTemplate.get(name)) {
 				properties = cacheTemplate.get(name);
 			}
 
-			int heap = 10;
-			int offheap = 100;
-			int disk = 1000;
-			boolean persistent = false;
-			int ttl = 0;
-			int tti = 0;
-			ExpiryPolicy<Object, Object> expiryPolicy = null;
-			if(null != properties) {
-				heap = properties.getHeap();
-				offheap = properties.getOffheap();
-				disk = properties.getDisk();
-				persistent = properties.isPersistent();
-				ttl = properties.getTtl();
-				tti = properties.getTti();
-			}
-			else {
-				heap = EhCacheContants.DEFAULT_HEAP;
-				offheap = EhCacheContants.DEFAULT_OFFHEAP;
-				disk = EhCacheContants.DEFAULT_DISK;
-				persistent = EhCacheContants.DEFAULT_PERSISTENT;
-				ttl = EhCacheContants.DEFAULT_TTL;
-				tti = EhCacheContants.DEFAULT_TTI;
-			}
-			
-			if(ttl > 0) {
-				expiryPolicy = EhCacheExpiryUtil.instance("ttl", ttl);
-			}
-			
-			if(tti > 0) {
-				expiryPolicy = EhCacheExpiryUtil.instance("tti", tti);
-			}
-			
-			if(tti <=0 && tti <=0 ) {
-				expiryPolicy = EhCacheExpiryUtil.instance();
-			}
+			CacheConfigurationBuilder<String, Serializable> builder = EhCacheConfigurationUtil
+					.initCacheConfiguration(properties);
 
-			cacheManager = CacheManagerBuilder
-					.newCacheManagerBuilder()
-					.with(CacheManagerBuilder.persistence(new File(directory, "ehcacheData")))
-					.withCache(name,
-							CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Serializable.class,
-											ResourcePoolsBuilder.newResourcePoolsBuilder()
-													.heap(heap, MemoryUnit.MB)
-													.offheap(offheap, MemoryUnit.MB)
-													.disk(disk, MemoryUnit.MB, persistent))
-									.withExpiry(expiryPolicy))
-					.build(true);
+			cacheManager = EhCacheManagerUtil.initCacheManager(name, directory, builder);
 		} else {
-			Configuration xmlConfig = new XmlConfiguration(xmlUrl);
-			cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
-			cacheManager.init();
+			cacheManager = EhCacheManagerUtil.initCacheManager(xmlUrl);
 		}
 
 		return cacheManager;

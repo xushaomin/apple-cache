@@ -1,9 +1,11 @@
-package com.appleframework.cache.ehcache;
+package com.appleframework.cache.ehcache.utils;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
 import org.ehcache.expiry.ExpiryPolicy;
+
+import com.appleframework.cache.ehcache.ExpiryPolicyBuilder2;
 
 public class EhCacheExpiryUtil {
 	

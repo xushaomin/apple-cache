@@ -13,10 +13,10 @@ import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheObjectImpl;
 import com.appleframework.cache.core.spring.BaseCacheOperation;
-import com.appleframework.cache.ehcache.EhCacheExpiryUtil;
 import com.appleframework.cache.ehcache.config.EhCacheConfiguration;
 import com.appleframework.cache.ehcache.config.EhCacheContants;
 import com.appleframework.cache.ehcache.config.EhCacheProperties;
+import com.appleframework.cache.ehcache.utils.EhCacheExpiryUtil;
 
 public class SpringCacheOperation implements BaseCacheOperation {
 

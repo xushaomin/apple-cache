@@ -9,7 +9,7 @@ public class EhCacheConfiguration {
 
 	private static String directory = System.getProperty("user.home");
 
-	private static Map<String, EhCacheProperties> properties = new HashMap<String, EhCacheProperties>();
+	private static Map<String, EhCacheProperties> propertiesMap = new HashMap<String, EhCacheProperties>();
 
 	public static String getDirectory() {
 		return directory;
@@ -20,16 +20,19 @@ public class EhCacheConfiguration {
 	}
 
 	public static Map<String, EhCacheProperties> getProperties() {
-		return properties;
+		return propertiesMap;
 	}
 
-	public void setProperties(Map<String, EhCacheProperties> properties) {
-		EhCacheConfiguration.properties = properties;
+	public void setPropertiesMap(Map<String, EhCacheProperties> properties) {
+		EhCacheConfiguration.propertiesMap = properties;
 	}
 
-	public void setProperties(String key, EhCacheProperties property) {
-		EhCacheConfiguration.properties.put(key, property);
+	public void setProperties(String key, EhCacheProperties properties) {
+		EhCacheConfiguration.propertiesMap.put(key, properties);
 	}
-
+	
+	public void setProperties(EhCacheProperties properties) {
+		EhCacheConfiguration.propertiesMap.put(EhCacheContants.DEFAULT_NAME, properties);
+	}
 
 }
