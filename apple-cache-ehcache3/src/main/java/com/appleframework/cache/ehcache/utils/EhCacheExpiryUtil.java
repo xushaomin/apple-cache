@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 import org.ehcache.expiry.ExpiryPolicy;
 
 import com.appleframework.cache.ehcache.ExpiryPolicyBuilder2;
+import com.appleframework.cache.ehcache.enums.ExpiryType;
 
 public class EhCacheExpiryUtil {
 	
@@ -18,14 +19,14 @@ public class EhCacheExpiryUtil {
 		return ehCacheExpiry;
 	}
 	
-	public static ExpiryPolicy<Object, Object> instance(String type, long ttl) {
+	public static ExpiryPolicy<Object, Object> instance(ExpiryType type, long ttl) {
 		if(null == ehCacheExpiry) {
 			synchronized (type) {
-				if(type.equalsIgnoreCase("ttl")) {
+				if(type == ExpiryType.TTL) {
 					ehCacheExpiry = ExpiryPolicyBuilder2.timeToLiveExpiration(Duration.of(ttl, ChronoUnit.SECONDS));
 
 				}
-				else if(type.equalsIgnoreCase("tti")) {
+				else if(type == ExpiryType.TTI) {
 					ehCacheExpiry = ExpiryPolicyBuilder2.timeToIdleExpiration(Duration.of(ttl, ChronoUnit.SECONDS));
 				}
 				else {

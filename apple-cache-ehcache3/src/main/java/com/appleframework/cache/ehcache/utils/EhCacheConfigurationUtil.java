@@ -9,6 +9,7 @@ import org.ehcache.expiry.ExpiryPolicy;
 
 import com.appleframework.cache.ehcache.config.EhCacheContants;
 import com.appleframework.cache.ehcache.config.EhCacheProperties;
+import com.appleframework.cache.ehcache.enums.ExpiryType;
 
 public class EhCacheConfigurationUtil  {
 	
@@ -38,11 +39,11 @@ public class EhCacheConfigurationUtil  {
 		}
 		
 		if(ttl > 0) {
-			expiryPolicy = EhCacheExpiryUtil.instance("ttl", ttl);
+			expiryPolicy = EhCacheExpiryUtil.instance(ExpiryType.TTL, ttl);
 		}
 		
 		if(tti > 0) {
-			expiryPolicy = EhCacheExpiryUtil.instance("tti", tti);
+			expiryPolicy = EhCacheExpiryUtil.instance(ExpiryType.TTI, tti);
 		}
 		
 		if(tti <=0 && ttl <=0 ) {
