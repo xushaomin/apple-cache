@@ -24,15 +24,23 @@ public class EhCacheManagerFactoryBean implements FactoryBean<CacheManager> {
 		CacheManager cacheManager = null;
 		if (null == xmlUrl) {
 			EhCacheProperties properties = null;
+			boolean persistent = false;
 			Map<String, EhCacheProperties> cacheTemplate = EhCacheConfiguration.getProperties();
 			if (null != cacheTemplate.get(name)) {
 				properties = cacheTemplate.get(name);
+				if(null != properties) {
+					persistent = properties.isPersistent();
+				}
 			}
-
 			CacheConfigurationBuilder<String, Serializable> builder = EhCacheConfigurationUtil
 					.initCacheConfiguration(properties);
-
-			cacheManager = EhCacheManagerUtil.initCacheManager(name, directory, builder);
+			
+			if(persistent) {
+				cacheManager = EhCacheManagerUtil.initCacheManager(name, directory, builder);
+			}
+			else {
+				cacheManager = EhCacheManagerUtil.initCacheManager(name, builder);
+			}
 		} else {
 			cacheManager = EhCacheManagerUtil.initCacheManager(xmlUrl);
 		}

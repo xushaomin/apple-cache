@@ -3,8 +3,6 @@ package com.appleframework.cache.ehcache.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.appleframework.cache.ehcache.config.EhCacheProperties;
-
 public class EhCacheConfiguration {
 
 	private static String directory = System.getProperty("user.home");

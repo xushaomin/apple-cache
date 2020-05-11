@@ -24,6 +24,17 @@ public class EhCacheManagerUtil  {
 		return cacheManager;
 	}
 	
+	public static CacheManager initCacheManager(String name,
+			CacheConfigurationBuilder<String, Serializable> cacheConfiguration) {
+		CacheManager cacheManager = null;
+		cacheManager = CacheManagerBuilder
+				.newCacheManagerBuilder()
+				.withCache(name, cacheConfiguration)
+				.build(true);
+		return cacheManager;
+	}
+
+	
 	public static CacheManager initCacheManager(URL xmlUrl) {
 		Configuration xmlConfig = new XmlConfiguration(xmlUrl);
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);

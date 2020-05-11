@@ -52,12 +52,21 @@ public class AppleCacheAutoConfiguration {
 		if (null == xmlUrl) {
 			Map<String, EhCacheProperties> cacheTemplate = properties.getCacheTemplate();
 			EhCacheProperties property = null;
+			boolean persistent = false;
 			if(null != cacheTemplate) {
 				property = properties.getCacheTemplate().get(initName);
+				if(null != property) {
+					persistent = property.isPersistent();
+				}
 			}
-			CacheConfigurationBuilder<String, Serializable> configuration = EhCacheConfigurationUtil.initCacheConfiguration(property);			
-			ehCacheManager = EhCacheManagerUtil.initCacheManager(initName, directory, configuration);
-
+			CacheConfigurationBuilder<String, Serializable> configuration 
+				= EhCacheConfigurationUtil.initCacheConfiguration(property);
+			if(persistent) {
+				ehCacheManager = EhCacheManagerUtil.initCacheManager(initName, directory, configuration);
+			}
+			else {
+				ehCacheManager = EhCacheManagerUtil.initCacheManager(initName, configuration);
+			}
 		} else {
 			ehCacheManager = EhCacheManagerUtil.initCacheManager(xmlUrl);
 		}

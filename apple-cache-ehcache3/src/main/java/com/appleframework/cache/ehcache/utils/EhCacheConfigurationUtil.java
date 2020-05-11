@@ -49,13 +49,23 @@ public class EhCacheConfigurationUtil  {
 		if(tti <=0 && ttl <=0 ) {
 			expiryPolicy = EhCacheExpiryUtil.instance();
 		}
-		
-		CacheConfigurationBuilder<String, Serializable> builder = CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Serializable.class,
-				ResourcePoolsBuilder.newResourcePoolsBuilder()
-						.heap(heap, MemoryUnit.MB)
-						.offheap(offheap, MemoryUnit.MB)
-						.disk(disk, MemoryUnit.MB, persistent))
-						.withExpiry(expiryPolicy);
+		CacheConfigurationBuilder<String, Serializable> builder = null;
+		if(persistent) {
+			builder = CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Serializable.class,
+					ResourcePoolsBuilder.newResourcePoolsBuilder()
+							.heap(heap, MemoryUnit.MB)
+							.offheap(offheap, MemoryUnit.MB)
+							.disk(disk, MemoryUnit.MB, persistent))
+							.withExpiry(expiryPolicy);
+		}
+		else {
+			builder = CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Serializable.class,
+					ResourcePoolsBuilder.newResourcePoolsBuilder()
+							.heap(heap, MemoryUnit.MB)
+							.offheap(offheap, MemoryUnit.MB)
+							.disk(disk, MemoryUnit.MB))
+							.withExpiry(expiryPolicy);
+		}
 		return builder;
 	}
 		
