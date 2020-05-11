@@ -55,15 +55,14 @@ public class EhCacheConfigurationUtil  {
 					ResourcePoolsBuilder.newResourcePoolsBuilder()
 							.heap(heap, MemoryUnit.MB)
 							.offheap(offheap, MemoryUnit.MB)
-							.disk(disk, MemoryUnit.MB, persistent))
+							.disk(disk, MemoryUnit.MB, true))
 							.withExpiry(expiryPolicy);
 		}
 		else {
 			builder = CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Serializable.class,
 					ResourcePoolsBuilder.newResourcePoolsBuilder()
 							.heap(heap, MemoryUnit.MB)
-							.offheap(offheap, MemoryUnit.MB)
-							.disk(disk, MemoryUnit.MB))
+							.offheap(offheap, MemoryUnit.MB))
 							.withExpiry(expiryPolicy);
 		}
 		return builder;

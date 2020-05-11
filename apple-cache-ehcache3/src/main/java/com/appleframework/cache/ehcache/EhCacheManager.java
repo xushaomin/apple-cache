@@ -60,7 +60,8 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 		cache = ehcacheManager.getCache(name, String.class, Serializable.class);
 		if (null == cache) {
 			try {
-				CacheConfigurationBuilder<String, Serializable> configuration = EhCacheConfigurationUtil.initCacheConfiguration(properties);
+				CacheConfigurationBuilder<String, Serializable> configuration 
+					= EhCacheConfigurationUtil.initCacheConfiguration(properties);
 				cache = ehcacheManager.createCache(name, configuration);
 			} catch (IllegalArgumentException e) {
 				logger.warn("the cache name " + name + " is exist !");
