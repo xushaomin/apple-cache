@@ -20,7 +20,6 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Response;
 
-@SuppressWarnings({ "deprecation" })
 public class SingleJedisHmsetCacheManager implements CacheManager {
 
 	private static Logger logger = LoggerFactory.getLogger(SingleJedisHmsetCacheManager.class);
@@ -108,8 +107,6 @@ public class SingleJedisHmsetCacheManager implements CacheManager {
 			jedis.del(getKey("*"));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -131,9 +128,7 @@ public class SingleJedisHmsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
-		}
+		} 
 	}
 	
 	private boolean isListNull(List<?> list) {
@@ -174,8 +169,6 @@ public class SingleJedisHmsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -185,8 +178,6 @@ public class SingleJedisHmsetCacheManager implements CacheManager {
 			return jedis.del(getKey(key))>0;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 		return false;
 	}
@@ -199,8 +190,6 @@ public class SingleJedisHmsetCacheManager implements CacheManager {
 			jedis.expire(byteKey, expireTime);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 	
@@ -220,8 +209,6 @@ public class SingleJedisHmsetCacheManager implements CacheManager {
 				jedis.hmset(getKey(key), map);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-			} finally {
-				jedisPool.returnResource(jedis);
 			}
 		}
 	}
@@ -244,8 +231,6 @@ public class SingleJedisHmsetCacheManager implements CacheManager {
 				jedis.expire(byteKey, expireTime);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-			} finally {
-				jedisPool.returnResource(jedis);
 			}
 		}
 	}
@@ -288,8 +273,6 @@ public class SingleJedisHmsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -339,8 +322,6 @@ public class SingleJedisHmsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -382,8 +363,6 @@ public class SingleJedisHmsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -433,8 +412,6 @@ public class SingleJedisHmsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 

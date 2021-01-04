@@ -9,7 +9,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisShardInfo;
 import redis.clients.jedis.Protocol;
-import redis.clients.util.Pool;
+import redis.clients.jedis.util.Pool;
 
 public class JedisShardInfoFactory {
 

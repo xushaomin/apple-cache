@@ -1,18 +1,22 @@
 package com.appleframework.cache.ehcache.spring;
 
+import java.io.Serializable;
+import java.util.Map;
+
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.ehcache.config.units.MemoryUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.appleframework.cache.core.CacheObject;
 import com.appleframework.cache.core.CacheObjectImpl;
-import com.appleframework.cache.core.config.SpringCacheConfig;
 import com.appleframework.cache.core.spring.BaseCacheOperation;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.ObjectExistsException;
-import net.sf.ehcache.config.CacheConfiguration;
+import com.appleframework.cache.ehcache.config.EhCacheConfiguration;
+import com.appleframework.cache.ehcache.config.EhCacheContants;
+import com.appleframework.cache.ehcache.config.EhCacheProperties;
+import com.appleframework.cache.ehcache.utils.EhCacheExpiryUtil;
 
 public class SpringCacheOperation implements BaseCacheOperation {
 
@@ -21,36 +25,59 @@ public class SpringCacheOperation implements BaseCacheOperation {
 	private String name;
 	private int expire = 0;
 	
-	private long timeToIdleSeconds = 0L;
-	private long timeToLiveSeconds = 0L;
+	private EhCacheProperties properties;
 	
-	private Cache cache;
-	
-	private Cache getEhCache() {
+	private boolean isCacheObject = false;
+
+	private Cache<String, Serializable> cache;
+
+	private Cache<String, Serializable> getEhCache() {
 		return cache;
 	}
-	
-	private void init(CacheManager ehcacheManager){
-		cache = ehcacheManager.getCache(name);
-		if(null == cache) {
+
+	private void init(CacheManager ehcacheManager) {
+		Map<String, EhCacheProperties> cacheTemplate = EhCacheConfiguration.getProperties();
+		if(null != cacheTemplate.get(name) ) {
+			properties = cacheTemplate.get(name);
+		}
+		int heap = 10;
+		int offheap = 100;
+		if(null != properties) {
+			heap = properties.getHeap();
+			offheap = properties.getOffheap();
+			isCacheObject = properties.isCacheObject();
+			expire = properties.getTti();
+		}
+		else {
+			heap = EhCacheContants.DEFAULT_HEAP;
+			offheap = EhCacheContants.DEFAULT_OFFHEAP;
+		}
+
+		
+		SpringCacheExpiry expiry = null;
+		if (expire > 0 && !isCacheObject) {
+			expiry = new SpringCacheExpiry(expire);
+		} else {
+			expiry = new SpringCacheExpiry();
+		}
+
+		cache = ehcacheManager.getCache(name, String.class, Serializable.class);
+		if (null == cache) {
 			try {
-				ehcacheManager.addCache(name);
-			} catch (ObjectExistsException e) {
-				logger.warn("Cache " + name + " already exists");
+				CacheConfigurationBuilder<String, Serializable> configuration = CacheConfigurationBuilder
+						.newCacheConfigurationBuilder(String.class, Serializable.class,
+								ResourcePoolsBuilder.newResourcePoolsBuilder()
+										.heap(heap, MemoryUnit.MB)
+										.offheap(offheap, MemoryUnit.MB))
+						.withExpiry(expiry);
+				cache = ehcacheManager.createCache(name, configuration);
+			} catch (IllegalArgumentException e) {
+				logger.warn("the cache name " + name + " is exist !");
+				cache = ehcacheManager.getCache(name, String.class, Serializable.class);
 			}
-			cache = ehcacheManager.getCache(name);
-		}
-		CacheConfiguration config = cache.getCacheConfiguration();
-		timeToIdleSeconds = config.getTimeToIdleSeconds();
-		timeToLiveSeconds = config.getTimeToLiveSeconds();
-		if(timeToIdleSeconds <= expire) {
-			timeToIdleSeconds = timeToIdleSeconds + expire;
-		}
-		if(timeToLiveSeconds <= expire) {
-			timeToLiveSeconds = timeToLiveSeconds + expire;
 		}
 	}
-	
+
 	public SpringCacheOperation(CacheManager ehcacheManager, String name) {
 		this.name = name;
 		this.init(ehcacheManager);
@@ -65,10 +92,10 @@ public class SpringCacheOperation implements BaseCacheOperation {
 	public Object get(String key) {
 		Object value = null;
 		try {
-			Element element = getEhCache().get(key);
-			if(null != element) {
-				if(SpringCacheConfig.isCacheObject()) {
-					CacheObject cache = (CacheObject) element.getObjectValue();
+			Object element = getEhCache().get(key);
+			if (null != element) {
+				if (isCacheObject) {
+					CacheObjectImpl cache = (CacheObjectImpl) element;
 					if (null != cache) {
 						if (cache.isExpired()) {
 							this.resetCacheObject(key, cache);
@@ -76,9 +103,8 @@ public class SpringCacheOperation implements BaseCacheOperation {
 							value = cache.getObject();
 						}
 					}
-				}
-				else {
-					value = element.getObjectValue();
+				} else {
+					value = element;
 				}
 			}
 		} catch (Exception e) {
@@ -87,32 +113,29 @@ public class SpringCacheOperation implements BaseCacheOperation {
 		return value;
 	}
 
-	private void resetCacheObject(String key, CacheObject cache) {
+	private void resetCacheObject(String key, CacheObjectImpl cache) {
 		try {
 			cache.setExpiredSecond(expire);
-			Element element = new Element(key, cache, (int)timeToIdleSeconds, (int)timeToLiveSeconds);
-			getEhCache().put(element);
+			getEhCache().put(key, cache);
 		} catch (Exception e) {
 			logger.warn("cache error", e);
 		}
 	}
-	
+
 	public void put(String key, Object value) {
 		if (value == null)
 			this.delete(key);
 		try {
-			Element element = null;
-			if(SpringCacheConfig.isCacheObject()) {
-				CacheObject object = CacheObjectImpl.create(value, expire);
-				element = new Element(key, object, (int)timeToIdleSeconds, (int)timeToLiveSeconds);
+			if (isCacheObject) {
+				CacheObjectImpl object = CacheObjectImpl.create(value, expire);
+				getEhCache().put(key, object);
+			} else {
+				if (expire > 0) {
+					EhCacheExpiryUtil.setExpiry(key, expire);
+				}
+				getEhCache().put(key, (Serializable) value);
 			}
-			else {
-				if(expire > 0)
-					element = new Element(key, value, expire, expire);
-				else
-					element = new Element(key, value);
-			}
-			getEhCache().put(element);
+
 		} catch (Exception e) {
 			logger.warn("cache error", e);
 		}
@@ -120,7 +143,7 @@ public class SpringCacheOperation implements BaseCacheOperation {
 
 	public void clear() {
 		try {
-			getEhCache().removeAll();
+			getEhCache().clear();
 		} catch (Exception e) {
 			logger.warn("cache error", e);
 		}
@@ -137,5 +160,5 @@ public class SpringCacheOperation implements BaseCacheOperation {
 	public int getExpire() {
 		return expire;
 	}
-	
+
 }

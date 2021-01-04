@@ -20,7 +20,6 @@ public class RedisSpringTest6 {
 	@Resource
 	private JedisPool jedisPool;
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testAddOpinion1() {
 
@@ -38,9 +37,7 @@ public class RedisSpringTest6 {
 			
 			System.out.println("555555555:" + jedis.zrevrange(key, 0, 2));} catch (Exception e) {
 		} finally {
-			if (null != jedis) {
-				jedisPool.returnResource(jedis);
-			}
+			
 		}
 	}
 

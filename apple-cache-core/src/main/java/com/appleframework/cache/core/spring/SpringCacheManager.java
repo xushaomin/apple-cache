@@ -3,7 +3,6 @@ package com.appleframework.cache.core.spring;
 import org.springframework.cache.Cache;
 
 import com.appleframework.cache.core.CacheManager;
-import com.appleframework.cache.core.spring.BaseSpringCacheManager;
 
 public class SpringCacheManager extends BaseSpringCacheManager {
 

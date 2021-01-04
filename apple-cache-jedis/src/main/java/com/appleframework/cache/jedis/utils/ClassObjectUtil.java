@@ -5,12 +5,10 @@ import java.util.Date;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 
-import com.appleframework.cache.jedis.utils.DateUtil;
-
 public class ClassObjectUtil {
 
 	public static Object getObject(Class<?> typeClz, String value) throws RuntimeException {
-		if (StringUtils.isNotEmpty(value)) {
+		if (value != null && StringUtils.isNotBlank(value)) {
 			try {
 				if (typeClz == String.class) {
 					return value;

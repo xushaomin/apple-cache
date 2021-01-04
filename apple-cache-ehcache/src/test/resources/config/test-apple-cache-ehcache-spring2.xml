@@ -16,11 +16,13 @@
 	<!-- turn on declarative caching -->
 	<cache:annotation-driven cache-manager="springCacheManager" />  
 
-	<bean id="ehCacheManagerFactoryBean" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
-	
-	<bean id="cacheManager" class="com.appleframework.cache.ehcache.EhCacheManager">
-		<property name="ehcacheManager" ref="ehCacheManagerFactoryBean" />
+	<!-- 
+	<bean id="configurationFactoryBean" class="com.appleframework.cache.ehcache.factory.ConfigurationFactoryBean">
+		<property name="name" value="test" />
 	</bean>
+	 -->
+	
+	<bean id="ehCacheManagerFactoryBean" class="com.appleframework.cache.ehcache.factory.EhCacheManagerFactoryBean" />
 	
 	<bean id="springCacheManager"
 		class="com.appleframework.cache.ehcache.spring.SpringCacheManager">
@@ -30,7 +32,8 @@
 		<!-- 配置缓存时间 -->
 		<property name="expireConfig">
 			<map>
-				<entry key="testd" value="5" />   <!-- key缓存对象名称 value缓存过期时间 -->
+				<entry key="testd" value="50000" />   <!-- key缓存对象名称 value缓存过期时间 -->
+				<entry key="teste" value="3" />
 			</map>
 		</property>
 	</bean>

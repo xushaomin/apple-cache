@@ -13,7 +13,6 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
 
-@SuppressWarnings("deprecation")
 public class SpringCacheOperationBucket implements BaseCacheOperation {
 
 	private static Logger logger = LoggerFactory.getLogger(SpringCacheOperationBucket.class);
@@ -42,8 +41,6 @@ public class SpringCacheOperationBucket implements BaseCacheOperation {
 			}
 		} catch (Exception e) {
 			logger.warn("Cache Error : ", e);
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 		return value;
 	}
@@ -60,8 +57,6 @@ public class SpringCacheOperationBucket implements BaseCacheOperation {
 			}
 		} catch (Exception e) {
 			logger.warn("Cache Error : ", e);
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -77,8 +72,6 @@ public class SpringCacheOperationBucket implements BaseCacheOperation {
 			pipeline.sync();
 		} catch (Exception e) {
 			logger.warn("Cache Error : ", e);
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 

@@ -18,7 +18,6 @@ import redis.clients.jedis.Transaction;
  *
  * @author cruise.xu
  */
-@SuppressWarnings("deprecation")
 public class JedisLock implements Lock {
 
 	private static Logger logger = LoggerFactory.getLogger(JedisLock.class);
@@ -116,8 +115,6 @@ public class JedisLock implements Lock {
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -155,8 +152,6 @@ public class JedisLock implements Lock {
 			logger.error(e.getMessage());
 			unlock(jedis, lockKey);
 			lockedSuccess = false;
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 		return lockedSuccess;
 	}
@@ -193,8 +188,6 @@ public class JedisLock implements Lock {
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 		return isLocked;
 	}
@@ -256,8 +249,6 @@ public class JedisLock implements Lock {
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 

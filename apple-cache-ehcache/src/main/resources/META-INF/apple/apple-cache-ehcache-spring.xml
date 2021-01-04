@@ -16,17 +16,19 @@
 
 	<import resource="apple-cache-echcache.xml"/>
 	
+	<bean id="ehCacheManagerFactoryBean" class="com.appleframework.cache.ehcache.factory.EhCacheManagerFactoryBean" />
+	
 	<bean id="springCacheManager"
 		class="com.appleframework.cache.ehcache.spring.SpringCacheManager">
 		<property name="ehcacheManager" ref="ehCacheManagerFactoryBean" />
+		<property name="cacheObject" value="false" />
+		<property name="cacheEnable" value="true" />
 		<!-- 配置缓存时间 -->
 		<property name="expireConfig">
 			<map>
-				<entry key="typeList" value="3600" />   <!-- key缓存对象名称 value缓存过期时间 -->
+				<entry key="testd" value="50000" />   <!-- key缓存对象名称 value缓存过期时间 -->
 			</map>
 		</property>
-		<property name="cacheObject" value="true" />
-		<property name="cacheEnable" value="true" />
 	</bean>
 
 </beans>

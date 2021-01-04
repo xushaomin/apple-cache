@@ -19,7 +19,6 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Response;
 
-@SuppressWarnings({ "deprecation" })
 public class SingleJedisHmsetCacheManager2 extends SingleJedisHmsetCacheManager implements CacheManager2 {
 
 	private static Logger logger = LoggerFactory.getLogger(MasterSlaveJedisHmsetCacheManager2.class);
@@ -95,8 +94,6 @@ public class SingleJedisHmsetCacheManager2 extends SingleJedisHmsetCacheManager 
 			return list;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 		return null;
 	}
@@ -123,8 +120,6 @@ public class SingleJedisHmsetCacheManager2 extends SingleJedisHmsetCacheManager 
 			return map;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 		return null;
 	}
@@ -158,8 +153,6 @@ public class SingleJedisHmsetCacheManager2 extends SingleJedisHmsetCacheManager 
 			return map;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 		return null;
 	}

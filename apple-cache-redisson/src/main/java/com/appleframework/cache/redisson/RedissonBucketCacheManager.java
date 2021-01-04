@@ -74,7 +74,7 @@ public class RedissonBucketCacheManager implements CacheManager {
 	
 	@Override
 	public void expire(String key, int timeout) throws CacheException {
-		
+		// TODO Auto-generated method stub	
 	}
 
 	public void set(String key, Object value) throws CacheException {
@@ -164,7 +164,7 @@ public class RedissonBucketCacheManager implements CacheManager {
 		for (String key : keys) {
 			batch.getBucket(key).getAsync();
 		}
-		return batch.execute();
+		return batch.execute().getResponses();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -173,7 +173,7 @@ public class RedissonBucketCacheManager implements CacheManager {
 		for (String key : keys) {
 			batch.getBucket(key).getAsync();
 		}
-		return (List<T>) batch.execute();
+		return (List<T>) batch.execute().getResponses();
 	}
 	
 	private <T> Map<String, RFuture<T>> getBatchRFutureMap(String... keys) {

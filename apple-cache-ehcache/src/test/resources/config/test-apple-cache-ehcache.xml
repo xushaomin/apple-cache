@@ -10,11 +10,26 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
      default-lazy-init="true">
-		
-	<bean id="ehCacheManagerFactoryBean" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
+	
+	<bean id="ehCacheProperties" class="com.appleframework.cache.ehcache.config.EhCacheProperties">
+		<property name="heap" value="10" />
+		<property name="offheap" value="100" />
+		<property name="disk" value="1000" />
+		<property name="persistent" value="false" />
+		<property name="ttl" value="10" />	
+	</bean>
+	
+	<bean id="ehCacheConfiguration" class="com.appleframework.cache.ehcache.config.EhCacheConfiguration" depends-on="ehCacheProperties">
+		<property name="properties" ref="ehCacheProperties" />
+	</bean>
+	
+	<bean id="ehCacheManagerFactoryBean" class="com.appleframework.cache.ehcache.factory.EhCacheManagerFactoryBean" depends-on="ehCacheConfiguration">
+		<property name="name" value="default"></property>
+	</bean>
 	
 	<bean id="cacheManager" class="com.appleframework.cache.ehcache.EhCacheManager">
 		<property name="ehcacheManager" ref="ehCacheManagerFactoryBean" />
+		<property name="name" value="default" />
 	</bean>
 	
 	

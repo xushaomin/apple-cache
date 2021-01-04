@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>apple-cache</artifactId>
 		<groupId>com.appleframework.cache</groupId>
-		<version>0.4.4.RELEASE</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>apple-cache-jedis</artifactId>
 	<name>apple-cache-jedis</name>
@@ -45,7 +45,7 @@
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
-			<version>2.10.2</version>
+			<version>3.4.1</version>
 		</dependency>
 
 		<dependency>

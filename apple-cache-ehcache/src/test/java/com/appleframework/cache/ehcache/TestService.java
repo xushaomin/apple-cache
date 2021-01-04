@@ -10,7 +10,14 @@ public class TestService {
 
 	@Cacheable(value = "testd", key = "#name")
 	public String getCache(String name) {
-		System.out.println("-----service in------" + (System.currentTimeMillis() - time));
+		System.out.println("-----testd service in------" + name + "--->" + (System.currentTimeMillis() - time));
+		time = System.currentTimeMillis();
+		return "hello " + name;
+	}
+	
+	@Cacheable(value = "teste", key = "#name")
+	public String getCache2(String name) {
+		System.out.println("-----teste service in------" + name + "--->" + (System.currentTimeMillis() - time));
 		time = System.currentTimeMillis();
 		return "hello " + name;
 	}

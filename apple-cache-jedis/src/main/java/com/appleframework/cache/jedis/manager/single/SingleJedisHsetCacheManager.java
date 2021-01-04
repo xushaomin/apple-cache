@@ -18,7 +18,7 @@ import com.appleframework.cache.jedis.manager.master.MasterSlaveJedisHsetCacheMa
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
-@SuppressWarnings({ "unchecked", "deprecation" })
+@SuppressWarnings({ "unchecked" })
 public class SingleJedisHsetCacheManager implements CacheManager {
 
 	private static Logger logger = LoggerFactory.getLogger(MasterSlaveJedisHsetCacheManager.class);
@@ -37,8 +37,6 @@ public class SingleJedisHsetCacheManager implements CacheManager {
 			jedis.del(name.getBytes());
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -61,8 +59,6 @@ public class SingleJedisHsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -86,8 +82,6 @@ public class SingleJedisHsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -97,8 +91,6 @@ public class SingleJedisHsetCacheManager implements CacheManager {
 			return jedis.hdel(name.getBytes(), key.getBytes())>0;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 		return false;
 	}
@@ -115,8 +107,6 @@ public class SingleJedisHsetCacheManager implements CacheManager {
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -128,8 +118,6 @@ public class SingleJedisHsetCacheManager implements CacheManager {
 				jedis.hset(name.getBytes(), key.getBytes(), SerializeUtility.serialize(cache));
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-			} finally {
-				jedisPool.returnResource(jedis);
 			}
 		}
 	}
@@ -142,8 +130,6 @@ public class SingleJedisHsetCacheManager implements CacheManager {
 				jedis.hset(name.getBytes(), key.getBytes(), SerializeUtility.serialize(cache));
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-			} finally {
-				jedisPool.returnResource(jedis);
 			}
 		}
 	}
@@ -184,8 +170,6 @@ public class SingleJedisHsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -225,8 +209,6 @@ public class SingleJedisHsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -262,8 +244,6 @@ public class SingleJedisHsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -299,8 +279,6 @@ public class SingleJedisHsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 

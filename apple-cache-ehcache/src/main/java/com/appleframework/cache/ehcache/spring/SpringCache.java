@@ -1,8 +1,8 @@
 package com.appleframework.cache.ehcache.spring;
 
-import com.appleframework.cache.core.spring.BaseSpringCache;
+import org.ehcache.CacheManager;
 
-import net.sf.ehcache.CacheManager;
+import com.appleframework.cache.core.spring.BaseSpringCache;
 
 public class SpringCache extends BaseSpringCache {
 

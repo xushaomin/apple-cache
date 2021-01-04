@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
@@ -20,6 +21,7 @@ public class JedisClusterFactoryBean implements FactoryBean<JedisClusterFactory>
 	private JedisClusterFactory factory = null;
 
 	private String serverNodes;
+	private String password;
 
 	private JedisPoolConfig poolConfig;
 	
@@ -31,6 +33,9 @@ public class JedisClusterFactoryBean implements FactoryBean<JedisClusterFactory>
 		factory = new JedisClusterFactory();
 		factory.setRedisServers(getNodeList());
 		factory.setPoolConfig(poolConfig);
+		if(StringUtils.isNotEmpty(password)) {
+			factory.setPassword(password);
+		}
 		factory.init();
 		test();
 		logger.info("test the redis...");
@@ -81,6 +86,10 @@ public class JedisClusterFactoryBean implements FactoryBean<JedisClusterFactory>
 
 	public void setSingleton(Boolean singleton) {
 		this.singleton = singleton;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	
 }

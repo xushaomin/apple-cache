@@ -7,16 +7,6 @@ import org.springframework.beans.factory.FactoryBean;
 public class MasterSlaveServersConfigFactoryBean implements FactoryBean<Config> {
 	
     /**
-     * Redis 'slave' node minimum idle subscription (pub/sub) connection amount for <b>each</b> slave node
-     */
-    private int slaveSubscriptionConnectionMinimumIdleSize = 1;
-
-    /**
-     * Redis 'slave' node maximum subscription (pub/sub) connection pool size for <b>each</b> slave node
-     */
-    private int slaveSubscriptionConnectionPoolSize = 50;
-
-    /**
      * Redis 'slave' node minimum idle connection amount for <b>each</b> slave node
      */
     private int slaveConnectionMinimumIdleSize = 10;
@@ -55,7 +45,7 @@ public class MasterSlaveServersConfigFactoryBean implements FactoryBean<Config> 
      * Value in milliseconds.
      *
      */
-    private int pingTimeout = 1000;
+    private int pingConnectionInterval = 1000;
 
     /**
      * Timeout during connecting to any Redis server.
@@ -74,25 +64,6 @@ public class MasterSlaveServersConfigFactoryBean implements FactoryBean<Config> 
     private int retryAttempts = 3;
 
     private int retryInterval = 1500;
-
-    /**
-     * Reconnection attempt timeout to Redis server then
-     * it has been excluded from internal list of available servers.
-     *
-     * On every such timeout event Redisson tries
-     * to connect to disconnected Redis server.
-     *
-     * @see #failedAttempts
-     *
-     */
-    private int reconnectionTimeout = 3000;
-
-    /**
-     * Redis server will be excluded from the list of available nodes
-     * when sequential unsuccessful execution attempts of any Redis command
-     * reaches <code>failedAttempts</code>.
-     */
-    private int failedAttempts = 3;
 
     /**
      * Password for Redis authentication. Should be null if not needed
@@ -122,7 +93,6 @@ public class MasterSlaveServersConfigFactoryBean implements FactoryBean<Config> 
 		this.slaveAddresses = slaveAddresses.split(",");
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public Config getObject() throws Exception {
 		Config config = new Config();
@@ -132,19 +102,15 @@ public class MasterSlaveServersConfigFactoryBean implements FactoryBean<Config> 
 			.setDatabase(database)
 			.setConnectTimeout(connectTimeout)
 			.setIdleConnectionTimeout(idleConnectionTimeout)
-			.setPingTimeout(pingTimeout)
-			.setReconnectionTimeout(reconnectionTimeout)
+			.setPingConnectionInterval(pingConnectionInterval)
 			.setSlaveConnectionMinimumIdleSize(slaveConnectionMinimumIdleSize)
 			.setSlaveConnectionPoolSize(slaveConnectionPoolSize)
-			.setSlaveSubscriptionConnectionMinimumIdleSize(slaveSubscriptionConnectionMinimumIdleSize)
-			.setSlaveSubscriptionConnectionPoolSize(slaveSubscriptionConnectionPoolSize)
 			.setSubscriptionsPerConnection(subscriptionsPerConnection)
 			.setTimeout(timeout)
 			.setMasterConnectionMinimumIdleSize(masterConnectionMinimumIdleSize)
 			.setMasterConnectionPoolSize(masterConnectionPoolSize)
 			.setRetryAttempts(retryAttempts)
 			.setRetryInterval(retryInterval)
-			.setFailedAttempts(failedAttempts)
 			.setPassword(password)
 			.setClientName(clientName);
 		if(null != codec) {
@@ -165,14 +131,6 @@ public class MasterSlaveServersConfigFactoryBean implements FactoryBean<Config> 
 
 	public void setMasterAddress(String masterAddress) {
 		this.masterAddress = masterAddress;
-	}
-
-	public void setSlaveSubscriptionConnectionMinimumIdleSize(int slaveSubscriptionConnectionMinimumIdleSize) {
-		this.slaveSubscriptionConnectionMinimumIdleSize = slaveSubscriptionConnectionMinimumIdleSize;
-	}
-
-	public void setSlaveSubscriptionConnectionPoolSize(int slaveSubscriptionConnectionPoolSize) {
-		this.slaveSubscriptionConnectionPoolSize = slaveSubscriptionConnectionPoolSize;
 	}
 
 	public void setSlaveConnectionMinimumIdleSize(int slaveConnectionMinimumIdleSize) {
@@ -199,10 +157,6 @@ public class MasterSlaveServersConfigFactoryBean implements FactoryBean<Config> 
 		this.idleConnectionTimeout = idleConnectionTimeout;
 	}
 
-	public void setPingTimeout(int pingTimeout) {
-		this.pingTimeout = pingTimeout;
-	}
-
 	public void setConnectTimeout(int connectTimeout) {
 		this.connectTimeout = connectTimeout;
 	}
@@ -218,15 +172,7 @@ public class MasterSlaveServersConfigFactoryBean implements FactoryBean<Config> 
 	public void setRetryInterval(int retryInterval) {
 		this.retryInterval = retryInterval;
 	}
-
-	public void setReconnectionTimeout(int reconnectionTimeout) {
-		this.reconnectionTimeout = reconnectionTimeout;
-	}
-
-	public void setFailedAttempts(int failedAttempts) {
-		this.failedAttempts = failedAttempts;
-	}
-
+	
 	public void setPassword(String password) {
 		this.password = password;
 	}
@@ -243,4 +189,8 @@ public class MasterSlaveServersConfigFactoryBean implements FactoryBean<Config> 
 		this.codec = codec;
 	}
 
+	public void setPingConnectionInterval(int pingConnectionInterval) {
+		this.pingConnectionInterval = pingConnectionInterval;
+	}
+	
 }

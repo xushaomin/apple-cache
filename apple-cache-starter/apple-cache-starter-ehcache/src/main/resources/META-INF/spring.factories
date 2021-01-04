@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.appleframework.cache.ehcache.config.AppleCacheAutoConfiguration

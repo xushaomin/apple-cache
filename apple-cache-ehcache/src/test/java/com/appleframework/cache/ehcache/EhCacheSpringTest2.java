@@ -17,9 +17,15 @@ public class EhCacheSpringTest2 {
 	@Test
 	public void testAddOpinion1() {
 		try {
+			System.out.println(testService.getCache("xusm"));
+			System.out.println(testService.getCache2("zyq"));
+			
 			for (int i = 1; i < 100; i++) {
+				System.out.println("1-----------------------");
 				System.out.println(testService.getCache("xusm"));
-				Thread.sleep(1000);
+				Thread.sleep(6000);
+				System.out.println(testService.getCache2("zyq"));
+				System.out.println("2-----------------------");
 			}
 			System.in.read();
 		} catch (Exception e) {

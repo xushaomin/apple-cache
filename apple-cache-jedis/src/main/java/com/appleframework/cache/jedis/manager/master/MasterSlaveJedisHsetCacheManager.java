@@ -18,7 +18,7 @@ import com.appleframework.cache.jedis.factory.PoolFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
-@SuppressWarnings({ "unchecked", "deprecation" })
+@SuppressWarnings({ "unchecked" })
 public class MasterSlaveJedisHsetCacheManager implements CacheManager {
 
 	private static Logger logger = LoggerFactory.getLogger(MasterSlaveJedisHsetCacheManager.class);
@@ -38,8 +38,6 @@ public class MasterSlaveJedisHsetCacheManager implements CacheManager {
 			jedis.del(name.getBytes());
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -63,8 +61,6 @@ public class MasterSlaveJedisHsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -89,8 +85,6 @@ public class MasterSlaveJedisHsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -101,8 +95,6 @@ public class MasterSlaveJedisHsetCacheManager implements CacheManager {
 			return jedis.hdel(name.getBytes(), key.getBytes())>0;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 		return false;
 	}
@@ -120,10 +112,7 @@ public class MasterSlaveJedisHsetCacheManager implements CacheManager {
 			}			
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
-
 	}
 
 	public void set(String key, Object obj) throws CacheException {
@@ -135,8 +124,6 @@ public class MasterSlaveJedisHsetCacheManager implements CacheManager {
 				jedis.hset(name.getBytes(), key.getBytes(), SerializeUtility.serialize(cache));
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-			} finally {
-				jedisPool.returnResource(jedis);
 			}
 		}
 	}
@@ -150,8 +137,6 @@ public class MasterSlaveJedisHsetCacheManager implements CacheManager {
 				jedis.hset(name.getBytes(), key.getBytes(), SerializeUtility.serialize(cache));
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-			} finally {
-				jedisPool.returnResource(jedis);
 			}
 		}
 	}
@@ -193,8 +178,6 @@ public class MasterSlaveJedisHsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -235,8 +218,6 @@ public class MasterSlaveJedisHsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -273,8 +254,6 @@ public class MasterSlaveJedisHsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -311,8 +290,6 @@ public class MasterSlaveJedisHsetCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 

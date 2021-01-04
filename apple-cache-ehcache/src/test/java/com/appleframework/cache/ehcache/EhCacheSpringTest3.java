@@ -24,8 +24,6 @@ public class EhCacheSpringTest3 {
 			for (int i = 1; i < 100000; i++) {
 				
 				try {
-					
-					// 使用多线程处理 更新缓存
 					threadPoolTaskExecutor.execute(new Runnable() {
 						public void run() {
 							testService.getCache("xusm");
@@ -41,7 +39,6 @@ public class EhCacheSpringTest3 {
 				
 				try {
 					Thread.sleep(100);
-					// 使用多线程处理 更新缓存
 					threadPoolTaskExecutor.execute(new Runnable() {
 						public void run() {
 							testService.getCache("xusm");

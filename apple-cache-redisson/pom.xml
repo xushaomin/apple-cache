@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>apple-cache</artifactId>
 		<groupId>com.appleframework.cache</groupId>
-		<version>0.4.4.RELEASE</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>apple-cache-redisson</artifactId>
 	<name>apple-cache-redisson</name>
@@ -41,17 +41,27 @@
 			<groupId>cglib</groupId>
 			<artifactId>cglib</artifactId>
 		</dependency>
-		
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-				
+						
 		<dependency>
 			<groupId>org.redisson</groupId>
 			<artifactId>redisson</artifactId>
-			<version>2.15.2</version>
+			<version>3.14.1</version>
 		</dependency>
 		
 	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>${file.encoding}</encoding>
+				</configuration>
+			</plugin>			
+		</plugins>
+	</build>
 </project>

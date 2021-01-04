@@ -18,7 +18,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Response;
 
-@SuppressWarnings({ "unchecked", "deprecation" })
+@SuppressWarnings({ "unchecked" })
 public class MasterSlaveJedisBucketCacheManager implements CacheManager {
 
 	private static Logger logger = LoggerFactory.getLogger(MasterSlaveJedisBucketCacheManager.class);
@@ -49,8 +49,6 @@ public class MasterSlaveJedisBucketCacheManager implements CacheManager {
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -63,8 +61,6 @@ public class MasterSlaveJedisBucketCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -78,8 +74,6 @@ public class MasterSlaveJedisBucketCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -90,8 +84,6 @@ public class MasterSlaveJedisBucketCacheManager implements CacheManager {
 			return jedis.del(getKey(key).getBytes())>0;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 		return false;
 	}
@@ -104,8 +96,6 @@ public class MasterSlaveJedisBucketCacheManager implements CacheManager {
 			jedis.expire(getKey(key).getBytes(), expireTime);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -117,8 +107,6 @@ public class MasterSlaveJedisBucketCacheManager implements CacheManager {
 				jedis.set(getKey(key).getBytes(), SerializeUtility.serialize(obj));
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-			} finally {
-				jedisPool.returnResource(jedis);
 			}
 		}
 	}
@@ -132,8 +120,6 @@ public class MasterSlaveJedisBucketCacheManager implements CacheManager {
 				jedis.expire(getKey(key).getBytes(), expireTime);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-			} finally {
-				jedisPool.returnResource(jedis);
 			}
 		}
 	}
@@ -158,8 +144,6 @@ public class MasterSlaveJedisBucketCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -196,8 +180,6 @@ public class MasterSlaveJedisBucketCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -234,8 +216,6 @@ public class MasterSlaveJedisBucketCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -272,8 +252,6 @@ public class MasterSlaveJedisBucketCacheManager implements CacheManager {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 

@@ -68,6 +68,11 @@ public class RedissonMapCacheManager implements CacheManager {
 		}
 	}
 
+	@Override
+	public void expire(String key, int timeout) throws CacheException {
+		// TODO Auto-generated method stub	
+	}
+
 	public boolean remove(String key) throws CacheException {
 		try {
 			getCacheMap().remove(key);
@@ -76,11 +81,6 @@ public class RedissonMapCacheManager implements CacheManager {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
 		}
-	}
-	
-	@Override
-	public void expire(String key, int timeout) throws CacheException {
-		
 	}
 
 	public void set(String key, Object value) throws CacheException {

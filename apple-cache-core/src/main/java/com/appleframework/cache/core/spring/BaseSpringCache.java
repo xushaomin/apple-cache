@@ -6,7 +6,6 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.support.SimpleValueWrapper;
 
 import com.appleframework.cache.core.config.SpringCacheConfig;
-import com.appleframework.cache.core.spring.BaseCacheOperation;
 
 public abstract class BaseSpringCache implements Cache {
 	

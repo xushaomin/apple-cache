@@ -13,7 +13,6 @@ import com.appleframework.cache.jedis.factory.PoolFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
-@SuppressWarnings("deprecation")
 public class SpringCacheOperationHset implements BaseCacheOperation {
 
 	private static Logger logger = LoggerFactory.getLogger(SpringCacheOperationHset.class);
@@ -50,8 +49,6 @@ public class SpringCacheOperationHset implements BaseCacheOperation {
 			}
 		} catch (Exception e) {
 			logger.warn("Cache Error : ", e);
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 		return object;
 	}
@@ -68,8 +65,6 @@ public class SpringCacheOperationHset implements BaseCacheOperation {
 				jedis.expire(byteKey, expireTime * 2);
 		} catch (Exception e) {
 			logger.warn("Cache Error : ", e);
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 	
@@ -87,8 +82,6 @@ public class SpringCacheOperationHset implements BaseCacheOperation {
 				jedis.expire(byteKey, expireTime * 2);
 		} catch (Exception e) {
 			logger.warn("Cache Error : ", e);
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -99,8 +92,6 @@ public class SpringCacheOperationHset implements BaseCacheOperation {
 			jedis.del(getNameKey());
 		} catch (Exception e) {
 			logger.warn("Cache Error : ", e);
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 

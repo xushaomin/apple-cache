@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.appleframework.cache</groupId>
 		<artifactId>apple-cache</artifactId>
-		<version>0.4.4.RELEASE</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>apple-cache-starter</artifactId>
 	<name>apple-cache-starter</name>
@@ -49,7 +49,6 @@
 	</dependencyManagement>
 
 	<modules>
-		<module>apple-cache-starter-ehcache3</module>
-		<module>apple-cache-starter-codis</module>
+		<module>apple-cache-starter-ehcache</module>
 	</modules>
 </project>

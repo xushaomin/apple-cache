@@ -3,8 +3,6 @@ package com.appleframework.cache.jedis.utils;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-
 import com.appleframework.cache.core.utils.ReflectionUtility;
 
 public class ObjectMapUtil {
@@ -24,11 +22,9 @@ public class ObjectMapUtil {
 				continue;
 			}
 			Class<?> typeClz = field.getType();
-			if (StringUtils.isNotEmpty(value)) {
+			if (value != null) {
 				Object valueObject = ClassObjectUtil.getObject(typeClz, value);
-				if(null != valueObject) {
-					ReflectionUtility.invokeSetterMethod(object, name, valueObject);
-				}
+				ReflectionUtility.invokeSetterMethod(object, name, valueObject);
 			}
 		}
 		return object;

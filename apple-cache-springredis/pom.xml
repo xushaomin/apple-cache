@@ -6,14 +6,14 @@
 	<parent>
 		<artifactId>apple-cache</artifactId>
 		<groupId>com.appleframework.cache</groupId>
-		<version>0.4.4.RELEASE</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>apple-cache-springredis</artifactId>
 	<name>apple-cache-springredis</name>
 	<url>http://mvnrepo.appleframework.com</url>
 	
 	<properties>
-		<boot.version>2.2.1.RELEASE</boot.version>
+		<springdata.redis.version>2.4.2</springdata.redis.version>
 	</properties>
 		
 	<dependencies>
@@ -42,10 +42,9 @@
 		</dependency>
 		
 		<dependency>
-       		<groupId>org.springframework.boot</groupId>
-       		<artifactId>spring-boot-starter-data-redis</artifactId>
-       		<version>${boot.version}</version>
-			<scope>provided</scope>
+  			<groupId>org.springframework.data</groupId>
+  			<artifactId>spring-data-redis</artifactId>
+  			<version>${springdata.redis.version}</version>
 		</dependency>
 
 		<dependency>

@@ -21,7 +21,6 @@ public class RedisSpringTest9 {
 	@Resource
 	private PoolFactory poolFactory;
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testAddOpinion1() {
 		Jedis jedis = poolFactory.getWritePool().getResource();
@@ -39,9 +38,7 @@ public class RedisSpringTest9 {
 			System.out.println("555555555:" + jedis.zrevrange(key, 0, 2));
 		} catch (Exception e) {
 		} finally {
-			if (null != jedis) {
-				poolFactory.getWritePool().returnResource(jedis);
-			}
+		
 		}
 	}
 

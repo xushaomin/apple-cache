@@ -18,7 +18,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Response;
 
-@SuppressWarnings({ "unchecked", "deprecation" })
+@SuppressWarnings({ "unchecked" })
 public class MasterSlaveJedisBucketCacheManager2 extends MasterSlaveJedisBucketCacheManager implements CacheManager2 {
 
 	private static Logger logger = LoggerFactory.getLogger(MasterSlaveJedisBucketCacheManager2.class);
@@ -54,8 +54,6 @@ public class MasterSlaveJedisBucketCacheManager2 extends MasterSlaveJedisBucketC
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -78,8 +76,6 @@ public class MasterSlaveJedisBucketCacheManager2 extends MasterSlaveJedisBucketC
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -102,8 +98,6 @@ public class MasterSlaveJedisBucketCacheManager2 extends MasterSlaveJedisBucketC
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	}
 
@@ -126,8 +120,6 @@ public class MasterSlaveJedisBucketCacheManager2 extends MasterSlaveJedisBucketC
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
-		} finally {
-			jedisPool.returnResource(jedis);
 		}
 	
 	}

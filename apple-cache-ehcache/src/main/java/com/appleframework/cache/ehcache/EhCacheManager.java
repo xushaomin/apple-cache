@@ -1,29 +1,36 @@
 package com.appleframework.cache.ehcache;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.appleframework.cache.core.CacheException;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
+import com.appleframework.cache.ehcache.config.EhCacheConfiguration;
+import com.appleframework.cache.ehcache.config.EhCacheProperties;
+import com.appleframework.cache.ehcache.utils.EhCacheConfigurationUtil;
+import com.appleframework.cache.ehcache.utils.EhCacheExpiryUtil;
 
 @SuppressWarnings("unchecked")
 public class EhCacheManager implements com.appleframework.cache.core.CacheManager {
 
 	private static Logger logger = LoggerFactory.getLogger(EhCacheManager.class);
-	
+
+    private volatile Cache<String, Serializable> cache;  
+
 	private String name = "default";
-	
+
 	private CacheManager ehcacheManager;
-		
+
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -31,21 +38,41 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 	public void setEhcacheManager(CacheManager ehcacheManager) {
 		this.ehcacheManager = ehcacheManager;
 	}
-	
-	public Cache getEhCache() {
-		Cache cache = ehcacheManager.getCache(name);
-		if(null == cache) {
+
+	public Cache<String, Serializable> getEhCache() {
+		if (cache == null) {
 			synchronized (Cache.class) {
-				ehcacheManager.addCache(name);
+				if (cache == null) {
+					initCache();
+				}
 			}
-			cache = ehcacheManager.getCache(name);
 		}
 		return cache;
 	}
-
+	
+	private void initCache() {
+		EhCacheProperties properties = null;
+		Map<String, EhCacheProperties> cacheTemplate = EhCacheConfiguration.getProperties();
+		if(null != cacheTemplate.get(name) ) {
+			properties = cacheTemplate.get(name);
+		}
+		
+		cache = ehcacheManager.getCache(name, String.class, Serializable.class);
+		if (null == cache) {
+			try {
+				CacheConfigurationBuilder<String, Serializable> configuration 
+					= EhCacheConfigurationUtil.initCacheConfiguration(properties);
+				cache = ehcacheManager.createCache(name, configuration);
+			} catch (IllegalArgumentException e) {
+				logger.warn("the cache name " + name + " is exist !");
+				cache = ehcacheManager.getCache(name, String.class, Serializable.class);
+			}
+		}
+	}
+	
 	public void clear() throws CacheException {
 		try {
-			getEhCache().removeAll();
+			getEhCache().clear();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
@@ -53,28 +80,17 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 
 	public Object get(String key) throws CacheException {
 		try {
-			Object value = null;
-			Element element = getEhCache().get(key);
-			if(null != element) {
-				value = element.getObjectValue();
-			}
-			return value;
+			return getEhCache().get(key);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
 		}
-		
 	}
 
 	@Override
 	public <T> T get(String key, Class<T> clazz) throws CacheException {
 		try {
-			T value = null;
-			Element element = getEhCache().get(key);
-			if(null != element) {
-				value = (T)element.getObjectValue();
-			}			
-			return value;
+			return (T) getEhCache().get(key);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
@@ -90,34 +106,30 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 		}
 		return false;
 	}
+	
+	public void expire(String key, int expireTime) throws CacheException {
+		try {
+			EhCacheExpiryUtil.setExpiry(key, expireTime);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
 
 	public void set(String key, Object value) throws CacheException {
 		if (null != value) {
 			try {
-				Element element = new Element(key, value);
-				getEhCache().put(element);
+				getEhCache().put(key, (Serializable) value);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}
-		}
-	}
-	
-	public void expire(String key, int expireTime) throws CacheException {
-		try {
-			Element element = getEhCache().get(key);
-			element.setTimeToIdle(expireTime);
-			element.setTimeToLive(expireTime);
-			getEhCache().put(element);
-		} catch (Exception e) {
-			logger.error(e.getMessage());
 		}
 	}
 
 	public void set(String key, Object value, int expireTime) throws CacheException {
 		if (null != value) {
 			try {
-				Element element = new Element(key, value, expireTime, expireTime);
-				getEhCache().put(element);
+				EhCacheExpiryUtil.setExpiry(key, expireTime);
+				getEhCache().put(key, (Serializable) value);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}
@@ -128,13 +140,12 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 	public List<Object> getList(List<String> keyList) throws CacheException {
 		try {
 			List<Object> list = new ArrayList<Object>();
-			Map<Object, Element> map = this.getEhCache().getAll(keyList);
+			Map<String, Object> map = this.getMap(keyList);
 			for (String key : keyList) {
-				Element element = map.get(key);
-				if(null != element) {
-					list.add(element.getObjectValue());
-				}
-				else {
+				Object value = map.get(key);
+				if (null != value) {
+					list.add(value);
+				} else {
 					list.add(null);
 				}
 			}
@@ -154,13 +165,12 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 	public <T> List<T> getList(Class<T> clazz, List<String> keyList) throws CacheException {
 		try {
 			List<T> list = new ArrayList<T>();
-			Map<Object, Element> map = this.getEhCache().getAll(keyList);
+			Map<String, T> map = this.getMap(clazz, keyList);
 			for (String key : keyList) {
-				Element element = map.get(key);
-				if(null != element) {
-					list.add((T)element.getObjectValue());
-				}
-				else {
+				Object value = map.get(key);
+				if (null != value) {
+					list.add((T) value);
+				} else {
 					list.add(null);
 				}
 			}
@@ -173,39 +183,16 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 
 	@Override
 	public <T> List<T> getList(Class<T> clazz, String... keys) throws CacheException {
-		try {
-			List<T> list = new ArrayList<T>();
-			Cache cache = this.getEhCache();
-			for (String key : keys) {
-				Element element = cache.get(key);
-				if(null != element) {
-					list.add((T)element.getObjectValue());
-				}
-				else {
-					list.add(null);
-				}
-			}
-			return list;
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			throw new CacheException(e.getMessage());
-		}
+		return this.getList(clazz, Arrays.asList(keys));
 	}
 
 	@Override
+	@SuppressWarnings("rawtypes")
 	public Map<String, Object> getMap(List<String> keyList) throws CacheException {
 		try {
-			Map<String, Object> map = new HashMap<String, Object>();
-			Map<Object, Element> cacheMap = this.getEhCache().getAll(keyList);
-			for (String key : keyList) {
-				Element element = cacheMap.get(key);
-				if(null != element) {
-					map.put(key, element.getObjectValue());
-				}
-				else {
-					map.put(key, null);
-				}
-			}
+			Set<String> keys = new HashSet<String>();
+			keys.addAll(keyList);
+			Map map = this.getEhCache().getAll(keys);
 			return map;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -221,18 +208,9 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 	@Override
 	public <T> Map<String, T> getMap(Class<T> clazz, List<String> keyList) throws CacheException {
 		try {
-			Map<String, T> map = new HashMap<String, T>();
-			Map<Object, Element> cacheMap = this.getEhCache().getAll(keyList);
-			for (String key : keyList) {
-				Element element = cacheMap.get(key);
-				if(null != element) {
-					map.put(key, (T)element.getObjectValue());
-				}
-				else {
-					map.put(key, null);
-				}
-			}
-			return map;
+			Set<String> keys = new HashSet<String>();
+			keys.addAll(keyList);
+			return (Map<String, T>) this.getEhCache().getAll(keys);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new CacheException(e.getMessage());
@@ -243,5 +221,5 @@ public class EhCacheManager implements com.appleframework.cache.core.CacheManage
 	public <T> Map<String, T> getMap(Class<T> clazz, String... keys) throws CacheException {
 		return this.getMap(clazz, Arrays.asList(keys));
 	}
-	
+
 }

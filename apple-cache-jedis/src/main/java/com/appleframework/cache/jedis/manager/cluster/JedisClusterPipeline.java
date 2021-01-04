@@ -27,8 +27,8 @@ import redis.clients.jedis.JedisSlotBasedConnectionHandler;
 import redis.clients.jedis.PipelineBase;
 import redis.clients.jedis.exceptions.JedisMovedDataException;
 import redis.clients.jedis.exceptions.JedisRedirectionException;
-import redis.clients.util.JedisClusterCRC16;
-import redis.clients.util.SafeEncoder;
+import redis.clients.jedis.util.JedisClusterCRC16;
+import redis.clients.jedis.util.SafeEncoder;
 
 /**
  * 在集群模式下提供批量操作的功能。 <br/>
@@ -161,7 +161,7 @@ public class JedisClusterPipeline extends PipelineBase implements Closeable {
 
     private void flushCachedData(Jedis jedis) {
         try {
-            jedis.getClient().getAll();
+            jedis.getClient().flushDB();;
         } catch (RuntimeException ex) {
         }
     }
