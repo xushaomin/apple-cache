@@ -53,9 +53,6 @@ public class JedisClusterFactory {
     	for (RedisNode redisNode : redisServers) {
     		hostAndPorts.add(new HostAndPort(redisNode.host, redisNode.port));
 		}
-        if (StringUtils.isNotEmpty(getPassword())) {
-            throw new IllegalArgumentException("Jedis does not support password protected Redis Cluster configurations!");
-        }
         if (StringUtils.isNotEmpty(password)) {
             return new JedisCluster(hostAndPorts, timeout, timeout, maxAttempts, password, poolConfig);
         }
