@@ -14,7 +14,7 @@
 	<url>http://maven.apache.org</url>
 	<packaging>pom</packaging>
 	<properties>
-		<boot.version>2.2.1.RELEASE</boot.version>
+		<boot.version>2.5.12</boot.version>
 	</properties>
 
 	<dependencyManagement>
